@@ -1,11 +1,10 @@
 import os
 import json
+import asyncio
 from agents.brain.reasoner import ReasoningEngine
 from core.memory import shared_memory
 
 def run_tests():
-    # Safety chec
-
     reasoner = ReasoningEngine()
     incident_id = "INC-LLM-001"
 
@@ -26,8 +25,8 @@ def run_tests():
     # Fetch context (will be empty for Round 1)
     memory_context = shared_memory.get_reasoner_context(incident_id)
     
-    print("Generating hypothesis via Gemini 3.5 Flash...")
-    hypothesis = reasoner.generate_hypothesis(incident_id, active_alerts, memory_context)
+    print("Generating hypothesis via Reasoner...")
+    hypothesis = reasoner.generate_hypothesis_sync(incident_id, active_alerts, memory_context)
     
     print("\n--- LLM GENERATED HYPOTHESIS BROADCAST ---")
     print(json.dumps(hypothesis, indent=2))
@@ -36,6 +35,9 @@ def run_tests():
     assert "SW_HOSTEL_01" in hypothesis["target_devices"], "Failed to extract target devices"
 
     print("\n=== GEMINI REASONER TEST PASSED ===")
+
+def test_reasoner():
+    run_tests()
 
 if __name__ == "__main__":
     run_tests()

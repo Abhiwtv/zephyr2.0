@@ -64,5 +64,8 @@ def run_fuzzy_tests():
                 for ev in alert["evidence"]:
                     print(f"  -> {ev['metric']}: {ev['value']} | {ev['interpretation']}")
 
+def test_fuzzy():
+    run_fuzzy_tests()
+
 if __name__ == "__main__":
     run_fuzzy_tests()

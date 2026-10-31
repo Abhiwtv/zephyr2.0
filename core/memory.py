@@ -10,7 +10,7 @@ class IncidentMemory:
     def _init_incident(self, incident_id):
         # Internal helper: lock is acquired by the caller
         if incident_id not in self.incidents:
-            self.incidents[incident_id] = {"rounds": {}}
+            self.incidents[incident_id] = {"rounds": {}, "feedback": []}
 
     def record_hypothesis(self, incident_id, round_num, proposed_cause):
         with self._lock:               # <-- LOCK
@@ -20,7 +20,7 @@ class IncidentMemory:
             else:
                 self.incidents[incident_id]["rounds"][round_num]["hypothesis"] = proposed_cause
 
-    def record_vote(self, incident_id, round_num, agent_id, vote, reason, alternative=None, question=None):
+    def record_vote(self, incident_id, round_num, agent_id, vote, reason, alternative=None, question=None, pivot_hint=None):
         with self._lock:               # <-- LOCK
             self._init_incident(incident_id)
             if round_num not in self.incidents[incident_id]["rounds"]:
@@ -30,8 +30,16 @@ class IncidentMemory:
                 "vote": vote,
                 "reason": reason,
                 "alternative": alternative,
-                "question": question
+                "question": question,
+                "pivot_hint": pivot_hint
             }
+
+    def add_failed_round(self, incident_id, proposed_cause, feedback):
+        with self._lock:
+            self._init_incident(incident_id)
+            if "feedback" not in self.incidents[incident_id]:
+                self.incidents[incident_id]["feedback"] = []
+            self.incidents[incident_id]["feedback"].append(feedback)
 
     def get_reasoner_context(self, incident_id):
         """Builds a strict text summary of past rounds to inject into the Brain LLM prompt."""
@@ -50,13 +58,21 @@ class IncidentMemory:
                 
                 for agent, v_data in r_data["votes"].items():
                     context += f"- {agent} voted {v_data['vote']}. Reason: {v_data['reason']}\n"
+                    if v_data.get('pivot_hint'):
+                        context += f"  CRITICAL PIVOT HINT: {v_data['pivot_hint']}\n"
                     if v_data.get('alternative'):
                         context += f"  Suggested Alternative: {v_data['alternative']}\n"
                     if v_data.get('question'):
                         context += f"  Targeted Question from Agent: {v_data['question']}\n"
                 context += "\n"
+
+            # Check if any custom failed round feedback was recorded
+            if "feedback" in self.incidents[incident_id] and self.incidents[incident_id]["feedback"]:
+                context += "FEEDBACK FROM FAILED ROUNDS:\n"
+                for fb in self.incidents[incident_id]["feedback"]:
+                    context += f"{fb}\n"
                 
-            context += "INSTRUCTION: You must NOT propose a hypothesis that was rejected in previous rounds. Use the Agent Feedback AND answer any Targeted Questions to formulate a precise new hypothesis."
+            context += "INSTRUCTION: You must NOT propose a hypothesis that was rejected in previous rounds. Use the Agent Feedback AND answer any Targeted Questions or CRITICAL PIVOT HINTS to formulate a precise new hypothesis."
             return context
     
     def get_voter_context(self, incident_id, agent_id):

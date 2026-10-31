@@ -40,5 +40,8 @@ def run_tests():
 
     print("\n=== GEMINI VOTER TEST PASSED ===")
 
+def test_llm_voter():
+    run_tests()
+
 if __name__ == "__main__":
     run_tests()

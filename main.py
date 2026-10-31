@@ -1,6 +1,7 @@
 import asyncio
 import json
 import os
+import sys
 from core.shared_state import global_state
 from core.memory import shared_memory
 
@@ -8,10 +9,10 @@ from agents.brain.reasoner import ReasoningEngine
 from agents.brain.iterator import AsyncConsensusIterator
 from agents.voters.llm_voter import LLMDomainVoter
 
-async def run_full_system():
+def run_full_system_sync():
     print("=== INITIALIZING NETCOOP AI MULTI-AGENT SYSTEM ===\n")
     
-    # 1. Initialize the 3 LLM Voters with distinct, greedy personas
+    # 1. Initialize the 3 LLM Voters with distinct personas
     infra_voter = LLMDomainVoter(
         agent_id="infrastructure_agent",
         domain_expertise="Layer 1/2 physical hardware, cpu_utilization_pct, interface_errors, and queue_drops.",
@@ -58,6 +59,9 @@ async def run_full_system():
     # Simulate the initial trigger alert
     initial_alerts = [{
         "device_id": target_device,
+        "source": "traffic",
+        "domain": "traffic",
+        "anomaly_score": 3.0,
         "alert_category": "anomaly",
         "evidence": [
             {"metric": "link_utilization_pct", "value": 99.0, "interpretation": "Severe link saturation"},
@@ -69,12 +73,15 @@ async def run_full_system():
     print("=== STARTING DIAGNOSTIC LOOP ===\n")
     incident_id = "INC-HACKATHON-FINAL"
     
-    # Execute the async loop
-    final_report = await iterator.execute_voting_loop(incident_id, initial_alerts)
+    # Execute the voting loop
+    final_report = iterator.execute_voting_loop_sync(incident_id, initial_alerts)
 
     print("\n=== FINAL DIAGNOSTIC REPORT ===")
     print(json.dumps(final_report, indent=2))
+    return final_report
+
+async def run_full_system():
+    return run_full_system_sync()
 
 if __name__ == "__main__":
-    # Ensure API key is present
-        asyncio.run(run_full_system())
+    run_full_system_sync()

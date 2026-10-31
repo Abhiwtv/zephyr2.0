@@ -5,6 +5,11 @@ class AgentVoteSchema(BaseModel):
     """Strict schema definition for agent inter-communication"""
     vote: str = Field(pattern="^(APPROVE|REJECT|ABSTAIN)$", description="Must be an exact match")
     reason: str = Field(min_length=5, description="Agent must provide a justification")
+    # THE UPGRADE: A specific channel for constructive feedback
+    pivot_hint: Optional[str] = Field(
+        default=None, 
+        description="Mandatory if voting REJECT. Suggests a new direction for the Brain."
+    )
     suggested_alternative: Optional[str] = None
     supporting_evidence: List[Dict[str, Any]] = []
 
@@ -29,6 +34,7 @@ class CoordinationMiddleware:
             return {
                 "vote": "ABSTAIN",
                 "reason": "Middleware intercept: Agent generated malformed JSON schema.",
+                "pivot_hint": None,
                 "suggested_alternative": None,
                 "supporting_evidence": []
             }

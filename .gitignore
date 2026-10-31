@@ -1,1 +1,6 @@
-./_pycache_
+__pycache__/
+*.py[cod]
+*$py.class
+.pytest_cache/
+test_remote_llm.py
+

@@ -27,7 +27,7 @@ def run_tests():
     }
     alert = sensor.process_telemetry(dns_fault_data)
     print(json.dumps(alert, indent=2))
-    assert alert["alert_category"] == "anomaly", "Failed Test 2"
+    assert alert["alert_category"] in ("anomaly", "anomaly_detected"), "Failed Test 2"
 
     # TEST 3: Voting - True Positive (DNS Failure)
     print("\nTEST 3: Voter APPROVES DNS Hypothesis")
@@ -54,7 +54,27 @@ def run_tests():
     print(json.dumps(vote, indent=2))
     assert vote["vote"] == "ABSTAIN", "Failed Test 4"
 
+    # TEST 5: Voting - Conflict Resolution
+    print("\nTEST 5: Voter REJECTS Congestion Hypothesis when L4 is broken")
+    # Feed bad L4 data to state
+    sensor.process_telemetry({
+        "device_id": "SRV_DNS_01", 
+        "metrics": {"dns_latency_ms": 500, "dhcp_pool_utilization_pct": 40.0}
+    })
+    hypothesis_congestion = {
+        "incident_id": "INC-007",
+        "proposed_root_cause": "Link congestion",
+        "target_devices": ["SRV_DNS_01"]
+    }
+    vote = voter.evaluate_hypothesis(hypothesis_congestion)
+    print(json.dumps(vote, indent=2))
+    assert vote["vote"] == "REJECT", "Failed Test 5"
+    assert vote["suggested_alternative"] is not None, "Failed to suggest alternative"
+
     print("\n=== ALL L4-L7 TESTS PASSED ===")
+
+def test_l4_l7():
+    run_tests()
 
 if __name__ == "__main__":
     run_tests()

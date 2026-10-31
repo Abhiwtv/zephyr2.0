@@ -66,5 +66,8 @@ def run_integration_test():
     assert "limitations" in final_report, "Report missing limitations"
     assert any("Consensus reached" in x for x in final_report["limitations"]), "Failed to reach consensus"
 
+def test_brain_integration():
+    run_integration_test()
+
 if __name__ == "__main__":
     run_integration_test()

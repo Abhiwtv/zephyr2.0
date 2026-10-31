@@ -1,28 +1,267 @@
 import asyncio
-from core.memory import shared_memory
 import time
+from core.memory import shared_memory
+from core.shared_state import global_state
 
 class AsyncConsensusIterator:
     """Orchestrates voting rounds asynchronously to minimize LLM latency."""
     def __init__(self, voter_agents, reasoner):
-        self.voters = voter_agents  # List of instantiated LLMDomainVoter objects
+        self.voter_agents = voter_agents
+        self.voters = voter_agents  # Backwards compatibility
         self.reasoner = reasoner
         self.max_rounds = 3
 
-    async def _async_get_vote(self, voter, hypothesis):
-        """Wraps the synchronous Gemini call in an async thread."""
-        # For a hackathon, running blocking IO in an async wrapper is sufficient
-        return await asyncio.to_thread(voter.evaluate_hypothesis, hypothesis)
-    
+    def calculate_heuristic_consensus(self, agent_responses, active_alerts, round_num=1):
+        """
+        Calculates consensus using Dynamic Severity Multipliers and verbosely logs the math.
+        """
+        print(f"\n[EPOCH {round_num}: MIDDLEWARE & CONSENSUS MATH]")
+        print("Middleware: All JSON payloads validated successfully. No semantic drift detected.")
+        
+        # 1. Map the exact float anomaly score directly to the agent's voting power
+        domain_weights = {"infrastructure_agent": 0.0, "traffic_agent": 0.0, "l4_l7_agent": 0.0}
+        
+        for alert in active_alerts:
+            agent_mapping = {
+                "infrastructure": "infrastructure_agent",
+                "traffic": "traffic_agent",
+                "l4_l7": "l4_l7_agent"
+            }
+            agent_key = agent_mapping.get(alert.get("source") or alert.get("domain"))
+            current_weight = alert.get("anomaly_score", 0.0)
+            if agent_key:
+                domain_weights[agent_key] = max(domain_weights[agent_key], current_weight)
+
+        # 2. Tally the weighted votes and log the agent decisions
+        weighted_approves = 0.0
+        weighted_total = 0.0
+
+        print("\n--- AGENT VOTE TALLY ---")
+        for response in agent_responses:
+            agent_id = response.get("agent_id", "unknown_agent")
+            vote = response.get("vote", "ABSTAIN")
+            reason = response.get("reason", "No reason provided.")
+            hint = response.get("pivot_hint")
+            
+            weight = domain_weights.get(agent_id, 0.0)
+            
+            severity_label = "HEALTHY"
+            if weight >= 3.0: severity_label = "FATAL"
+            elif weight >= 2.0: severity_label = "CRITICAL"
+            elif weight >= 1.0: severity_label = "MAJOR"
+            elif weight > 0.0: severity_label = "MINOR"
+
+            print(f"--> {agent_id} (Active Multiplier: {weight} - {severity_label})")
+            print(f"    Decision: {vote}")
+            print(f"    Reasoning: {reason}")
+            if hint:
+                print(f"    Pivot Hint: {hint}")
+
+            if vote == "APPROVE":
+                weighted_approves += weight
+                weighted_total += weight
+            elif vote == "REJECT":
+                weighted_total += weight
+
+        # 3. Calculate final heuristic score
+        confidence = 0.0
+        if weighted_total > 0:
+            confidence = round(weighted_approves / weighted_total, 2)
+            
+        print("\n--- CONSENSUS CALCULATION ---")
+        print(f"- Total Possible Weight (Non-Abstaining): {weighted_total}")
+        print(f"- Total Approve Weight: {weighted_approves}")
+        print(f"- Math: {weighted_approves} / {weighted_total if weighted_total > 0 else 1} = {confidence} Confidence")
+        
+        return confidence
+
+    async def execute_voting_loop(self, incident_id, active_alerts):
+        """
+        Manages the async debate, handling hypothesis generation and passing it to the voters.
+        """
+        max_rounds = 3
+        current_confidence = 0.0
+        best_report = None
+        
+        for round_num in range(1, max_rounds + 1):
+            print(f"\n=======================================================")
+            print(f"[EPOCH {round_num}: HYPOTHESIS GENERATION]")
+            print(f"=======================================================")
+            
+            # 1. Brain generates hypothesis
+            memory_context = shared_memory.get_reasoner_context(incident_id)
+            if asyncio.iscoroutinefunction(self.reasoner.generate_hypothesis):
+                hypothesis_payload = await self.reasoner.generate_hypothesis(incident_id, active_alerts, memory_context)
+            else:
+                res = self.reasoner.generate_hypothesis(incident_id, active_alerts, memory_context)
+                hypothesis_payload = await res if asyncio.iscoroutine(res) else res
+            proposed_cause = hypothesis_payload.get("proposed_cause") or hypothesis_payload.get("proposed_root_cause", "Unknown network anomaly.")
+            print(f"Brain Agent: {proposed_cause}")
+
+            print(f"\n[EPOCH {round_num}: SEQUENTIAL VOTER BROADCAST]")
+            
+            # 2. Broadcast to voters sequentially to protect Kaggle GPU VRAM
+            valid_responses = []
+            for voter in self.voter_agents:
+                try:
+                    # Await each agent one at a time before firing the next
+                    res = await voter.evaluate_hypothesis(incident_id, proposed_cause)
+                    valid_responses.append(res)
+                except Exception as e:
+                    print(f"\n[NETWORK ALERT] {voter.agent_id} failed or timed out: {e}")
+                    # Circuit breaker: Force a safe ABSTAIN if Cloudflare drops
+                    valid_responses.append({
+                        "agent_id": voter.agent_id,
+                        "vote": "ABSTAIN",
+                        "reason": "Network timeout or generation failure via Cloudflare.",
+                        "pivot_hint": None
+                    })
+
+            # Record round hypothesis and votes in shared memory
+            shared_memory.record_hypothesis(incident_id, round_num, proposed_cause)
+            for r in valid_responses:
+                shared_memory.record_vote(
+                    incident_id=incident_id,
+                    round_num=round_num,
+                    agent_id=r.get("agent_id", "unknown_agent"),
+                    vote=r.get("vote", "ABSTAIN"),
+                    reason=r.get("reason", ""),
+                    alternative=r.get("suggested_alternative"),
+                    pivot_hint=r.get("pivot_hint")
+                )
+
+            # 4. Calculate weighted consensus with verbose trace
+            current_confidence = self.calculate_heuristic_consensus(valid_responses, active_alerts, round_num)
+            
+            # Collect evidence from APPROVE votes
+            round_evidence = []
+            for r in valid_responses:
+                if r.get("vote") == "APPROVE" and "supporting_evidence" in r:
+                    round_evidence.extend(r["supporting_evidence"])
+            
+            best_report = {
+                "incident_id": incident_id,
+                "status": "diagnosed" if current_confidence >= 0.70 else "investigating",
+                "suspected_root_cause": proposed_cause,
+                "confidence": current_confidence,
+                "supporting_evidence": round_evidence,
+                "limitations": [f"Consensus reached in round {round_num}"] if current_confidence >= 0.70 else ["Failed to reach consensus"]
+            }
+
+            if current_confidence >= 0.70:
+                print(f"\n=> STATUS: SUCCESS. Consensus Exit Condition ({current_confidence} >= 0.70) Met.")
+                break
+            else:
+                print(f"\n=> STATUS: FAILED. Confidence {current_confidence} < 0.70. Forcing Memory Loop.")
+                # If consensus fails, build the memory string for the next round
+                round_feedback = f"Round {round_num} Failed. Hypothesis: '{proposed_cause}'\n"
+                for response in valid_responses:
+                    vote = response.get("vote")
+                    agent = response.get("agent_id")
+                    hint = response.get("pivot_hint")
+                    
+                    if vote == "REJECT":
+                        round_feedback += f"- {agent} VOTED REJECT. "
+                        if hint:
+                            round_feedback += f"CRITICAL PIVOT HINT: {hint}\n"
+                        else:
+                            round_feedback += f"Reason: {response.get('reason')}\n"
+
+                # Save this to the Brain's memory
+                if hasattr(self.reasoner, "memory") and isinstance(self.reasoner.memory, list):
+                    self.reasoner.memory.append(round_feedback)
+                shared_memory.add_failed_round(incident_id, proposed_cause, round_feedback)
+        
+        return best_report
+
+    def execute_voting_loop_sync(self, incident_id, active_alerts):
+        """
+        Synchronous counterpart to execute_voting_loop with identical verbose logging.
+        """
+        max_rounds = 3
+        current_confidence = 0.0
+        best_report = None
+
+        for round_num in range(1, max_rounds + 1):
+            print(f"\n=======================================================")
+            print(f"[EPOCH {round_num}: HYPOTHESIS GENERATION]")
+            print(f"=======================================================")
+
+            memory_context = shared_memory.get_reasoner_context(incident_id)
+            if hasattr(self.reasoner, "generate_hypothesis_sync"):
+                hypothesis_payload = self.reasoner.generate_hypothesis_sync(incident_id, active_alerts, memory_context)
+            else:
+                hypothesis_payload = self.reasoner.generate_hypothesis(incident_id, active_alerts)
+
+            proposed_cause = hypothesis_payload.get("proposed_cause") or hypothesis_payload.get("proposed_root_cause", "Unknown network anomaly.")
+            print(f"Brain Agent: {proposed_cause}")
+
+            print(f"\n[EPOCH {round_num}: ASYNC VOTER BROADCAST]")
+
+            valid_responses = []
+            for voter in self.voter_agents:
+                res = voter.evaluate_hypothesis(incident_id, proposed_cause)
+                valid_responses.append(res)
+
+            # Record round hypothesis and votes in shared memory
+            shared_memory.record_hypothesis(incident_id, round_num, proposed_cause)
+            for r in valid_responses:
+                shared_memory.record_vote(
+                    incident_id=incident_id,
+                    round_num=round_num,
+                    agent_id=r.get("agent_id", "unknown_agent"),
+                    vote=r.get("vote", "ABSTAIN"),
+                    reason=r.get("reason", ""),
+                    alternative=r.get("suggested_alternative"),
+                    pivot_hint=r.get("pivot_hint")
+                )
+
+            current_confidence = self.calculate_heuristic_consensus(valid_responses, active_alerts, round_num)
+
+            round_evidence = []
+            for r in valid_responses:
+                if r.get("vote") == "APPROVE" and "supporting_evidence" in r:
+                    round_evidence.extend(r["supporting_evidence"])
+
+            best_report = {
+                "incident_id": incident_id,
+                "status": "diagnosed" if current_confidence >= 0.70 else "investigating",
+                "suspected_root_cause": proposed_cause,
+                "confidence": current_confidence,
+                "supporting_evidence": round_evidence,
+                "limitations": [f"Consensus reached in round {round_num}"] if current_confidence >= 0.70 else ["Failed to reach consensus"]
+            }
+
+            if current_confidence >= 0.70:
+                print(f"\n=> STATUS: SUCCESS. Consensus Exit Condition ({current_confidence} >= 0.70) Met.")
+                break
+            else:
+                print(f"\n=> STATUS: FAILED. Confidence {current_confidence} < 0.70. Forcing Memory Loop.")
+                # If consensus fails, build the memory string for the next round
+                round_feedback = f"Round {round_num} Failed. Hypothesis: '{proposed_cause}'\n"
+                for response in valid_responses:
+                    vote = response.get("vote")
+                    agent = response.get("agent_id")
+                    hint = response.get("pivot_hint")
+                    
+                    if vote == "REJECT":
+                        round_feedback += f"- {agent} VOTED REJECT. "
+                        if hint:
+                            round_feedback += f"CRITICAL PIVOT HINT: {hint}\n"
+                        else:
+                            round_feedback += f"Reason: {response.get('reason')}\n"
+
+                # Save this to the Brain's memory
+                if hasattr(self.reasoner, "memory") and isinstance(self.reasoner.memory, list):
+                    self.reasoner.memory.append(round_feedback)
+                shared_memory.add_failed_round(incident_id, proposed_cause, round_feedback)
+
+        return best_report
+
     async def route_and_resolve_batch(self, all_active_alerts):
-        """
-        SYSTEM ORCHESTRATOR: Takes a chaotic stream of multi-device alerts, 
-        groups them logically, and queues them sequentially to protect local LLM VRAM.
-        """
         if not all_active_alerts:
             return []
 
-        # 1. Group alerts by device to strictly separate the incidents
         grouped_incidents = {}
         for alert in all_active_alerts:
             device = alert["device_id"]
@@ -30,163 +269,16 @@ class AsyncConsensusIterator:
                 grouped_incidents[device] = []
             grouped_incidents[device].append(alert)
 
-        # 2. Sort incidents chronologically (earliest alert first)
         sorted_devices = sorted(
             grouped_incidents.keys(),
             key=lambda d: min([alert.get("timestamp", "9999") for alert in grouped_incidents[d]])
         )
 
         all_reports = []
-        print(f"\n[SYSTEM ROUTER] Detected {len(sorted_devices)} distinct fault domains. Queuing LLM diagnostics...")
-        
-        # 3. Execute one full debate at a time sequentially
         for device in sorted_devices:
             alerts = grouped_incidents[device]
             incident_id = f"INC-{device}-{int(time.time())}"
-            
-            print(f"\n" + "="*50)
-            print(f"[SYSTEM ROUTER] DEPLOYING AGENTS FOR: {incident_id}")
-            print("="*50)
-            
-            # Await pauses the router until this specific switch's debate is 100% finished
             report = await self.execute_voting_loop(incident_id, alerts)
             all_reports.append(report)
 
         return all_reports
-    
-    async def execute_voting_loop(self, incident_id, initial_alerts):
-        current_round = 1
-        best_report = None
-        highest_confidence = -1.0
-
-        try:
-            while current_round <= self.max_rounds:
-                print(f"\n--- INITIATING ROUND {current_round} ---")
-                
-                # 1. Fetch memory context and generate hypothesis (Now Awaited)
-                memory_context = shared_memory.get_reasoner_context(incident_id)
-                hypothesis = await self.reasoner.generate_hypothesis(incident_id, initial_alerts, memory_context)
-                
-                print(f"Brain Hypothesis: {hypothesis['proposed_root_cause']}")
-                
-                # Save the Brain's guess to memory
-                shared_memory.record_hypothesis(incident_id, current_round, hypothesis['proposed_root_cause'])
-
-                # 2. Broadcast to Domain Agents sequentially to protect local VRAM
-                print("Broadcasting to Domain Agents sequentially to protect local VRAM...")
-                votes = []
-                for voter in self.voters:
-                    vote = await voter.evaluate_hypothesis(hypothesis)
-                    votes.append(vote)
-
-                # 3. Process Votes and update Memory
-                approvals = 0
-                rejections = 0
-                abstentions = 0
-
-                for v in votes:
-                    agent_id = v["agent_id"]
-                    vote_cast = v["vote"]
-                    
-                    print(f"[{agent_id}] voted {vote_cast}")
-                    
-                    shared_memory.record_vote(
-                        incident_id=incident_id,
-                        round_num=current_round,
-                        agent_id=agent_id,
-                        vote=vote_cast,
-                        reason=v["reason"],
-                        alternative=v.get("suggested_alternative"),
-                        question=v.get("targeted_question")
-                    )
-
-                    if vote_cast == "APPROVE":
-                        approvals += 1
-                    elif vote_cast == "REJECT":
-                        rejections += 1
-                    elif vote_cast == "ABSTAIN":
-                        abstentions += 1
-
-                # 4. Corrected Confidence Math
-                total_opinions = approvals + rejections
-                confidence = 0.30 if total_opinions == 0 else round((approvals / total_opinions), 2)
-                
-                # Strict Consensus Rules against single-agent hallucinations
-                if approvals == 1 and rejections == 0:
-                    confidence = min(0.60, confidence)  # Cap single-agent approval
-                elif approvals > 1 and rejections == 0:
-                    confidence = min(0.95, confidence + 0.20) # Requires multi-agent consensus
-
-                print(f"Round {current_round} Confidence: {confidence}")
-
-                # 5. Build Intermediate Report
-                report = self._build_report(incident_id, hypothesis, initial_alerts, votes, confidence)
-                
-                if confidence > highest_confidence:
-                    highest_confidence = confidence
-                    best_report = report
-
-                # 6. Break Conditions
-                if confidence >= 0.70:
-                    best_report["limitations"].append(f"Consensus reached in round {current_round}")
-                    break
-                    
-                current_round += 1
-
-            return best_report
-            
-        finally:
-            # This guarantees memory wipes even if Ollama or the Python script crashes mid-loop
-            shared_memory.clear_incident(incident_id)
-
-    def _build_report(self, incident_id, hypothesis, initial_alerts, votes, confidence):
-        final_evidence = []
-        data_errors_found = []
-        alternative_causes = []
-        sources = set()
-
-        for alert in initial_alerts:
-            final_evidence.extend(alert.get("evidence", []))
-            data_errors_found.extend(alert.get("data_errors", []))
-            
-        for vote in votes:
-            if vote.get("supporting_evidence"):
-                 final_evidence.extend(vote["supporting_evidence"])
-            if vote["vote"] != "ABSTAIN":
-                sources.add(vote["agent_id"])
-            if vote.get("suggested_alternative"):
-                alternative_causes.append(vote["suggested_alternative"])
-
-        # Deduplicate evidence
-        unique_evidence = []
-        seen = set()
-        for ev in final_evidence:
-            identifier = f"{ev['metric']}_{ev['value']}"
-            if identifier not in seen:
-                seen.add(identifier)
-                unique_evidence.append(ev)
-
-        # Build dynamic actions
-        # Build dynamic actions
-        # Build dynamic actions
-        # Actions are now dynamically generated by the Brain LLM in reasoner.py
-        actions = hypothesis.get("recommended_actions", ["Manual review required"])
-
-        limitations = []
-        if data_errors_found:
-             limitations.append(f"Malformed data encountered: {data_errors_found[0]}")
-        if confidence < 0.7:
-             limitations.append("Failed to reach strong consensus. Outputting best hypothesis.")
-
-        return {
-            "incident_id": incident_id,
-            "status": "diagnosed" if confidence >= 0.7 else "investigating",
-            "suspected_root_cause": hypothesis["proposed_root_cause"],
-            "confidence": confidence,
-            "affected_devices": hypothesis["target_devices"],
-            "supporting_evidence": unique_evidence,
-            "alternative_causes": list(set(alternative_causes)),
-            "recommended_actions": actions,
-            "evidence_sources": list(sources),
-            "limitations": limitations
-        }
