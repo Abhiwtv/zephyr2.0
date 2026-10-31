@@ -18,7 +18,7 @@ class LLMDomainVoter:
         self.api_url = "http://localhost:11434/api/generate"
         self.model_name = "qwen2.5:7b-instruct"
         
-    def evaluate_hypothesis(self, hypothesis_broadcast):
+    async def evaluate_hypothesis(self, hypothesis_broadcast):
         incident_id = hypothesis_broadcast.get("incident_id")
         target_devices = hypothesis_broadcast.get("target_devices", [])
         proposed_cause = hypothesis_broadcast.get("proposed_root_cause")
