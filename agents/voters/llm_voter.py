@@ -4,7 +4,7 @@ from google import genai
 from google.genai import types
 from core.shared_state import global_state
 from core.memory import shared_memory
-
+from core.middleware import CoordinationMiddleware
 import json
 import requests
 from core.shared_state import global_state
@@ -77,30 +77,35 @@ class LLMDomainVoter:
             print(f"[{self.agent_id}] Ollama Error: {e}")
             llm_result = {"vote": "ABSTAIN", "reason": f"Local LLM Failure: {e}"}
 
+        # Extract and format the raw results (your existing code)
         vote_cast = llm_result.get("vote", "ABSTAIN").upper()
         suggested_alt = llm_result.get("suggested_alternative")
         
-        # Scrub hallucinated filler text if the agent abstained or couldn't think of one
         if vote_cast == "ABSTAIN" or not suggested_alt or "none" in suggested_alt.lower():
             suggested_alt = None
 
         evidence = []
-        # ONLY append evidence if the agent agrees with the hypothesis
-        evidence = []
-        if vote_cast == "APPROVE": 
+        if vote_cast == "APPROVE":
             for device, metrics in local_telemetry.items():
                 for k, v in metrics.items():
                     if k == "domain_status":
                         continue
                     evidence.append({"metric": k, "value": v, "interpretation": f"Sourced by {self.agent_id}"})
 
+        # --- THE MIDDLEWARE INJECTION ---
+        raw_payload = {
+            "vote": vote_cast,
+            "reason": llm_result.get("reason", "No reason provided."),
+            "suggested_alternative": suggested_alt,
+            "supporting_evidence": evidence
+        }
+        
+        # The firewall sanitizes the payload before releasing it to the Iterator
+        sanitized_payload = CoordinationMiddleware.validate_agent_message(self.agent_id, raw_payload)
+
         return {
             "message_type": "hypothesis_vote",
             "incident_id": incident_id,
             "agent_id": self.agent_id,
-            "vote": vote_cast,
-            "reason": llm_result.get("reason", ""),
-            "supporting_evidence": evidence,
-            "suggested_alternative": suggested_alt,
-            "targeted_question": llm_result.get("targeted_question")
+            **sanitized_payload
         }
