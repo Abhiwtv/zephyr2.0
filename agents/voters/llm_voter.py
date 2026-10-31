@@ -8,8 +8,12 @@ from core.shared_state import global_state
 from core.memory import shared_memory
 from core.middleware import CoordinationMiddleware
 
-OLLAMA_BASE_URL = os.environ.get("OLLAMA_BASE_URL", "https://flux-epinions-gallery-proposition.trycloudflare.com").rstrip("/")
-DEFAULT_MODEL = os.environ.get("OLLAMA_MODEL", "qwen3:14b")
+OLLAMA_BASE_URL = os.environ.get(
+    "OLLAMA_BASE_URL", 
+    "https://corrections-nancy-compound-whose.trycloudflare.com"
+).rstrip("/")
+# Change this to match your Kaggle vLLM model argument
+DEFAULT_MODEL = os.environ.get("OLLAMA_MODEL", "qwen3-14b")
 
 _ONLINE_CACHE = {"timestamp": 0.0, "status": False}
 
@@ -32,27 +36,22 @@ def _is_ollama_online(base_url: str = None) -> bool:
     _ONLINE_CACHE["status"] = is_online
     return is_online
 
-def _send_http_post(url, payload, timeout=25):
-    """Sends JSON POST using httpx if available, fallback to urllib.request."""
-    try:
-        import httpx
-        r = httpx.post(url, json=payload, timeout=timeout)
+def _send_http_post(url, payload, timeout=12):
+    """Sends JSON POST using httpx to enforce strict Cloudflare network timeouts."""
+    import httpx
+    # 5 seconds to connect to Cloudflare, 12 seconds total for GPU to generate
+    limits = httpx.Timeout(timeout, connect=5.0)
+    with httpx.Client(timeout=limits) as client:
+        r = client.post(url, json=payload)
         r.raise_for_status()
         return r.json()
-    except Exception:
-        pass
-    
-    data = json.dumps(payload).encode("utf-8")
-    req = urllib.request.Request(url, data=data, headers={"Content-Type": "application/json"})
-    with urllib.request.urlopen(req, timeout=timeout) as resp:
-        return json.loads(resp.read().decode("utf-8"))
 
 class LLMDomainVoter:
     def __init__(self, agent_id, domain_expertise, monitored_metrics=None, api_url=None, model_name=None):
         self.agent_id = agent_id
         self.domain_expertise = domain_expertise
         self.monitored_metrics = monitored_metrics if monitored_metrics is not None else []
-        self.api_url = api_url or f"{OLLAMA_BASE_URL}/api/generate"
+        self.api_url = api_url or f"{OLLAMA_BASE_URL}/v1/chat/completions"
         self.model_name = model_name or DEFAULT_MODEL
         
     def evaluate_hypothesis(self, incident_or_payload, proposed_cause_param=None, target_devices_param=None):
@@ -87,56 +86,63 @@ class LLMDomainVoter:
 
         prompt = f"""
         You are the {self.agent_id} for a university network. Expertise: {self.domain_expertise}.
-        You are a highly skeptical, adversarial expert. You do NOT trust the Brain's hypothesis unless your local metrics mathematically prove it.
+        Evaluate if the Brain's hypothesis correctly identifies the root cause shown in your metrics.
         
-        CRITICAL INSTRUCTIONS FOR LOCAL LLM:
-        1. DO NOT be helpful or agreeable. 
-        2. DO NOT attempt to diagnose root causes outside your domain (e.g., Traffic agent must ignore physical cable hypotheses).
-        3. DO NOT vote ABSTAIN just because you are unsure. 
+        RULES:
+        1. If the hypothesis correctly identifies the core fault in your domain, vote APPROVE. Ignore extra descriptive words.
+        2. If the hypothesis blames YOUR domain, but your metrics are healthy, vote REJECT and provide a pivot_hint to another domain.
+        3. If the hypothesis blames a DIFFERENT domain, vote ABSTAIN. Do not reject just because you see secondary symptoms.
+        4. CASCADING FAILURE EXCEPTION: If the hypothesis describes a catastrophic physical or hardware failure (e.g., core switch breakdown), and your metrics show downstream service timeouts (like DNS latency or extreme packet loss), VOTE APPROVE. Your services are failing because the underlying hardware is dead.
         
-        STRICT VOTING LOGIC TREE:
-        - If the hypothesis describes symptoms that PERFECTLY MATCH your anomalous metrics -> Vote APPROVE.
-        - If your metrics are completely normal (e.g., 0 errors, low CPU) AND the hypothesis blames your domain -> Vote REJECT.
-        - If the hypothesis blames a DIFFERENT domain, but your metrics show secondary symptoms (e.g., hypothesis says 'Bad Cable', you see 'Latency') -> Vote REJECT. You only approve root causes, not secondary symptoms.
-        - ONLY vote ABSTAIN if your metrics are 100% healthy AND the hypothesis is completely unrelated to your domain.
+        EXAMPLES:
+        - Brain says "Hardware failure". You see 100% CPU. Output: {{"vote": "APPROVE", "reason": "My metrics show max CPU, confirming hardware fault.", "pivot_hint": null}}
+        - Brain says "Hardware failure". You see 10% CPU and 0 errors. Output: {{"vote": "REJECT", "reason": "Hardware metrics are normal.", "pivot_hint": "Traffic"}}
+        - Brain says "DNS failure". Your domain is Infrastructure. Output: {{"vote": "ABSTAIN", "reason": "DNS is outside my physical hardware domain.", "pivot_hint": null}}
+        
+        CRITICAL: Output ONLY valid JSON. Do not output <think> tags, do not explain your steps, and do not include markdown formatting outside the JSON block.
 
-        THE CONSTRUCTIVE VETO RULE:
-        If you vote REJECT, you MUST populate the "pivot_hint" field in your JSON output. 
-        Briefly state why your data proves the hypothesis is wrong, and explicitly tell the Brain which other domain (Infrastructure, Traffic, or L4_L7) it should pivot its focus to.
-        
-        OUTPUT FORMAT:
-        Return strictly JSON with keys: 
-        "vote" (APPROVE, REJECT, or ABSTAIN), 
-        "reason" (string), 
-        "pivot_hint" (string or null),
-        "supporting_evidence" (list)
+        OUTPUT FORMAT (Strict JSON):
+        {{
+            "vote": "APPROVE" | "REJECT" | "ABSTAIN",
+            "reason": "Explain your logic in 1 sentence.",
+            "pivot_hint": "String telling the Brain where to pivot, or null",
+            "supporting_evidence": []
+        }}
 
         INCIDENT: {incident_id}
         HYPOTHESIS: "{proposed_cause}"
         YOUR METRICS: {json.dumps(local_telemetry)}
         MEMORY: {memory_context}
         """
+        # OpenAI / vLLM strictly requires the 'messages' array and 'response_format'
         payload = {
             "model": self.model_name,
-            "prompt": prompt,
-            "format": "json",
-            "stream": False
+            "messages": [
+                {"role": "system", "content": "You are a deterministic logic agent. Output strictly valid JSON."},
+                {"role": "user", "content": prompt}
+            ],
+            "response_format": {"type": "json_object"},
+            "temperature": 0.0,
+            "max_tokens": 300,
+            "chat_template_kwargs": {"enable_thinking": False}  # Claude's vLLM optimization
         }
 
         llm_result = None
-        if _is_ollama_online(self.api_url.replace("/api/generate", "")):
-            try:
-                res_json = _send_http_post(self.api_url, payload, timeout=25)
-                raw_text = res_json.get("response", "{}")
-                raw_text = raw_text.strip()
-                if raw_text.startswith("```json"):
-                    raw_text = raw_text[7:]
-                if raw_text.endswith("```"):
-                    raw_text = raw_text[:-3]
-                llm_result = json.loads(raw_text.strip())
-            except Exception:
-                llm_result = None
-
+        try:
+            res_json = _send_http_post(self.api_url, payload, timeout=30)
+            raw_text = res_json.get("choices", [{}])[0].get("message", {}).get("content", "{}")
+            
+            # Robust JSON Extractor: Strips any markdown or stray text
+            import re
+            match = re.search(r'\{.*\}', raw_text, re.DOTALL)
+            if match:
+                llm_result = json.loads(match.group(0))
+            else:
+                llm_result = json.loads(raw_text)
+        except Exception as e:
+            print(f"[vLLM NETWORK ALERT] Voter generation failed: {e}")
+            llm_result = None
+        
         if llm_result is None:
             # Deterministic neuro-symbolic logic tree matching the exact prompt specification
             p_lower = proposed_cause.lower()

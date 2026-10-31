@@ -114,13 +114,27 @@ class AsyncConsensusIterator:
                     if asyncio.iscoroutine(task):
                         tasks.append(task)
                     else:
-                        async def _wrap(res=task):
-                            return res
+                        async def _wrap(res=task): return res
                         tasks.append(_wrap())
                     
-                raw_responses = await asyncio.gather(*tasks)
-                valid_responses = raw_responses 
+                raw_responses = await asyncio.gather(*tasks, return_exceptions=True)
+                
+                valid_responses = [] 
 
+                for idx, res in enumerate(raw_responses):
+                    if isinstance(res, Exception):
+                        agent_name = self.voter_agents[idx].agent_id
+                        print(f"[NETWORK ALERT] {agent_name} API timed out. Defaulting to ABSTAIN. Error: {res}")
+                        valid_responses.append({
+                            "agent_id": agent_name,
+                            "vote": "ABSTAIN",
+                            "reason": "vLLM Network Timeout or Cloudflare Drop.",
+                            "pivot_hint": None
+                        })
+                    else:
+                        valid_responses.append(res)
+
+            
                 # Record round hypothesis and votes in shared memory
                 shared_memory.record_hypothesis(incident_id, round_num, proposed_cause)
                 for r in valid_responses:
@@ -162,6 +176,15 @@ class AsyncConsensusIterator:
                     break
                 else:
                     print(f"\n=> STATUS: FAILED. Confidence {current_confidence} < 0.70. Forcing Memory Loop.")
+                    
+                    # 1. Map which agents actually have anomalous metrics
+                    anomalous_agents = set()
+                    for alert in active_alerts:
+                        agent_mapping = {"infrastructure": "infrastructure_agent", "traffic": "traffic_agent", "l4_l7": "l4_l7_agent"}
+                        key = agent_mapping.get(alert.get("source") or alert.get("domain"))
+                        if key: anomalous_agents.add(key)
+
+                    # 2. Build feedback, stripping hallucinated hints from healthy agents
                     round_feedback = f"Round {round_num} Failed. Hypothesis: '{proposed_cause}'\n"
                     for response in valid_responses:
                         vote = response.get("vote")
@@ -170,7 +193,8 @@ class AsyncConsensusIterator:
                         
                         if vote == "REJECT":
                             round_feedback += f"- {agent} VOTED REJECT. "
-                            if hint:
+                            # Only inject the pivot hint if this agent has active anomalies
+                            if hint and agent in anomalous_agents:
                                 round_feedback += f"CRITICAL PIVOT HINT: {hint}\n"
                             else:
                                 round_feedback += f"Reason: {response.get('reason')}\n"
@@ -258,6 +282,15 @@ class AsyncConsensusIterator:
                     break
                 else:
                     print(f"\n=> STATUS: FAILED. Confidence {current_confidence} < 0.70. Forcing Memory Loop.")
+                    
+                    # 1. Map which agents actually have anomalous metrics
+                    anomalous_agents = set()
+                    for alert in active_alerts:
+                        agent_mapping = {"infrastructure": "infrastructure_agent", "traffic": "traffic_agent", "l4_l7": "l4_l7_agent"}
+                        key = agent_mapping.get(alert.get("source") or alert.get("domain"))
+                        if key: anomalous_agents.add(key)
+
+                    # 2. Build feedback, stripping hallucinated hints from healthy agents
                     round_feedback = f"Round {round_num} Failed. Hypothesis: '{proposed_cause}'\n"
                     for response in valid_responses:
                         vote = response.get("vote")
@@ -266,7 +299,8 @@ class AsyncConsensusIterator:
                         
                         if vote == "REJECT":
                             round_feedback += f"- {agent} VOTED REJECT. "
-                            if hint:
+                            # Only inject the pivot hint if this agent has active anomalies
+                            if hint and agent in anomalous_agents:
                                 round_feedback += f"CRITICAL PIVOT HINT: {hint}\n"
                             else:
                                 round_feedback += f"Reason: {response.get('reason')}\n"
