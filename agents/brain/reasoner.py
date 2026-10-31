@@ -1,9 +1,8 @@
-
 import os
 import json
+import aiohttp
 from google import genai
 from google.genai import types
-import requests
 
 class ReasoningEngine:
     """Ollama-driven logic engine running local Qwen 7B."""
@@ -22,10 +21,13 @@ class ReasoningEngine:
         
         INSTRUCTIONS:
         1. Analyze active alerts and memory.
-        2. Return strictly valid JSON containing EXACTLY two keys: "proposed_root_cause" (string) and "confidence_estimate" (float between 0.0 and 1.0).
+        2. Return strictly valid JSON containing EXACTLY three keys: 
+           - "proposed_root_cause" (string)
+           - "confidence_estimate" (float between 0.0 and 1.0)
+           - "recommended_actions" (list of strings representing practical troubleshooting steps)
         """
 
-    def generate_hypothesis(self, incident_id, aggregated_alerts, memory_context):
+    async def generate_hypothesis(self, incident_id, aggregated_alerts, memory_context):
         devices = list(set(alert["device_id"] for alert in aggregated_alerts))
         
         prompt = f"""
@@ -44,25 +46,38 @@ class ReasoningEngine:
         }
 
         try:
-            response = requests.post(self.api_url, json=payload)
-            response.raise_for_status()
-            
-            # Ollama returns the generated text in the 'response' key
-            raw_text = response.json().get("response", "{}")
-            llm_result = json.loads(raw_text)
+            # Replaced blocking requests.post with asynchronous aiohttp
+            timeout = aiohttp.ClientTimeout(total=45)
+            async with aiohttp.ClientSession(timeout=timeout) as session:
+                async with session.post(self.api_url, json=payload) as response:
+                    response.raise_for_status()
+                    result = await response.json()
+                    raw_text = result.get("response", "{}")
+                    
+                    # Strip Markdown code blocks to prevent JSON parsing crashes
+                    raw_text = raw_text.strip()
+                    if raw_text.startswith("```json"):
+                        raw_text = raw_text[7:]
+                    if raw_text.endswith("```"):
+                        raw_text = raw_text[:-3]
+                        
+                    llm_result = json.loads(raw_text.strip())
 
             root_cause = llm_result.get("proposed_root_cause", "Unknown network anomaly")
             confidence = float(llm_result.get("confidence_estimate", 0.1))
+            actions = llm_result.get("recommended_actions", ["Manual review required"])
 
         except Exception as e:
             print(f"Reasoner Error: {e}")
             root_cause = "Unknown network anomaly"
             confidence = 0.1
+            actions = ["Manual review required"]
 
         return {
             "message_type": "hypothesis_broadcast",
             "incident_id": incident_id,
             "proposed_root_cause": root_cause,
             "confidence_estimate": confidence,
+            "recommended_actions": actions,
             "target_devices": devices
         }

@@ -59,78 +59,85 @@ class AsyncConsensusIterator:
         best_report = None
         highest_confidence = -1.0
 
-        while current_round <= self.max_rounds:
-            print(f"\n--- INITIATING ROUND {current_round} ---")
-            
-            # 1. Fetch memory context and generate hypothesis
-            memory_context = shared_memory.get_reasoner_context(incident_id)
-            hypothesis = self.reasoner.generate_hypothesis(incident_id, initial_alerts, memory_context)
-            
-            print(f"Brain Hypothesis: {hypothesis['proposed_root_cause']}")
-            
-            # Save the Brain's guess to memory
-            shared_memory.record_hypothesis(incident_id, current_round, hypothesis['proposed_root_cause'])
-
-            # 2. Broadcast to all voters concurrently
-            print("Broadcasting to Domain Agents concurrently...")
-            tasks = [self._async_get_vote(voter, hypothesis) for voter in self.voters]
-            votes = await asyncio.gather(*tasks)
-
-            # 3. Process Votes and update Memory
-            approvals = 0
-            rejections = 0
-            abstentions = 0
-
-            for v in votes:
-                agent_id = v["agent_id"]
-                vote_cast = v["vote"]
+        try:
+            while current_round <= self.max_rounds:
+                print(f"\n--- INITIATING ROUND {current_round} ---")
                 
-                print(f"[{agent_id}] voted {vote_cast}")
+                # 1. Fetch memory context and generate hypothesis (Now Awaited)
+                memory_context = shared_memory.get_reasoner_context(incident_id)
+                hypothesis = await self.reasoner.generate_hypothesis(incident_id, initial_alerts, memory_context)
                 
-                shared_memory.record_vote(
-                    incident_id=incident_id,
-                    round_num=current_round,
-                    agent_id=agent_id,
-                    vote=vote_cast,
-                    reason=v["reason"],
-                    alternative=v.get("suggested_alternative"),
-                    question=v.get("targeted_question")
-                )
-
-                if vote_cast == "APPROVE":
-                    approvals += 1
-                elif vote_cast == "REJECT":
-                    rejections += 1
-                elif vote_cast == "ABSTAIN":
-                    abstentions += 1
-
-            # 4. Confidence Math
-            total_opinions = approvals + rejections
-            confidence = 0.30 if total_opinions == 0 else round((approvals / total_opinions), 2)
-            
-            # Edge case: If 1 approves and 2 abstain (healthy domains), it's a strong hypothesis
-            if approvals >= 1 and rejections == 0:
-                 confidence = min(0.95, confidence + 0.20)
-
-            print(f"Round {current_round} Confidence: {confidence}")
-
-            # 5. Build Intermediate Report
-            report = self._build_report(incident_id, hypothesis, initial_alerts, votes, confidence)
-            
-            if confidence > highest_confidence:
-                highest_confidence = confidence
-                best_report = report
-
-            # 6. Break Conditions
-            if confidence >= 0.70:
-                best_report["limitations"].append(f"Consensus reached in round {current_round}")
-                break
+                print(f"Brain Hypothesis: {hypothesis['proposed_root_cause']}")
                 
-            current_round += 1
+                # Save the Brain's guess to memory
+                shared_memory.record_hypothesis(incident_id, current_round, hypothesis['proposed_root_cause'])
 
-        # Clear memory after the loop concludes to prevent state bleed
-        shared_memory.clear_incident(incident_id)
-        return best_report
+                # 2. Broadcast to Domain Agents sequentially to protect local VRAM
+                print("Broadcasting to Domain Agents sequentially to protect local VRAM...")
+                votes = []
+                for voter in self.voters:
+                    vote = await voter.evaluate_hypothesis(hypothesis)
+                    votes.append(vote)
+
+                # 3. Process Votes and update Memory
+                approvals = 0
+                rejections = 0
+                abstentions = 0
+
+                for v in votes:
+                    agent_id = v["agent_id"]
+                    vote_cast = v["vote"]
+                    
+                    print(f"[{agent_id}] voted {vote_cast}")
+                    
+                    shared_memory.record_vote(
+                        incident_id=incident_id,
+                        round_num=current_round,
+                        agent_id=agent_id,
+                        vote=vote_cast,
+                        reason=v["reason"],
+                        alternative=v.get("suggested_alternative"),
+                        question=v.get("targeted_question")
+                    )
+
+                    if vote_cast == "APPROVE":
+                        approvals += 1
+                    elif vote_cast == "REJECT":
+                        rejections += 1
+                    elif vote_cast == "ABSTAIN":
+                        abstentions += 1
+
+                # 4. Corrected Confidence Math
+                total_opinions = approvals + rejections
+                confidence = 0.30 if total_opinions == 0 else round((approvals / total_opinions), 2)
+                
+                # Strict Consensus Rules against single-agent hallucinations
+                if approvals == 1 and rejections == 0:
+                    confidence = min(0.60, confidence)  # Cap single-agent approval
+                elif approvals > 1 and rejections == 0:
+                    confidence = min(0.95, confidence + 0.20) # Requires multi-agent consensus
+
+                print(f"Round {current_round} Confidence: {confidence}")
+
+                # 5. Build Intermediate Report
+                report = self._build_report(incident_id, hypothesis, initial_alerts, votes, confidence)
+                
+                if confidence > highest_confidence:
+                    highest_confidence = confidence
+                    best_report = report
+
+                # 6. Break Conditions
+                if confidence >= 0.70:
+                    best_report["limitations"].append(f"Consensus reached in round {current_round}")
+                    break
+                    
+                current_round += 1
+
+            return best_report
+            
+        finally:
+            # This guarantees memory wipes even if Ollama or the Python script crashes mid-loop
+            shared_memory.clear_incident(incident_id)
 
     def _build_report(self, incident_id, hypothesis, initial_alerts, votes, confidence):
         final_evidence = []
@@ -161,14 +168,9 @@ class AsyncConsensusIterator:
 
         # Build dynamic actions
         # Build dynamic actions
-        actions = []
-        cause = hypothesis["proposed_root_cause"].lower()
-        if "hardware" in cause or "physical" in cause or "cpu" in cause or "interface" in cause:
-            actions = ["Dispatch physical technician", "Isolate affected port", "Check physical cabling"]
-        elif "congestion" in cause or "bandwidth" in cause or "saturation" in cause:
-            actions = ["Inspect upstream link utilization", "Review QoS configuration"]
-        elif "service" in cause or "dns" in cause:
-            actions = ["Check DNS/DHCP server logs", "Scale out service instances"]
+        # Build dynamic actions
+        # Actions are now dynamically generated by the Brain LLM in reasoner.py
+        actions = hypothesis.get("recommended_actions", ["Manual review required"])
 
         limitations = []
         if data_errors_found:
