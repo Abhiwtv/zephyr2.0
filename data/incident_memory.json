@@ -1,6 +1,110 @@
 {
-  "last_updated": "2026-10-31T22:04:57.361140+00:00",
-  "active_incidents": {},
+  "last_updated": "2026-10-31T23:47:56.435619+00:00",
+  "active_incidents": {
+    "INC-l1_fiber_bend_core-1793486343": {
+      "incident_id": "INC-l1_fiber_bend_core-1793486343",
+      "created_at": "2026-10-31T22:40:35.526739+00:00",
+      "updated_at": "2026-10-31T22:40:35.577408+00:00",
+      "status": "in_progress",
+      "rounds": {
+        "1": {
+          "hypothesis": "Physical layer (L1) fiber optic cable damage due to excessive bending, causing signal degradation and interface errors.",
+          "votes": {
+            "infrastructure_agent": {
+              "vote": "ABSTAIN",
+              "reason": "Middleware intercept: Agent generated malformed JSON schema.",
+              "alternative": null,
+              "question": null,
+              "pivot_hint": null
+            },
+            "traffic_agent": {
+              "vote": "ABSTAIN",
+              "reason": "Middleware intercept: Agent generated malformed JSON schema.",
+              "alternative": null,
+              "question": null,
+              "pivot_hint": null
+            },
+            "l4_l7_agent": {
+              "vote": "REJECT",
+              "reason": "Evaluated via Context-Aware Evidence Engine",
+              "alternative": null,
+              "question": null,
+              "pivot_hint": null
+            }
+          }
+        }
+      },
+      "feedback": [
+        "Round 1 Failed. Hypothesis: 'Physical layer (L1) fiber optic cable damage due to excessive bending, causing signal degradation and interface errors.'\n- l4_l7_agent VOTED REJECT. Reason: Evaluated via Context-Aware Evidence Engine\n"
+      ],
+      "final_report": null
+    },
+    "INC-l2_mac_flap-1793489156": {
+      "incident_id": "INC-l2_mac_flap-1793489156",
+      "created_at": "2026-10-31T23:27:11.561376+00:00",
+      "updated_at": "2026-10-31T23:28:49.002223+00:00",
+      "status": "in_progress",
+      "rounds": {
+        "1": {
+          "hypothesis": "High CPU utilization (82.22%) on WIFI_CTRL_01 in the infrastructure domain, combined with elevated jitter (71.28 ms), suggests a potential resource exhaustion or processing bottleneck causing intermittent network instability.",
+          "votes": {
+            "infrastructure_agent": {
+              "vote": "APPROVE",
+              "reason": "Evaluated via Context-Aware Evidence Engine",
+              "alternative": null,
+              "question": null,
+              "pivot_hint": null
+            },
+            "traffic_agent": {
+              "vote": "REJECT",
+              "reason": "Evaluated via Context-Aware Evidence Engine",
+              "alternative": null,
+              "question": null,
+              "pivot_hint": null
+            },
+            "l4_l7_agent": {
+              "vote": "APPROVE",
+              "reason": "Evaluated via Context-Aware Evidence Engine",
+              "alternative": null,
+              "question": null,
+              "pivot_hint": null
+            }
+          }
+        },
+        "2": {
+          "hypothesis": "High CPU utilization (82.22%) on WIFI_CTRL_01 in the infrastructure domain is causing elevated jitter (71.28 ms), indicating a resource exhaustion or processing bottleneck in the infrastructure layer that affects network stability without causing packet loss or latency spikes.",
+          "votes": {
+            "infrastructure_agent": {
+              "vote": "APPROVE",
+              "reason": "Evaluated via Context-Aware Evidence Engine",
+              "alternative": null,
+              "question": null,
+              "pivot_hint": null
+            },
+            "traffic_agent": {
+              "vote": "REJECT",
+              "reason": "Evaluated via Context-Aware Evidence Engine",
+              "alternative": null,
+              "question": null,
+              "pivot_hint": null
+            },
+            "l4_l7_agent": {
+              "vote": "APPROVE",
+              "reason": "Evaluated via Context-Aware Evidence Engine",
+              "alternative": null,
+              "question": null,
+              "pivot_hint": null
+            }
+          }
+        }
+      },
+      "feedback": [
+        "Round 1 Failed. Your hypothesis: 'High CPU utilization (82.22%) on WIFI_CTRL_01 in the infrastructure domain, combined with elevated jitter (71.28 ms), suggests a potential resource exhaustion or processing bottleneck causing intermittent network instability.'\nThe following metrics CONTRADICT your hypothesis:\n- From traffic_agent:\n  * WIFI_CTRL_01 has a packet_loss_pct of 0.0%\n  * WIFI_CTRL_01 has a latency_ms of 11.69 ms\n",
+        "Round 2 Failed. Your hypothesis: 'High CPU utilization (82.22%) on WIFI_CTRL_01 in the infrastructure domain is causing elevated jitter (71.28 ms), indicating a resource exhaustion or processing bottleneck in the infrastructure layer that affects network stability without causing packet loss or latency spikes.'\nThe following metrics CONTRADICT your hypothesis:\n- From traffic_agent:\n  * WIFI_CTRL_01 has a packet_loss_pct of 0.0\n  * WIFI_CTRL_01 has a latency_ms of 11.69\n"
+      ],
+      "final_report": null
+    }
+  },
   "history": {
     "INC-TEST-99": {
       "incident_id": "INC-TEST-99",
@@ -14618,6 +14722,3361 @@
       ],
       "final_report": null,
       "archived_at": "2026-10-31T22:04:57.361140+00:00"
+    },
+    "INC-l1_cable_damage_lhc-1793485992": {
+      "incident_id": "INC-l1_cable_damage_lhc-1793485992",
+      "created_at": "2026-10-31T22:34:36.299648+00:00",
+      "updated_at": "2026-10-31T22:39:03.947336+00:00",
+      "status": "investigating",
+      "rounds": {
+        "1": {
+          "hypothesis": "Physical layer failure due to damaged network cable or faulty switch port causing high interface errors and packet loss.",
+          "votes": {
+            "infrastructure_agent": {
+              "vote": "ABSTAIN",
+              "reason": "Middleware intercept: Agent generated malformed JSON schema.",
+              "alternative": null,
+              "question": null,
+              "pivot_hint": null
+            },
+            "traffic_agent": {
+              "vote": "ABSTAIN",
+              "reason": "Middleware intercept: Agent generated malformed JSON schema.",
+              "alternative": null,
+              "question": null,
+              "pivot_hint": null
+            },
+            "l4_l7_agent": {
+              "vote": "ABSTAIN",
+              "reason": "Middleware intercept: Agent generated malformed JSON schema.",
+              "alternative": null,
+              "question": null,
+              "pivot_hint": null
+            }
+          }
+        },
+        "2": {
+          "hypothesis": "Unknown network anomaly",
+          "votes": {
+            "infrastructure_agent": {
+              "vote": "REJECT",
+              "reason": "Evaluated via Context-Aware Evidence Engine",
+              "alternative": null,
+              "question": null,
+              "pivot_hint": null
+            },
+            "traffic_agent": {
+              "vote": "REJECT",
+              "reason": "Evaluated via Context-Aware Evidence Engine",
+              "alternative": null,
+              "question": null,
+              "pivot_hint": null
+            },
+            "l4_l7_agent": {
+              "vote": "REJECT",
+              "reason": "Evaluated via Context-Aware Evidence Engine",
+              "alternative": null,
+              "question": null,
+              "pivot_hint": null
+            }
+          }
+        },
+        "3": {
+          "hypothesis": "Unknown network anomaly",
+          "votes": {
+            "infrastructure_agent": {
+              "vote": "REJECT",
+              "reason": "Evaluated via Context-Aware Evidence Engine",
+              "alternative": null,
+              "question": null,
+              "pivot_hint": null
+            },
+            "traffic_agent": {
+              "vote": "REJECT",
+              "reason": "Evaluated via Context-Aware Evidence Engine",
+              "alternative": null,
+              "question": null,
+              "pivot_hint": null
+            },
+            "l4_l7_agent": {
+              "vote": "REJECT",
+              "reason": "Evaluated via Context-Aware Evidence Engine",
+              "alternative": null,
+              "question": null,
+              "pivot_hint": null
+            }
+          }
+        }
+      },
+      "feedback": [
+        "Round 1 Failed. Hypothesis: 'Physical layer failure due to damaged network cable or faulty switch port causing high interface errors and packet loss.'\n",
+        "Round 2 Failed. Hypothesis: 'Unknown network anomaly'\n- infrastructure_agent VOTED REJECT. Reason: Evaluated via Context-Aware Evidence Engine\n- traffic_agent VOTED REJECT. Reason: Evaluated via Context-Aware Evidence Engine\n- l4_l7_agent VOTED REJECT. Reason: Evaluated via Context-Aware Evidence Engine\n",
+        "Round 3 Failed. Hypothesis: 'Unknown network anomaly'\n- infrastructure_agent VOTED REJECT. Reason: Evaluated via Context-Aware Evidence Engine\n- traffic_agent VOTED REJECT. Reason: Evaluated via Context-Aware Evidence Engine\n- l4_l7_agent VOTED REJECT. Reason: Evaluated via Context-Aware Evidence Engine\n"
+      ],
+      "final_report": {
+        "incident_id": "INC-l1_cable_damage_lhc-1793485992",
+        "status": "investigating",
+        "suspected_root_cause": "Unknown network anomaly",
+        "confidence": 0.0,
+        "affected_devices": [
+          "LHC_ROOM_104_SW"
+        ],
+        "supporting_evidence": [],
+        "alternative_causes": [],
+        "recommended_actions": [
+          "Manual review required"
+        ],
+        "evidence_sources": [
+          "infrastructure_agent",
+          "traffic_agent",
+          "l4_l7_agent"
+        ],
+        "limitations": [
+          "Failed to reach consensus"
+        ]
+      },
+      "archived_at": "2026-10-31T22:39:03.964183+00:00"
+    },
+    "INC-l1_cable_damage_lhc-1793486490": {
+      "incident_id": "INC-l1_cable_damage_lhc-1793486490",
+      "created_at": "2026-10-31T22:42:56.277458+00:00",
+      "updated_at": "2026-10-31T22:47:04.729290+00:00",
+      "status": "investigating",
+      "rounds": {
+        "1": {
+          "hypothesis": "Physical layer degradation due to damaged network cable or faulty switch port causing high interface errors and packet loss.",
+          "votes": {
+            "infrastructure_agent": {
+              "vote": "REJECT",
+              "reason": "Evaluated via Context-Aware Evidence Engine",
+              "alternative": null,
+              "question": null,
+              "pivot_hint": null
+            },
+            "traffic_agent": {
+              "vote": "REJECT",
+              "reason": "Evaluated via Context-Aware Evidence Engine",
+              "alternative": null,
+              "question": null,
+              "pivot_hint": null
+            },
+            "l4_l7_agent": {
+              "vote": "REJECT",
+              "reason": "Evaluated via Context-Aware Evidence Engine",
+              "alternative": null,
+              "question": null,
+              "pivot_hint": null
+            }
+          }
+        },
+        "2": {
+          "hypothesis": "Misconfigured switch port parameters (e.g., duplex/mismatched speed, VLAN tagging) causing persistent interface errors and packet loss despite intact physical layer connectivity.",
+          "votes": {
+            "infrastructure_agent": {
+              "vote": "REJECT",
+              "reason": "Evaluated via Context-Aware Evidence Engine",
+              "alternative": null,
+              "question": null,
+              "pivot_hint": null
+            },
+            "traffic_agent": {
+              "vote": "REJECT",
+              "reason": "Evaluated via Context-Aware Evidence Engine",
+              "alternative": null,
+              "question": null,
+              "pivot_hint": null
+            },
+            "l4_l7_agent": {
+              "vote": "REJECT",
+              "reason": "Evaluated via Context-Aware Evidence Engine",
+              "alternative": null,
+              "question": null,
+              "pivot_hint": null
+            }
+          }
+        },
+        "3": {
+          "hypothesis": "Unknown network anomaly",
+          "votes": {
+            "infrastructure_agent": {
+              "vote": "REJECT",
+              "reason": "Evaluated via Context-Aware Evidence Engine",
+              "alternative": null,
+              "question": null,
+              "pivot_hint": null
+            },
+            "traffic_agent": {
+              "vote": "REJECT",
+              "reason": "Evaluated via Context-Aware Evidence Engine",
+              "alternative": null,
+              "question": null,
+              "pivot_hint": null
+            },
+            "l4_l7_agent": {
+              "vote": "REJECT",
+              "reason": "Evaluated via Context-Aware Evidence Engine",
+              "alternative": null,
+              "question": null,
+              "pivot_hint": null
+            }
+          }
+        }
+      },
+      "feedback": [
+        "Round 1 Failed. Hypothesis: 'Physical layer degradation due to damaged network cable or faulty switch port causing high interface errors and packet loss.'\n- infrastructure_agent VOTED REJECT. Reason: Evaluated via Context-Aware Evidence Engine\n- traffic_agent VOTED REJECT. Reason: Evaluated via Context-Aware Evidence Engine\n- l4_l7_agent VOTED REJECT. Reason: Evaluated via Context-Aware Evidence Engine\n",
+        "Round 2 Failed. Hypothesis: 'Misconfigured switch port parameters (e.g., duplex/mismatched speed, VLAN tagging) causing persistent interface errors and packet loss despite intact physical layer connectivity.'\n- infrastructure_agent VOTED REJECT. Reason: Evaluated via Context-Aware Evidence Engine\n- traffic_agent VOTED REJECT. Reason: Evaluated via Context-Aware Evidence Engine\n- l4_l7_agent VOTED REJECT. Reason: Evaluated via Context-Aware Evidence Engine\n",
+        "Round 3 Failed. Hypothesis: 'Unknown network anomaly'\n- infrastructure_agent VOTED REJECT. Reason: Evaluated via Context-Aware Evidence Engine\n- traffic_agent VOTED REJECT. Reason: Evaluated via Context-Aware Evidence Engine\n- l4_l7_agent VOTED REJECT. Reason: Evaluated via Context-Aware Evidence Engine\n"
+      ],
+      "final_report": {
+        "incident_id": "INC-l1_cable_damage_lhc-1793486490",
+        "status": "investigating",
+        "suspected_root_cause": "Unknown network anomaly",
+        "confidence": 0.0,
+        "affected_devices": [
+          "LHC_ROOM_104_SW"
+        ],
+        "supporting_evidence": [],
+        "alternative_causes": [],
+        "recommended_actions": [
+          "Manual review required"
+        ],
+        "evidence_sources": [
+          "infrastructure_agent",
+          "traffic_agent",
+          "l4_l7_agent"
+        ],
+        "limitations": [
+          "Failed to reach consensus"
+        ]
+      },
+      "archived_at": "2026-10-31T22:47:04.746938+00:00"
+    },
+    "INC-l1_fiber_bend_core-1793486824": {
+      "incident_id": "INC-l1_fiber_bend_core-1793486824",
+      "created_at": "2026-10-31T22:48:32.192806+00:00",
+      "updated_at": "2026-10-31T22:48:32.255820+00:00",
+      "status": "diagnosed",
+      "rounds": {
+        "1": {
+          "hypothesis": "Physical layer (L1) fiber optic cable degradation due to excessive bending in the core segment, causing signal attenuation, packet loss, and interface errors on ADMIN_CORE_RTR.",
+          "votes": {
+            "infrastructure_agent": {
+              "vote": "APPROVE",
+              "reason": "Evaluated via Context-Aware Evidence Engine",
+              "alternative": null,
+              "question": null,
+              "pivot_hint": null
+            },
+            "traffic_agent": {
+              "vote": "APPROVE",
+              "reason": "Evaluated via Context-Aware Evidence Engine",
+              "alternative": null,
+              "question": null,
+              "pivot_hint": null
+            },
+            "l4_l7_agent": {
+              "vote": "REJECT",
+              "reason": "Evaluated via Context-Aware Evidence Engine",
+              "alternative": null,
+              "question": null,
+              "pivot_hint": null
+            }
+          }
+        }
+      },
+      "feedback": [],
+      "final_report": {
+        "incident_id": "INC-l1_fiber_bend_core-1793486824",
+        "status": "diagnosed",
+        "suspected_root_cause": "Physical layer (L1) fiber optic cable degradation due to excessive bending in the core segment, causing signal attenuation, packet loss, and interface errors on ADMIN_CORE_RTR.",
+        "confidence": 1.0,
+        "affected_devices": [
+          "ADMIN_CORE_RTR"
+        ],
+        "supporting_evidence": [
+          {
+            "evidence_extracted": "packet_loss_pct is 5.61 on ADMIN_CORE_RTR"
+          },
+          {
+            "evidence_extracted": "interface_errors is 995 on ADMIN_CORE_RTR"
+          },
+          {
+            "evidence_extracted": "ADMIN_CORE_RTR has packet_loss_pct of 5.61"
+          },
+          {
+            "evidence_extracted": "ADMIN_CORE_RTR has interface_errors of 995"
+          },
+          {
+            "evidence_extracted": "ADMIN_CORE_RTR has latency_ms of 45.0"
+          }
+        ],
+        "alternative_causes": [],
+        "recommended_actions": [
+          "Inspect fiber optic cable routing near ADMIN_CORE_RTR for physical bends or compression points exceeding manufacturer curvature specifications",
+          "Test link performance with a certified optical power meter to verify signal strength degradation",
+          "Replace affected fiber segment with a certified low-bend-loss cable type",
+          "Verify proper termination and connector alignment at both ends of the affected cable",
+          "Check for microbending in cable jacket using specialized fiber inspection tools"
+        ],
+        "evidence_sources": [
+          "infrastructure_agent",
+          "traffic_agent",
+          "l4_l7_agent"
+        ],
+        "limitations": [
+          "Consensus reached in round 1"
+        ]
+      },
+      "archived_at": "2026-10-31T22:48:32.274840+00:00"
+    },
+    "INC-l1_sfp_failure_ses-1793486912": {
+      "incident_id": "INC-l1_sfp_failure_ses-1793486912",
+      "created_at": "2026-10-31T22:49:46.638182+00:00",
+      "updated_at": "2026-10-31T22:49:46.701942+00:00",
+      "status": "diagnosed",
+      "rounds": {
+        "1": {
+          "hypothesis": "Faulty SFP module or physical layer degradation on SES_DEPT_SW causing high interface errors (6199) and packet loss (14.44%).",
+          "votes": {
+            "infrastructure_agent": {
+              "vote": "APPROVE",
+              "reason": "Evaluated via Context-Aware Evidence Engine",
+              "alternative": null,
+              "question": null,
+              "pivot_hint": null
+            },
+            "traffic_agent": {
+              "vote": "APPROVE",
+              "reason": "Evaluated via Context-Aware Evidence Engine",
+              "alternative": null,
+              "question": null,
+              "pivot_hint": null
+            },
+            "l4_l7_agent": {
+              "vote": "APPROVE",
+              "reason": "Evaluated via Context-Aware Evidence Engine",
+              "alternative": null,
+              "question": null,
+              "pivot_hint": null
+            }
+          }
+        }
+      },
+      "feedback": [],
+      "final_report": {
+        "incident_id": "INC-l1_sfp_failure_ses-1793486912",
+        "status": "diagnosed",
+        "suspected_root_cause": "Faulty SFP module or physical layer degradation on SES_DEPT_SW causing high interface errors (6199) and packet loss (14.44%).",
+        "confidence": 1.0,
+        "affected_devices": [
+          "SES_DEPT_SW"
+        ],
+        "supporting_evidence": [
+          {
+            "evidence_extracted": "SES_DEPT_SW has packet loss of 14.44% and interface errors of 6199, which align with the hypothesis of a faulty SFP module or physical layer degradation."
+          },
+          {
+            "evidence_extracted": "SES_DEPT_SW has packet loss of 14.44% and interface errors of 6199, which align with the hypothesis"
+          },
+          {
+            "evidence_extracted": "SES_DEPT_SW has packet loss of 14.44% and interface errors of 6199, which align with the hypothesis of faulty SFP module or physical layer degradation."
+          }
+        ],
+        "alternative_causes": [],
+        "recommended_actions": [
+          "Inspect and replace SFP modules on SES_DEPT_SW",
+          "Verify physical cable connections and test with known-good cables",
+          "Check switch port status and error counters for specific interface failures",
+          "Monitor environmental conditions (temperature, power) affecting hardware performance"
+        ],
+        "evidence_sources": [
+          "infrastructure_agent",
+          "traffic_agent",
+          "l4_l7_agent"
+        ],
+        "limitations": [
+          "Consensus reached in round 1"
+        ]
+      },
+      "archived_at": "2026-10-31T22:49:46.717568+00:00"
+    },
+    "INC-l1_cable_damage_lhc-1793487181": {
+      "incident_id": "INC-l1_cable_damage_lhc-1793487181",
+      "created_at": "2026-10-31T22:54:10.647017+00:00",
+      "updated_at": "2026-10-31T22:54:10.697246+00:00",
+      "status": "diagnosed",
+      "rounds": {
+        "1": {
+          "hypothesis": "Physical layer failure due to damaged network cable causing excessive interface errors and packet loss on LHC_ROOM_104_SW",
+          "votes": {
+            "infrastructure_agent": {
+              "vote": "APPROVE",
+              "reason": "Evaluated via Context-Aware Evidence Engine",
+              "alternative": null,
+              "question": null,
+              "pivot_hint": null
+            },
+            "traffic_agent": {
+              "vote": "APPROVE",
+              "reason": "Evaluated via Context-Aware Evidence Engine",
+              "alternative": null,
+              "question": null,
+              "pivot_hint": null
+            },
+            "l4_l7_agent": {
+              "vote": "APPROVE",
+              "reason": "Evaluated via Context-Aware Evidence Engine",
+              "alternative": null,
+              "question": null,
+              "pivot_hint": null
+            }
+          }
+        }
+      },
+      "feedback": [],
+      "final_report": {
+        "incident_id": "INC-l1_cable_damage_lhc-1793487181",
+        "status": "diagnosed",
+        "suspected_root_cause": "Physical layer failure due to damaged network cable causing excessive interface errors and packet loss on LHC_ROOM_104_SW",
+        "confidence": 1.0,
+        "affected_devices": [
+          "LHC_ROOM_104_SW"
+        ],
+        "supporting_evidence": [
+          {
+            "evidence_extracted": "LHC_ROOM_104_SW interface_errors confirms 23954"
+          },
+          {
+            "evidence_extracted": "LHC_ROOM_104_SW packet_loss_pct confirms 17.02"
+          },
+          {
+            "evidence_extracted": "LHC_ROOM_104_SW packet_loss_pct confirms 17.02"
+          },
+          {
+            "evidence_extracted": "LHC_ROOM_104_SW interface_errors confirms 23954"
+          },
+          {
+            "evidence_extracted": "LHC_ROOM_104_SW has packet_loss_pct of 17.02"
+          },
+          {
+            "evidence_extracted": "LHC_ROOM_104_SW has interface_errors of 23954"
+          }
+        ],
+        "alternative_causes": [],
+        "recommended_actions": [
+          "Inspect and replace the physical network cable connected to LHC_ROOM_104_SW",
+          "Check for visible damage on switch ports and cable ends",
+          "Test alternative cable pathways",
+          "Verify cable integrity using network testing tools"
+        ],
+        "evidence_sources": [
+          "infrastructure_agent",
+          "traffic_agent",
+          "l4_l7_agent"
+        ],
+        "limitations": [
+          "Consensus reached in round 1"
+        ]
+      },
+      "archived_at": "2026-10-31T22:54:10.724699+00:00"
+    },
+    "INC-l1_fiber_bend_core-1793487250": {
+      "incident_id": "INC-l1_fiber_bend_core-1793487250",
+      "created_at": "2026-10-31T22:55:28.764110+00:00",
+      "updated_at": "2026-10-31T22:55:28.826653+00:00",
+      "status": "diagnosed",
+      "rounds": {
+        "1": {
+          "hypothesis": "Physical layer degradation due to bent fiber optic cable causing high interface errors and packet loss on ADMIN_CORE_RTR",
+          "votes": {
+            "infrastructure_agent": {
+              "vote": "APPROVE",
+              "reason": "Evaluated via Context-Aware Evidence Engine",
+              "alternative": null,
+              "question": null,
+              "pivot_hint": null
+            },
+            "traffic_agent": {
+              "vote": "APPROVE",
+              "reason": "Evaluated via Context-Aware Evidence Engine",
+              "alternative": null,
+              "question": null,
+              "pivot_hint": null
+            },
+            "l4_l7_agent": {
+              "vote": "APPROVE",
+              "reason": "Evaluated via Context-Aware Evidence Engine",
+              "alternative": null,
+              "question": null,
+              "pivot_hint": null
+            }
+          }
+        }
+      },
+      "feedback": [],
+      "final_report": {
+        "incident_id": "INC-l1_fiber_bend_core-1793487250",
+        "status": "diagnosed",
+        "suspected_root_cause": "Physical layer degradation due to bent fiber optic cable causing high interface errors and packet loss on ADMIN_CORE_RTR",
+        "confidence": 1.0,
+        "affected_devices": [
+          "ADMIN_CORE_RTR"
+        ],
+        "supporting_evidence": [
+          {
+            "evidence_extracted": "ADMIN_CORE_RTR packet_loss_pct confirms 5.61"
+          },
+          {
+            "evidence_extracted": "ADMIN_CORE_RTR interface_errors confirms 995"
+          },
+          {
+            "evidence_extracted": "ADMIN_CORE_RTR packet_loss_pct confirms 5.61"
+          },
+          {
+            "evidence_extracted": "LHC_ROOM_104_SW interface_errors confirms 23954"
+          },
+          {
+            "evidence_extracted": "ADMIN_CORE_RTR has packet_loss_pct of 5.61"
+          },
+          {
+            "evidence_extracted": "ADMIN_CORE_RTR has interface_errors of 995"
+          }
+        ],
+        "alternative_causes": [],
+        "recommended_actions": [
+          "Inspect physical fiber connections for bends or damage",
+          "Run interface diagnostics on ADMIN_CORE_RTR",
+          "Check for hardware failures in router's optical modules",
+          "Monitor interface error rates over time",
+          "Verify link status and signal quality metrics"
+        ],
+        "evidence_sources": [
+          "infrastructure_agent",
+          "traffic_agent",
+          "l4_l7_agent"
+        ],
+        "limitations": [
+          "Consensus reached in round 1"
+        ]
+      },
+      "archived_at": "2026-10-31T22:55:28.846448+00:00"
+    },
+    "INC-l1_sfp_failure_ses-1793487328": {
+      "incident_id": "INC-l1_sfp_failure_ses-1793487328",
+      "created_at": "2026-10-31T22:56:25.899981+00:00",
+      "updated_at": "2026-10-31T22:56:25.955230+00:00",
+      "status": "diagnosed",
+      "rounds": {
+        "1": {
+          "hypothesis": "Faulty SFP module or physical layer degradation causing high interface errors and packet loss on SES_DEPT_SW.",
+          "votes": {
+            "infrastructure_agent": {
+              "vote": "APPROVE",
+              "reason": "Evaluated via Context-Aware Evidence Engine",
+              "alternative": null,
+              "question": null,
+              "pivot_hint": null
+            },
+            "traffic_agent": {
+              "vote": "APPROVE",
+              "reason": "Evaluated via Context-Aware Evidence Engine",
+              "alternative": null,
+              "question": null,
+              "pivot_hint": null
+            },
+            "l4_l7_agent": {
+              "vote": "APPROVE",
+              "reason": "Evaluated via Context-Aware Evidence Engine",
+              "alternative": null,
+              "question": null,
+              "pivot_hint": null
+            }
+          }
+        }
+      },
+      "feedback": [],
+      "final_report": {
+        "incident_id": "INC-l1_sfp_failure_ses-1793487328",
+        "status": "diagnosed",
+        "suspected_root_cause": "Faulty SFP module or physical layer degradation causing high interface errors and packet loss on SES_DEPT_SW.",
+        "confidence": 1.0,
+        "affected_devices": [
+          "SES_DEPT_SW"
+        ],
+        "supporting_evidence": [
+          {
+            "evidence_extracted": "SES_DEPT_SW interface_errors confirms 6199"
+          },
+          {
+            "evidence_extracted": "SES_DEPT_SW packet_loss_pct confirms 14.44"
+          },
+          {
+            "evidence_extracted": "SES_DEPT_SW packet_loss_pct confirms 14.44"
+          },
+          {
+            "evidence_extracted": "SES_DEPT_SW interface_errors confirms 6199"
+          },
+          {
+            "evidence_extracted": "SES_DEPT_SW has packet_loss_pct of 14.44"
+          },
+          {
+            "evidence_extracted": "SES_DEPT_SW has interface_errors of 6199"
+          }
+        ],
+        "alternative_causes": [],
+        "recommended_actions": [
+          "Inspect and replace the SFP module in SES_DEPT_SW",
+          "Verify all physical cable connections for damage or looseness",
+          "Check switch interface error logs for specific port failures",
+          "Test with a known-good SFP module to confirm hardware failure"
+        ],
+        "evidence_sources": [
+          "infrastructure_agent",
+          "traffic_agent",
+          "l4_l7_agent"
+        ],
+        "limitations": [
+          "Consensus reached in round 1"
+        ]
+      },
+      "archived_at": "2026-10-31T22:56:25.977037+00:00"
+    },
+    "INC-l1_overheating_switch-1793487385": {
+      "incident_id": "INC-l1_overheating_switch-1793487385",
+      "created_at": "2026-10-31T22:57:35.326982+00:00",
+      "updated_at": "2026-10-31T22:57:35.408523+00:00",
+      "status": "diagnosed",
+      "rounds": {
+        "1": {
+          "hypothesis": "The HOSTEL_M_CLOSET_SW switch is experiencing overheating due to excessive CPU utilization (91.97%) and queue drops (181), likely caused by hardware failure, environmental heat buildup, or abnormal traffic processing.",
+          "votes": {
+            "infrastructure_agent": {
+              "vote": "APPROVE",
+              "reason": "Evaluated via Context-Aware Evidence Engine",
+              "alternative": null,
+              "question": null,
+              "pivot_hint": null
+            },
+            "traffic_agent": {
+              "vote": "APPROVE",
+              "reason": "Evaluated via Context-Aware Evidence Engine",
+              "alternative": null,
+              "question": null,
+              "pivot_hint": null
+            },
+            "l4_l7_agent": {
+              "vote": "APPROVE",
+              "reason": "Evaluated via Context-Aware Evidence Engine",
+              "alternative": null,
+              "question": null,
+              "pivot_hint": null
+            }
+          }
+        }
+      },
+      "feedback": [],
+      "final_report": {
+        "incident_id": "INC-l1_overheating_switch-1793487385",
+        "status": "diagnosed",
+        "suspected_root_cause": "The HOSTEL_M_CLOSET_SW switch is experiencing overheating due to excessive CPU utilization (91.97%) and queue drops (181), likely caused by hardware failure, environmental heat buildup, or abnormal traffic processing.",
+        "confidence": 1.0,
+        "affected_devices": [
+          "HOSTEL_M_CLOSET_SW"
+        ],
+        "supporting_evidence": [
+          {
+            "evidence_extracted": "HOSTEL_M_CLOSET_SW cpu_utilization_pct confirms 91.97%"
+          },
+          {
+            "evidence_extracted": "HOSTEL_M_CLOSET_SW queue_drops confirms 181"
+          },
+          {
+            "evidence_extracted": "HOSTEL_M_CLOSET_SW has a CPU utilization of 91.97%"
+          },
+          {
+            "evidence_extracted": "HOSTEL_M_CLOSET_SW has 181 queue drops"
+          },
+          {
+            "evidence_extracted": "HOSTEL_M_CLOSET_SW has a CPU utilization of 91.97%"
+          },
+          {
+            "evidence_extracted": "HOSTEL_M_CLOSET_SW has 181 queue drops"
+          }
+        ],
+        "alternative_causes": [],
+        "recommended_actions": [
+          "Check the switch's temperature sensors and ensure proper cooling/ventilation",
+          "Inspect for hardware malfunctions or firmware issues",
+          "Monitor traffic patterns for potential DoS/DDoS attacks",
+          "Restart the device if overheating is confirmed and safely possible"
+        ],
+        "evidence_sources": [
+          "infrastructure_agent",
+          "traffic_agent",
+          "l4_l7_agent"
+        ],
+        "limitations": [
+          "Consensus reached in round 1"
+        ]
+      },
+      "archived_at": "2026-10-31T22:57:35.425909+00:00"
+    },
+    "INC-l1_speed_duplex-1793487455": {
+      "incident_id": "INC-l1_speed_duplex-1793487455",
+      "created_at": "2026-10-31T22:59:06.593710+00:00",
+      "updated_at": "2026-10-31T22:59:06.668781+00:00",
+      "status": "diagnosed",
+      "rounds": {
+        "1": {
+          "hypothesis": "High interface error count (2172) and elevated latency (295.52 ms) on ADMIN_PRINTER_SW indicate a physical layer issue, likely due to a faulty Ethernet cable, misconfigured switch port, or hardware degradation on the switch port connected to the printer.",
+          "votes": {
+            "infrastructure_agent": {
+              "vote": "APPROVE",
+              "reason": "Evaluated via Context-Aware Evidence Engine",
+              "alternative": null,
+              "question": null,
+              "pivot_hint": null
+            },
+            "traffic_agent": {
+              "vote": "APPROVE",
+              "reason": "Evaluated via Context-Aware Evidence Engine",
+              "alternative": null,
+              "question": null,
+              "pivot_hint": null
+            },
+            "l4_l7_agent": {
+              "vote": "APPROVE",
+              "reason": "Evaluated via Context-Aware Evidence Engine",
+              "alternative": null,
+              "question": null,
+              "pivot_hint": null
+            }
+          }
+        }
+      },
+      "feedback": [],
+      "final_report": {
+        "incident_id": "INC-l1_speed_duplex-1793487455",
+        "status": "diagnosed",
+        "suspected_root_cause": "High interface error count (2172) and elevated latency (295.52 ms) on ADMIN_PRINTER_SW indicate a physical layer issue, likely due to a faulty Ethernet cable, misconfigured switch port, or hardware degradation on the switch port connected to the printer.",
+        "confidence": 1.0,
+        "affected_devices": [
+          "ADMIN_PRINTER_SW"
+        ],
+        "supporting_evidence": [
+          {
+            "evidence_extracted": "ADMIN_PRINTER_SW latency_ms confirms 295.52 ms"
+          },
+          {
+            "evidence_extracted": "ADMIN_PRINTER_SW interface_errors confirms 2172"
+          },
+          {
+            "evidence_extracted": "ADMIN_PRINTER_SW latency_ms confirms 295.52 ms"
+          },
+          {
+            "evidence_extracted": "ADMIN_PRINTER_SW interface_errors confirms 2172"
+          },
+          {
+            "evidence_extracted": "ADMIN_PRINTER_SW has latency_ms of 295.52 ms"
+          },
+          {
+            "evidence_extracted": "ADMIN_PRINTER_SW has interface_errors of 2172"
+          }
+        ],
+        "alternative_causes": [],
+        "recommended_actions": [
+          "Inspect and replace the Ethernet cable connected to the printer",
+          "Check switch port configuration (duplex/speed settings) for mismatches",
+          "Test the printer connection on a different switch port",
+          "Examine switch interface statistics for collision counts or error thresholds",
+          "Verify firmware is up-to-date on the network switch"
+        ],
+        "evidence_sources": [
+          "infrastructure_agent",
+          "traffic_agent",
+          "l4_l7_agent"
+        ],
+        "limitations": [
+          "Consensus reached in round 1"
+        ]
+      },
+      "archived_at": "2026-10-31T22:59:06.687977+00:00"
+    },
+    "INC-l1_cable_damage_lhc-1793487659": {
+      "incident_id": "INC-l1_cable_damage_lhc-1793487659",
+      "created_at": "2026-10-31T23:02:09.350712+00:00",
+      "updated_at": "2026-10-31T23:02:09.431054+00:00",
+      "status": "diagnosed",
+      "rounds": {
+        "1": {
+          "hypothesis": "Physical layer failure due to damaged network cable or faulty switch port in LHC_ROOM_104_SW, causing excessive interface errors (23,954) and packet loss (17.02%).",
+          "votes": {
+            "infrastructure_agent": {
+              "vote": "APPROVE",
+              "reason": "Evaluated via Context-Aware Evidence Engine",
+              "alternative": null,
+              "question": null,
+              "pivot_hint": null
+            },
+            "traffic_agent": {
+              "vote": "APPROVE",
+              "reason": "Evaluated via Context-Aware Evidence Engine",
+              "alternative": null,
+              "question": null,
+              "pivot_hint": null
+            },
+            "l4_l7_agent": {
+              "vote": "APPROVE",
+              "reason": "Evaluated via Context-Aware Evidence Engine",
+              "alternative": null,
+              "question": null,
+              "pivot_hint": null
+            }
+          }
+        }
+      },
+      "feedback": [],
+      "final_report": {
+        "incident_id": "INC-l1_cable_damage_lhc-1793487659",
+        "status": "diagnosed",
+        "suspected_root_cause": "Physical layer failure due to damaged network cable or faulty switch port in LHC_ROOM_104_SW, causing excessive interface errors (23,954) and packet loss (17.02%).",
+        "confidence": 1.0,
+        "affected_devices": [
+          "LHC_ROOM_104_SW"
+        ],
+        "supporting_evidence": [
+          {
+            "evidence_extracted": "interface_errors confirms 23,954"
+          },
+          {
+            "evidence_extracted": "packet_loss_pct confirms 17.02%"
+          },
+          {
+            "evidence_extracted": "packet_loss_pct confirms 17.02%"
+          },
+          {
+            "evidence_extracted": "interface_errors confirms 23,954"
+          },
+          {
+            "evidence_extracted": "packet_loss_pct confirms 17.02%"
+          },
+          {
+            "evidence_extracted": "interface_errors confirms 23,954"
+          }
+        ],
+        "alternative_causes": [],
+        "recommended_actions": [
+          "Inspect and replace the physical network cable connected to LHC_ROOM_104_SW",
+          "Check for bent/broken pins on switch port connectors",
+          "Test alternative cable with known good performance",
+          "Verify power supply stability for the switch",
+          "Check for environmental hazards (e.g., moisture, temperature extremes) near the cabling"
+        ],
+        "evidence_sources": [
+          "infrastructure_agent",
+          "traffic_agent",
+          "l4_l7_agent"
+        ],
+        "limitations": [
+          "Consensus reached in round 1"
+        ]
+      },
+      "archived_at": "2026-10-31T23:02:09.458165+00:00"
+    },
+    "INC-l1_cable_damage_lhc-1793487772": {
+      "incident_id": "INC-l1_cable_damage_lhc-1793487772",
+      "created_at": "2026-10-31T23:04:05.767390+00:00",
+      "updated_at": "2026-10-31T23:04:05.842120+00:00",
+      "status": "diagnosed",
+      "rounds": {
+        "1": {
+          "hypothesis": "Physical layer failure due to damaged network cable or faulty switch port causing high packet loss and interface errors.",
+          "votes": {
+            "infrastructure_agent": {
+              "vote": "APPROVE",
+              "reason": "Evaluated via Context-Aware Evidence Engine",
+              "alternative": null,
+              "question": null,
+              "pivot_hint": null
+            },
+            "traffic_agent": {
+              "vote": "APPROVE",
+              "reason": "Evaluated via Context-Aware Evidence Engine",
+              "alternative": null,
+              "question": null,
+              "pivot_hint": null
+            },
+            "l4_l7_agent": {
+              "vote": "APPROVE",
+              "reason": "Evaluated via Context-Aware Evidence Engine",
+              "alternative": null,
+              "question": null,
+              "pivot_hint": null
+            }
+          }
+        }
+      },
+      "feedback": [],
+      "final_report": {
+        "incident_id": "INC-l1_cable_damage_lhc-1793487772",
+        "status": "diagnosed",
+        "suspected_root_cause": "Physical layer failure due to damaged network cable or faulty switch port causing high packet loss and interface errors.",
+        "confidence": 1.0,
+        "affected_devices": [
+          "LHC_ROOM_104_SW"
+        ],
+        "supporting_evidence": [
+          {
+            "evidence_extracted": "LHC_ROOM_104_SW interface_errors confirms high interface errors"
+          },
+          {
+            "evidence_extracted": "LHC_ROOM_104_SW cpu_utilization_pct confirms moderate CPU utilization"
+          },
+          {
+            "evidence_extracted": "packet_loss_pct confirms 17.02"
+          },
+          {
+            "evidence_extracted": "jitter_ms confirms 2.2"
+          },
+          {
+            "evidence_extracted": "dns_latency_ms is 20.15 (normal)"
+          },
+          {
+            "evidence_extracted": "dhcp_pool_utilization_pct is 20.6 (normal)"
+          }
+        ],
+        "alternative_causes": [],
+        "recommended_actions": [
+          "Inspect and replace the network cable connected to LHC_ROOM_104_SW",
+          "Check for physical damage on switch ports",
+          "Test alternative cable routes",
+          "Verify switch firmware is up to date",
+          "Monitor interface error counts after intervention"
+        ],
+        "evidence_sources": [
+          "infrastructure_agent",
+          "traffic_agent",
+          "l4_l7_agent"
+        ],
+        "limitations": [
+          "Consensus reached in round 1"
+        ]
+      },
+      "archived_at": "2026-10-31T23:04:05.861670+00:00"
+    },
+    "INC-l1_fiber_bend_core-1793487845": {
+      "incident_id": "INC-l1_fiber_bend_core-1793487845",
+      "created_at": "2026-10-31T23:05:10.991967+00:00",
+      "updated_at": "2026-10-31T23:05:11.075782+00:00",
+      "status": "diagnosed",
+      "rounds": {
+        "1": {
+          "hypothesis": "Physical layer (L1) fiber optic cable damage due to excessive bending, causing signal degradation and interface errors.",
+          "votes": {
+            "infrastructure_agent": {
+              "vote": "APPROVE",
+              "reason": "Evaluated via Context-Aware Evidence Engine",
+              "alternative": null,
+              "question": null,
+              "pivot_hint": null
+            },
+            "traffic_agent": {
+              "vote": "APPROVE",
+              "reason": "Evaluated via Context-Aware Evidence Engine",
+              "alternative": null,
+              "question": null,
+              "pivot_hint": null
+            },
+            "l4_l7_agent": {
+              "vote": "APPROVE",
+              "reason": "Evaluated via Context-Aware Evidence Engine",
+              "alternative": null,
+              "question": null,
+              "pivot_hint": null
+            }
+          }
+        }
+      },
+      "feedback": [],
+      "final_report": {
+        "incident_id": "INC-l1_fiber_bend_core-1793487845",
+        "status": "diagnosed",
+        "suspected_root_cause": "Physical layer (L1) fiber optic cable damage due to excessive bending, causing signal degradation and interface errors.",
+        "confidence": 1.0,
+        "affected_devices": [
+          "ADMIN_CORE_RTR"
+        ],
+        "supporting_evidence": [
+          {
+            "evidence_extracted": "interface_errors confirms Physical layer (L1) fiber optic cable damage due to excessive bending"
+          },
+          {
+            "evidence_extracted": "queue_drops confirms signal degradation and interface errors"
+          },
+          {
+            "evidence_extracted": "packet_loss_pct confirms 5.61"
+          },
+          {
+            "evidence_extracted": "latency_ms confirms 45.0"
+          },
+          {
+            "evidence_extracted": "jitter_ms confirms 2.7"
+          },
+          {
+            "evidence_extracted": "dns_latency_ms confirms normal DNS performance"
+          },
+          {
+            "evidence_extracted": "dhcp_pool_utilization_pct confirms normal DHCP pool utilization"
+          }
+        ],
+        "alternative_causes": [],
+        "recommended_actions": [
+          "Inspect fiber optic cable routing for sharp bends or physical damage",
+          "Test alternative cable segments or ports",
+          "Verify optical power levels at both ends of the link",
+          "Replace damaged fiber cable if detected",
+          "Check for environmental factors (temperature, vibration) affecting cable integrity"
+        ],
+        "evidence_sources": [
+          "infrastructure_agent",
+          "traffic_agent",
+          "l4_l7_agent"
+        ],
+        "limitations": [
+          "Consensus reached in round 1"
+        ]
+      },
+      "archived_at": "2026-10-31T23:05:11.103220+00:00"
+    },
+    "INC-l1_sfp_failure_ses-1793487911": {
+      "incident_id": "INC-l1_sfp_failure_ses-1793487911",
+      "created_at": "2026-10-31T23:06:08.643997+00:00",
+      "updated_at": "2026-10-31T23:07:47.941416+00:00",
+      "status": "diagnosed",
+      "rounds": {
+        "1": {
+          "hypothesis": "Faulty SFP module or physical layer degradation on SES_DEPT_SW causing high interface errors (6199) and packet loss (14.44%).",
+          "votes": {
+            "infrastructure_agent": {
+              "vote": "REJECT",
+              "reason": "Evaluated via Context-Aware Evidence Engine",
+              "alternative": null,
+              "question": null,
+              "pivot_hint": null
+            },
+            "traffic_agent": {
+              "vote": "APPROVE",
+              "reason": "Evaluated via Context-Aware Evidence Engine",
+              "alternative": null,
+              "question": null,
+              "pivot_hint": null
+            },
+            "l4_l7_agent": {
+              "vote": "APPROVE",
+              "reason": "Evaluated via Context-Aware Evidence Engine",
+              "alternative": null,
+              "question": null,
+              "pivot_hint": null
+            }
+          }
+        },
+        "2": {
+          "hypothesis": "Unknown network anomaly",
+          "votes": {
+            "infrastructure_agent": {
+              "vote": "APPROVE",
+              "reason": "Evaluated via Context-Aware Evidence Engine",
+              "alternative": null,
+              "question": null,
+              "pivot_hint": null
+            },
+            "traffic_agent": {
+              "vote": "APPROVE",
+              "reason": "Evaluated via Context-Aware Evidence Engine",
+              "alternative": null,
+              "question": null,
+              "pivot_hint": null
+            },
+            "l4_l7_agent": {
+              "vote": "APPROVE",
+              "reason": "Evaluated via Context-Aware Evidence Engine",
+              "alternative": null,
+              "question": null,
+              "pivot_hint": null
+            }
+          }
+        }
+      },
+      "feedback": [
+        "Round 1 Failed. Your hypothesis: 'Faulty SFP module or physical layer degradation on SES_DEPT_SW causing high interface errors (6199) and packet loss (14.44%).'\nThe following metrics CONTRADICT your hypothesis:\n- From infrastructure_agent:\n  * cpu_utilization_pct confirms no CPU overload (26.68%)\n"
+      ],
+      "final_report": {
+        "incident_id": "INC-l1_sfp_failure_ses-1793487911",
+        "status": "diagnosed",
+        "suspected_root_cause": "Unknown network anomaly",
+        "confidence": 1.0,
+        "affected_devices": [
+          "SES_DEPT_SW"
+        ],
+        "supporting_evidence": [
+          {
+            "evidence_extracted": "interface_errors confirms Unknown network anomaly"
+          },
+          {
+            "evidence_extracted": "packet_loss_pct confirms 14.44"
+          },
+          {
+            "evidence_extracted": "latency_ms confirms 11.03"
+          },
+          {
+            "evidence_extracted": "dns_latency_ms confirms normal DNS performance"
+          },
+          {
+            "evidence_extracted": "dhcp_pool_utilization_pct confirms normal DHCP pool utilization"
+          }
+        ],
+        "alternative_causes": [],
+        "recommended_actions": [
+          "Manual review required"
+        ],
+        "evidence_sources": [
+          "infrastructure_agent",
+          "traffic_agent",
+          "l4_l7_agent"
+        ],
+        "limitations": [
+          "Consensus reached in round 2"
+        ]
+      },
+      "archived_at": "2026-10-31T23:07:47.967723+00:00"
+    },
+    "INC-l1_overheating_switch-1793488067": {
+      "incident_id": "INC-l1_overheating_switch-1793488067",
+      "created_at": "2026-10-31T23:08:57.619731+00:00",
+      "updated_at": "2026-10-31T23:08:57.700668+00:00",
+      "status": "diagnosed",
+      "rounds": {
+        "1": {
+          "hypothesis": "The HOSTEL_M_CLOSET_SW switch is experiencing severe CPU overutilization (91.97%) likely due to excessive packet processing demands, leading to queue drops (181) and potential traffic congestion despite low link utilization.",
+          "votes": {
+            "infrastructure_agent": {
+              "vote": "APPROVE",
+              "reason": "Evaluated via Context-Aware Evidence Engine",
+              "alternative": null,
+              "question": null,
+              "pivot_hint": null
+            },
+            "traffic_agent": {
+              "vote": "APPROVE",
+              "reason": "Evaluated via Context-Aware Evidence Engine",
+              "alternative": null,
+              "question": null,
+              "pivot_hint": null
+            },
+            "l4_l7_agent": {
+              "vote": "APPROVE",
+              "reason": "Evaluated via Context-Aware Evidence Engine",
+              "alternative": null,
+              "question": null,
+              "pivot_hint": null
+            }
+          }
+        }
+      },
+      "feedback": [],
+      "final_report": {
+        "incident_id": "INC-l1_overheating_switch-1793488067",
+        "status": "diagnosed",
+        "suspected_root_cause": "The HOSTEL_M_CLOSET_SW switch is experiencing severe CPU overutilization (91.97%) likely due to excessive packet processing demands, leading to queue drops (181) and potential traffic congestion despite low link utilization.",
+        "confidence": 1.0,
+        "affected_devices": [
+          "HOSTEL_M_CLOSET_SW"
+        ],
+        "supporting_evidence": [
+          {
+            "evidence_extracted": "HOSTEL_M_CLOSET_SW cpu_utilization_pct confirms 91.97%"
+          },
+          {
+            "evidence_extracted": "HOSTEL_M_CLOSET_SW queue_drops confirms 181"
+          },
+          {
+            "evidence_extracted": "HOSTEL_M_CLOSET_SW has 36.9% link utilization, indicating no congestion"
+          },
+          {
+            "evidence_extracted": "HOSTEL_M_CLOSET_SW has 0.0% packet loss, indicating no queue drops"
+          },
+          {
+            "evidence_extracted": "dns_latency_ms confirms normal DNS performance"
+          },
+          {
+            "evidence_extracted": "dhcp_pool_utilization_pct confirms normal DHCP pool utilization"
+          }
+        ],
+        "alternative_causes": [],
+        "recommended_actions": [
+          "Check for recent configuration changes or firmware updates on the switch",
+          "Monitor traffic patterns for signs of DoS attacks or abnormal protocols",
+          "Verify hardware health (fan status, temperature sensors)",
+          "Temporarily throttle non-critical traffic to reduce CPU load",
+          "Check switch logs for error messages correlating with CPU spikes"
+        ],
+        "evidence_sources": [
+          "infrastructure_agent",
+          "traffic_agent",
+          "l4_l7_agent"
+        ],
+        "limitations": [
+          "Consensus reached in round 1"
+        ]
+      },
+      "archived_at": "2026-10-31T23:08:57.722852+00:00"
+    },
+    "INC-l1_speed_duplex-1793488137": {
+      "incident_id": "INC-l1_speed_duplex-1793488137",
+      "created_at": "2026-10-31T23:09:56.908360+00:00",
+      "updated_at": "2026-10-31T23:09:56.990666+00:00",
+      "status": "diagnosed",
+      "rounds": {
+        "1": {
+          "hypothesis": "Layer 1 speed/duplex mismatch on ADMIN_PRINTER_SW interface causing interface errors",
+          "votes": {
+            "infrastructure_agent": {
+              "vote": "APPROVE",
+              "reason": "Evaluated via Context-Aware Evidence Engine",
+              "alternative": null,
+              "question": null,
+              "pivot_hint": null
+            },
+            "traffic_agent": {
+              "vote": "APPROVE",
+              "reason": "Evaluated via Context-Aware Evidence Engine",
+              "alternative": null,
+              "question": null,
+              "pivot_hint": null
+            },
+            "l4_l7_agent": {
+              "vote": "APPROVE",
+              "reason": "Evaluated via Context-Aware Evidence Engine",
+              "alternative": null,
+              "question": null,
+              "pivot_hint": null
+            }
+          }
+        }
+      },
+      "feedback": [],
+      "final_report": {
+        "incident_id": "INC-l1_speed_duplex-1793488137",
+        "status": "diagnosed",
+        "suspected_root_cause": "Layer 1 speed/duplex mismatch on ADMIN_PRINTER_SW interface causing interface errors",
+        "confidence": 1.0,
+        "affected_devices": [
+          "ADMIN_PRINTER_SW"
+        ],
+        "supporting_evidence": [
+          {
+            "evidence_extracted": "interface_errors confirms Layer 1 speed/duplex mismatch on ADMIN_PRINTER_SW interface"
+          },
+          {
+            "evidence_extracted": "latency_ms confirms high latency"
+          },
+          {
+            "evidence_extracted": "jitter_ms confirms high jitter"
+          },
+          {
+            "evidence_extracted": "dns_latency_ms confirms normal DNS performance"
+          },
+          {
+            "evidence_extracted": "dhcp_pool_utilization_pct confirms normal DHCP utilization"
+          }
+        ],
+        "alternative_causes": [],
+        "recommended_actions": [
+          "Check speed/duplex settings on ADMIN_PRINTER_SW port connected to the printer",
+          "Verify physical cable integrity and test with a different cable",
+          "Inspect switch port statistics for error counters"
+        ],
+        "evidence_sources": [
+          "infrastructure_agent",
+          "traffic_agent",
+          "l4_l7_agent"
+        ],
+        "limitations": [
+          "Consensus reached in round 1"
+        ]
+      },
+      "archived_at": "2026-10-31T23:09:57.011833+00:00"
+    },
+    "INC-l1_cable_damage_lhc-1793488252": {
+      "incident_id": "INC-l1_cable_damage_lhc-1793488252",
+      "created_at": "2026-10-31T23:11:57.025421+00:00",
+      "updated_at": "2026-10-31T23:11:57.101289+00:00",
+      "status": "diagnosed",
+      "rounds": {
+        "1": {
+          "hypothesis": "Physical layer failure due to damaged network cable causing high interface errors and packet loss on LHC_ROOM_104_SW switch.",
+          "votes": {
+            "infrastructure_agent": {
+              "vote": "APPROVE",
+              "reason": "Evaluated via Context-Aware Evidence Engine",
+              "alternative": null,
+              "question": null,
+              "pivot_hint": null
+            },
+            "traffic_agent": {
+              "vote": "APPROVE",
+              "reason": "Evaluated via Context-Aware Evidence Engine",
+              "alternative": null,
+              "question": null,
+              "pivot_hint": null
+            },
+            "l4_l7_agent": {
+              "vote": "APPROVE",
+              "reason": "Evaluated via Context-Aware Evidence Engine",
+              "alternative": null,
+              "question": null,
+              "pivot_hint": null
+            }
+          }
+        }
+      },
+      "feedback": [],
+      "final_report": {
+        "incident_id": "INC-l1_cable_damage_lhc-1793488252",
+        "status": "diagnosed",
+        "suspected_root_cause": "Physical layer failure due to damaged network cable causing high interface errors and packet loss on LHC_ROOM_104_SW switch.",
+        "confidence": 1.0,
+        "affected_devices": [
+          "LHC_ROOM_104_SW"
+        ],
+        "supporting_evidence": [
+          {
+            "evidence_extracted": "interface_errors confirms Physical layer failure due to damaged network cable"
+          },
+          {
+            "evidence_extracted": "interface_errors confirms high interface errors"
+          },
+          {
+            "evidence_extracted": "packet_loss_pct confirms 17.02% packet loss"
+          },
+          {
+            "evidence_extracted": "latency_ms confirms 10.14 ms latency"
+          },
+          {
+            "evidence_extracted": "dns_latency_ms confirms normal DNS performance"
+          },
+          {
+            "evidence_extracted": "dhcp_pool_utilization_pct confirms normal DHCP pool utilization"
+          }
+        ],
+        "alternative_causes": [],
+        "recommended_actions": [
+          "Inspect and test the physical network cables connected to LHC_ROOM_104_SW",
+          "Check for bent/broken pins in switch ports",
+          "Verify cable integrity using a cable tester",
+          "Replace suspected damaged cable",
+          "Monitor interface error counts after intervention",
+          "Check for electromagnetic interference sources near the cable path"
+        ],
+        "evidence_sources": [
+          "infrastructure_agent",
+          "traffic_agent",
+          "l4_l7_agent"
+        ],
+        "limitations": [
+          "Consensus reached in round 1"
+        ]
+      },
+      "archived_at": "2026-10-31T23:11:57.121000+00:00"
+    },
+    "INC-l1_fiber_bend_core-1793488317": {
+      "incident_id": "INC-l1_fiber_bend_core-1793488317",
+      "created_at": "2026-10-31T23:13:13.527214+00:00",
+      "updated_at": "2026-10-31T23:13:13.580276+00:00",
+      "status": "diagnosed",
+      "rounds": {
+        "1": {
+          "hypothesis": "Physical layer (L1) fiber optic cable degradation due to excessive bending, causing signal loss and interface errors.",
+          "votes": {
+            "infrastructure_agent": {
+              "vote": "APPROVE",
+              "reason": "Evaluated via Context-Aware Evidence Engine",
+              "alternative": null,
+              "question": null,
+              "pivot_hint": null
+            },
+            "traffic_agent": {
+              "vote": "APPROVE",
+              "reason": "Evaluated via Context-Aware Evidence Engine",
+              "alternative": null,
+              "question": null,
+              "pivot_hint": null
+            },
+            "l4_l7_agent": {
+              "vote": "APPROVE",
+              "reason": "Evaluated via Context-Aware Evidence Engine",
+              "alternative": null,
+              "question": null,
+              "pivot_hint": null
+            }
+          }
+        }
+      },
+      "feedback": [],
+      "final_report": {
+        "incident_id": "INC-l1_fiber_bend_core-1793488317",
+        "status": "diagnosed",
+        "suspected_root_cause": "Physical layer (L1) fiber optic cable degradation due to excessive bending, causing signal loss and interface errors.",
+        "confidence": 1.0,
+        "affected_devices": [
+          "ADMIN_CORE_RTR"
+        ],
+        "supporting_evidence": [
+          {
+            "evidence_extracted": "interface_errors confirms signal loss and degradation"
+          },
+          {
+            "evidence_extracted": "queue_drops confirms data transmission issues"
+          },
+          {
+            "evidence_extracted": "packet_loss_pct confirms 5.61"
+          },
+          {
+            "evidence_extracted": "latency_ms confirms 45.0"
+          },
+          {
+            "evidence_extracted": "dns_latency_ms confirms normal DNS performance"
+          },
+          {
+            "evidence_extracted": "dhcp_pool_utilization_pct confirms normal DHCP pool utilization"
+          }
+        ],
+        "alternative_causes": [],
+        "recommended_actions": [
+          "Inspect fiber optic cable routing for sharp bends/kinks near ADMIN_CORE_RTR",
+          "Test with a known-good SFP module and cable",
+          "Check for environmental factors affecting fiber integrity",
+          "Verify optical power levels at both ends of the link"
+        ],
+        "evidence_sources": [
+          "infrastructure_agent",
+          "traffic_agent",
+          "l4_l7_agent"
+        ],
+        "limitations": [
+          "Consensus reached in round 1"
+        ]
+      },
+      "archived_at": "2026-10-31T23:13:13.607671+00:00"
+    },
+    "INC-l1_sfp_failure_ses-1793488393": {
+      "incident_id": "INC-l1_sfp_failure_ses-1793488393",
+      "created_at": "2026-10-31T23:14:06.060754+00:00",
+      "updated_at": "2026-10-31T23:14:06.114314+00:00",
+      "status": "diagnosed",
+      "rounds": {
+        "1": {
+          "hypothesis": "Faulty SFP module or cable causing high interface errors and network degradation on SES_DEPT_SW",
+          "votes": {
+            "infrastructure_agent": {
+              "vote": "APPROVE",
+              "reason": "Evaluated via Context-Aware Evidence Engine",
+              "alternative": null,
+              "question": null,
+              "pivot_hint": null
+            },
+            "traffic_agent": {
+              "vote": "APPROVE",
+              "reason": "Evaluated via Context-Aware Evidence Engine",
+              "alternative": null,
+              "question": null,
+              "pivot_hint": null
+            },
+            "l4_l7_agent": {
+              "vote": "APPROVE",
+              "reason": "Evaluated via Context-Aware Evidence Engine",
+              "alternative": null,
+              "question": null,
+              "pivot_hint": null
+            }
+          }
+        }
+      },
+      "feedback": [],
+      "final_report": {
+        "incident_id": "INC-l1_sfp_failure_ses-1793488393",
+        "status": "diagnosed",
+        "suspected_root_cause": "Faulty SFP module or cable causing high interface errors and network degradation on SES_DEPT_SW",
+        "confidence": 1.0,
+        "affected_devices": [
+          "SES_DEPT_SW"
+        ],
+        "supporting_evidence": [
+          {
+            "evidence_extracted": "interface_errors confirms high interface errors"
+          },
+          {
+            "evidence_extracted": "queue_drops confirms no packet drops"
+          },
+          {
+            "evidence_extracted": "packet_loss_pct confirms high interface errors"
+          },
+          {
+            "evidence_extracted": "latency_ms confirms network degradation"
+          },
+          {
+            "evidence_extracted": "dns_latency_ms confirms normal DNS performance"
+          },
+          {
+            "evidence_extracted": "dhcp_pool_utilization_pct confirms normal DHCP utilization"
+          }
+        ],
+        "alternative_causes": [],
+        "recommended_actions": [
+          "Inspect and replace SFP modules on SES_DEPT_SW",
+          "Verify all physical cable connections for damage or looseness",
+          "Check switch interface error logs for specific port failures",
+          "Test with known-good cables/SFPs to isolate hardware issues"
+        ],
+        "evidence_sources": [
+          "infrastructure_agent",
+          "traffic_agent",
+          "l4_l7_agent"
+        ],
+        "limitations": [
+          "Consensus reached in round 1"
+        ]
+      },
+      "archived_at": "2026-10-31T23:14:06.130127+00:00"
+    },
+    "INC-l1_overheating_switch-1793488446": {
+      "incident_id": "INC-l1_overheating_switch-1793488446",
+      "created_at": "2026-10-31T23:15:17.931776+00:00",
+      "updated_at": "2026-10-31T23:15:17.994925+00:00",
+      "status": "diagnosed",
+      "rounds": {
+        "1": {
+          "hypothesis": "The HOSTEL_M_CLOSET_SW switch is experiencing overheating due to excessive CPU utilization (91.97%) and potential thermal management failures, leading to performance degradation and packet queue drops.",
+          "votes": {
+            "infrastructure_agent": {
+              "vote": "APPROVE",
+              "reason": "Evaluated via Context-Aware Evidence Engine",
+              "alternative": null,
+              "question": null,
+              "pivot_hint": null
+            },
+            "traffic_agent": {
+              "vote": "REJECT",
+              "reason": "Evaluated via Context-Aware Evidence Engine",
+              "alternative": null,
+              "question": null,
+              "pivot_hint": null
+            },
+            "l4_l7_agent": {
+              "vote": "APPROVE",
+              "reason": "Evaluated via Context-Aware Evidence Engine",
+              "alternative": null,
+              "question": null,
+              "pivot_hint": null
+            }
+          }
+        }
+      },
+      "feedback": [],
+      "final_report": {
+        "incident_id": "INC-l1_overheating_switch-1793488446",
+        "status": "diagnosed",
+        "suspected_root_cause": "The HOSTEL_M_CLOSET_SW switch is experiencing overheating due to excessive CPU utilization (91.97%) and potential thermal management failures, leading to performance degradation and packet queue drops.",
+        "confidence": 0.75,
+        "affected_devices": [
+          "HOSTEL_M_CLOSET_SW"
+        ],
+        "supporting_evidence": [
+          {
+            "evidence_extracted": "cpu_utilization_pct confirms excessive CPU utilization (91.97%)"
+          },
+          {
+            "evidence_extracted": "queue_drops confirms performance degradation (181)"
+          },
+          {
+            "evidence_extracted": "HOSTEL_M_CLOSET_SW link utilization is 36.9% (normal)"
+          },
+          {
+            "evidence_extracted": "HOSTEL_M_CLOSET_SW packet loss is 0.0% (normal)"
+          },
+          {
+            "evidence_extracted": "HOSTEL_M_CLOSET_SW latency is 13.08 ms (normal)"
+          },
+          {
+            "evidence_extracted": "HOSTEL_M_CLOSET_SW jitter is 3.78 ms (normal)"
+          },
+          {
+            "evidence_extracted": "dns_latency_ms confirms normal DNS performance"
+          },
+          {
+            "evidence_extracted": "dhcp_pool_utilization_pct confirms normal DHCP pool utilization"
+          }
+        ],
+        "alternative_causes": [],
+        "recommended_actions": [
+          "Check the switch's temperature sensors and ensure proper airflow/cooling in the closet housing the device.",
+          "Verify if the switch's firmware is up to date and apply patches if necessary.",
+          "Inspect for hardware faults (e.g., failed fans, blocked vents) that could cause overheating.",
+          "Monitor CPU utilization trends over time to confirm if this is a recurring issue.",
+          "Review switch configuration for inefficient processes or misconfigured Quality of Service (QoS) policies contributing to queue drops."
+        ],
+        "evidence_sources": [
+          "infrastructure_agent",
+          "traffic_agent",
+          "l4_l7_agent"
+        ],
+        "limitations": [
+          "Consensus reached in round 1"
+        ]
+      },
+      "archived_at": "2026-10-31T23:15:18.019768+00:00"
+    },
+    "INC-l1_speed_duplex-1793488518": {
+      "incident_id": "INC-l1_speed_duplex-1793488518",
+      "created_at": "2026-10-31T23:16:17.228760+00:00",
+      "updated_at": "2026-10-31T23:16:17.291790+00:00",
+      "status": "diagnosed",
+      "rounds": {
+        "1": {
+          "hypothesis": "Speed/duplex mismatch on ADMIN_PRINTER_SW interface causing high interface errors and increased latency.",
+          "votes": {
+            "infrastructure_agent": {
+              "vote": "APPROVE",
+              "reason": "Evaluated via Context-Aware Evidence Engine",
+              "alternative": null,
+              "question": null,
+              "pivot_hint": null
+            },
+            "traffic_agent": {
+              "vote": "APPROVE",
+              "reason": "Evaluated via Context-Aware Evidence Engine",
+              "alternative": null,
+              "question": null,
+              "pivot_hint": null
+            },
+            "l4_l7_agent": {
+              "vote": "APPROVE",
+              "reason": "Evaluated via Context-Aware Evidence Engine",
+              "alternative": null,
+              "question": null,
+              "pivot_hint": null
+            }
+          }
+        }
+      },
+      "feedback": [],
+      "final_report": {
+        "incident_id": "INC-l1_speed_duplex-1793488518",
+        "status": "diagnosed",
+        "suspected_root_cause": "Speed/duplex mismatch on ADMIN_PRINTER_SW interface causing high interface errors and increased latency.",
+        "confidence": 1.0,
+        "affected_devices": [
+          "ADMIN_PRINTER_SW"
+        ],
+        "supporting_evidence": [
+          {
+            "evidence_extracted": "interface_errors confirms high interface errors"
+          },
+          {
+            "evidence_extracted": "ADMIN_PRINTER_SW interface_errors confirms increased latency"
+          },
+          {
+            "evidence_extracted": "latency_ms confirms increased latency"
+          },
+          {
+            "evidence_extracted": "packet_loss_pct confirms high interface errors"
+          },
+          {
+            "evidence_extracted": "dns_latency_ms is 12.37 ms (normal)"
+          },
+          {
+            "evidence_extracted": "dhcp_pool_utilization_pct is 26.52% (normal)"
+          }
+        ],
+        "alternative_causes": [],
+        "recommended_actions": [
+          "Check speed/duplex settings on ADMIN_PRINTER_SW port connected to the printer",
+          "Verify connected device's speed/duplex configuration matches switch settings",
+          "Test with alternative cable or port to rule out physical layer issues"
+        ],
+        "evidence_sources": [
+          "infrastructure_agent",
+          "traffic_agent",
+          "l4_l7_agent"
+        ],
+        "limitations": [
+          "Consensus reached in round 1"
+        ]
+      },
+      "archived_at": "2026-10-31T23:16:17.307649+00:00"
+    },
+    "INC-l1_dying_asic-1793488577": {
+      "incident_id": "INC-l1_dying_asic-1793488577",
+      "created_at": "2026-10-31T23:17:43.858525+00:00",
+      "updated_at": "2026-10-31T23:17:43.919940+00:00",
+      "status": "diagnosed",
+      "rounds": {
+        "1": {
+          "hypothesis": "The CAMPUS_CORE_02 device is experiencing a failing ASIC (Application-Specific Integrated Circuit) causing CPU saturation (100% utilization) and severe packet loss (99.0%) due to excessive queue drops (99999). This results in extreme latency (5000 ms) and degraded network performance despite low link utilization (33.78%).",
+          "votes": {
+            "infrastructure_agent": {
+              "vote": "APPROVE",
+              "reason": "Evaluated via Context-Aware Evidence Engine",
+              "alternative": null,
+              "question": null,
+              "pivot_hint": null
+            },
+            "traffic_agent": {
+              "vote": "APPROVE",
+              "reason": "Evaluated via Context-Aware Evidence Engine",
+              "alternative": null,
+              "question": null,
+              "pivot_hint": null
+            },
+            "l4_l7_agent": {
+              "vote": "APPROVE",
+              "reason": "Evaluated via Context-Aware Evidence Engine",
+              "alternative": null,
+              "question": null,
+              "pivot_hint": null
+            }
+          }
+        }
+      },
+      "feedback": [],
+      "final_report": {
+        "incident_id": "INC-l1_dying_asic-1793488577",
+        "status": "diagnosed",
+        "suspected_root_cause": "The CAMPUS_CORE_02 device is experiencing a failing ASIC (Application-Specific Integrated Circuit) causing CPU saturation (100% utilization) and severe packet loss (99.0%) due to excessive queue drops (99999). This results in extreme latency (5000 ms) and degraded network performance despite low link utilization (33.78%).",
+        "confidence": 1.0,
+        "affected_devices": [
+          "CAMPUS_CORE_02"
+        ],
+        "supporting_evidence": [
+          {
+            "evidence_extracted": "CAMPUS_CORE_02 cpu_utilization_pct confirms 100.0%"
+          },
+          {
+            "evidence_extracted": "CAMPUS_CORE_02 queue_drops confirms 99999"
+          },
+          {
+            "evidence_extracted": "packet_loss_pct confirms 99.0%"
+          },
+          {
+            "evidence_extracted": "latency_ms confirms 5000 ms"
+          },
+          {
+            "evidence_extracted": "dns_latency_ms confirms normal DNS performance"
+          },
+          {
+            "evidence_extracted": "dhcp_pool_utilization_pct confirms normal DHCP pool utilization"
+          }
+        ],
+        "alternative_causes": [],
+        "recommended_actions": [
+          "Check ASIC health status and firmware version for known defects",
+          "Monitor CPU-core utilization breakdown to identify resource-hogging processes",
+          "Inspect for malformed packet storms or looping traffic causing excessive processing",
+          "Verify hardware temperature and power supply stability",
+          "Temporarily isolate the device and test with a spare ASIC if available"
+        ],
+        "evidence_sources": [
+          "infrastructure_agent",
+          "traffic_agent",
+          "l4_l7_agent"
+        ],
+        "limitations": [
+          "Consensus reached in round 1"
+        ]
+      },
+      "archived_at": "2026-10-31T23:17:43.940482+00:00"
+    },
+    "INC-l1_cable_length-1793488663": {
+      "incident_id": "INC-l1_cable_length-1793488663",
+      "created_at": "2026-10-31T23:18:54.856489+00:00",
+      "updated_at": "2026-10-31T23:22:07.497929+00:00",
+      "status": "diagnosed",
+      "rounds": {
+        "1": {
+          "hypothesis": "Faulty or degraded physical network cable (likely exceeding maximum allowed length for the link's speed)",
+          "votes": {
+            "infrastructure_agent": {
+              "vote": "APPROVE",
+              "reason": "Evaluated via Context-Aware Evidence Engine",
+              "alternative": null,
+              "question": null,
+              "pivot_hint": null
+            },
+            "traffic_agent": {
+              "vote": "REJECT",
+              "reason": "Evaluated via Context-Aware Evidence Engine",
+              "alternative": null,
+              "question": null,
+              "pivot_hint": null
+            },
+            "l4_l7_agent": {
+              "vote": "ABSTAIN",
+              "reason": "Evaluated via Context-Aware Evidence Engine",
+              "alternative": null,
+              "question": null,
+              "pivot_hint": null
+            }
+          }
+        },
+        "2": {
+          "hypothesis": "Misconfigured switch port (duplex/speed mismatch) causing interface errors and high jitter",
+          "votes": {
+            "infrastructure_agent": {
+              "vote": "APPROVE",
+              "reason": "Evaluated via Context-Aware Evidence Engine",
+              "alternative": null,
+              "question": null,
+              "pivot_hint": null
+            },
+            "traffic_agent": {
+              "vote": "REJECT",
+              "reason": "Evaluated via Context-Aware Evidence Engine",
+              "alternative": null,
+              "question": null,
+              "pivot_hint": null
+            },
+            "l4_l7_agent": {
+              "vote": "APPROVE",
+              "reason": "Evaluated via Context-Aware Evidence Engine",
+              "alternative": null,
+              "question": null,
+              "pivot_hint": null
+            }
+          }
+        },
+        "3": {
+          "hypothesis": "Unknown network anomaly",
+          "votes": {
+            "infrastructure_agent": {
+              "vote": "APPROVE",
+              "reason": "Evaluated via Context-Aware Evidence Engine",
+              "alternative": null,
+              "question": null,
+              "pivot_hint": null
+            },
+            "traffic_agent": {
+              "vote": "APPROVE",
+              "reason": "Evaluated via Context-Aware Evidence Engine",
+              "alternative": null,
+              "question": null,
+              "pivot_hint": null
+            },
+            "l4_l7_agent": {
+              "vote": "APPROVE",
+              "reason": "Evaluated via Context-Aware Evidence Engine",
+              "alternative": null,
+              "question": null,
+              "pivot_hint": null
+            }
+          }
+        }
+      },
+      "feedback": [
+        "Round 1 Failed. Your hypothesis: 'Faulty or degraded physical network cable (likely exceeding maximum allowed length for the link's speed)'\nThe following metrics CONTRADICT your hypothesis:\n- From traffic_agent:\n  * packet_loss_pct is 0.0\n  * latency_ms is 6.74\n  * link_utilization_pct is 36.13\n",
+        "Round 2 Failed. Your hypothesis: 'Misconfigured switch port (duplex/speed mismatch) causing interface errors and high jitter'\nThe following metrics CONTRADICT your hypothesis:\n- From traffic_agent:\n  * jitter_ms indicates high jitter, contradicting the hypothesis of no issues\n"
+      ],
+      "final_report": {
+        "incident_id": "INC-l1_cable_length-1793488663",
+        "status": "diagnosed",
+        "suspected_root_cause": "Unknown network anomaly",
+        "confidence": 1.0,
+        "affected_devices": [
+          "CCTV_OUTDOOR_SW"
+        ],
+        "supporting_evidence": [
+          {
+            "evidence_extracted": "interface_errors confirms 200"
+          },
+          {
+            "evidence_extracted": "CCTV_OUTDOOR_SW interface_errors confirms 200"
+          },
+          {
+            "evidence_extracted": "CCTV_OUTDOOR_SW link utilization is 36.13%"
+          },
+          {
+            "evidence_extracted": "CCTV_OUTDOOR_SW has 0.0% packet loss"
+          },
+          {
+            "evidence_extracted": "CCTV_OUTDOOR_SW latency is 6.74 ms"
+          },
+          {
+            "evidence_extracted": "CCTV_OUTDOOR_SW jitter is 271.57 ms"
+          },
+          {
+            "evidence_extracted": "CCTV_OUTDOOR_SW dns_latency_ms is 21.0 ms (normal)"
+          },
+          {
+            "evidence_extracted": "CCTV_OUTDOOR_SW dhcp_pool_utilization_pct is 46.34% (normal)"
+          }
+        ],
+        "alternative_causes": [],
+        "recommended_actions": [
+          "Manual review required"
+        ],
+        "evidence_sources": [
+          "infrastructure_agent",
+          "traffic_agent",
+          "l4_l7_agent"
+        ],
+        "limitations": [
+          "Consensus reached in round 3"
+        ]
+      },
+      "archived_at": "2026-10-31T23:22:07.518886+00:00"
+    },
+    "INC-l1_ups_dip-1793488927": {
+      "incident_id": "INC-l1_ups_dip-1793488927",
+      "created_at": "2026-10-31T23:23:24.229331+00:00",
+      "updated_at": "2026-10-31T23:23:24.297204+00:00",
+      "status": "diagnosed",
+      "rounds": {
+        "1": {
+          "hypothesis": "High CPU utilization (99%) on DATA_CENTER_SW_04 combined with significant queue drops (5000) suggests a processing bottleneck or resource exhaustion causing traffic handling issues.",
+          "votes": {
+            "infrastructure_agent": {
+              "vote": "APPROVE",
+              "reason": "Evaluated via Context-Aware Evidence Engine",
+              "alternative": null,
+              "question": null,
+              "pivot_hint": null
+            },
+            "traffic_agent": {
+              "vote": "REJECT",
+              "reason": "Evaluated via Context-Aware Evidence Engine",
+              "alternative": null,
+              "question": null,
+              "pivot_hint": null
+            },
+            "l4_l7_agent": {
+              "vote": "APPROVE",
+              "reason": "Evaluated via Context-Aware Evidence Engine",
+              "alternative": null,
+              "question": null,
+              "pivot_hint": null
+            }
+          }
+        }
+      },
+      "feedback": [],
+      "final_report": {
+        "incident_id": "INC-l1_ups_dip-1793488927",
+        "status": "diagnosed",
+        "suspected_root_cause": "High CPU utilization (99%) on DATA_CENTER_SW_04 combined with significant queue drops (5000) suggests a processing bottleneck or resource exhaustion causing traffic handling issues.",
+        "confidence": 0.75,
+        "affected_devices": [
+          "DATA_CENTER_SW_04"
+        ],
+        "supporting_evidence": [
+          {
+            "evidence_extracted": "DATA_CENTER_SW_04 cpu_utilization_pct confirms High CPU utilization (99%)"
+          },
+          {
+            "evidence_extracted": "DATA_CENTER_SW_04 queue_drops confirms significant queue drops (5000)"
+          },
+          {
+            "evidence_extracted": "link_utilization_pct confirms low utilization (45.52%)"
+          },
+          {
+            "evidence_extracted": "packet_loss_pct confirms no packet loss (0.0%)"
+          },
+          {
+            "evidence_extracted": "latency_ms confirms normal latency (19.11 ms)"
+          },
+          {
+            "evidence_extracted": "jitter_ms confirms stable jitter (2.38 ms)"
+          },
+          {
+            "evidence_extracted": "dns_latency_ms of 24.14 ms is within normal ranges"
+          },
+          {
+            "evidence_extracted": "dhcp_pool_utilization_pct of 47.29% is within normal ranges"
+          }
+        ],
+        "alternative_causes": [],
+        "recommended_actions": [
+          "Check for CPU-intensive processes or services on the switch",
+          "Investigate potential DoS/DDoS attacks consuming resources",
+          "Review queue configuration and buffer sizes",
+          "Monitor traffic patterns for abnormal spikes",
+          "Check switch firmware for updates or known issues"
+        ],
+        "evidence_sources": [
+          "infrastructure_agent",
+          "traffic_agent",
+          "l4_l7_agent"
+        ],
+        "limitations": [
+          "Consensus reached in round 1"
+        ]
+      },
+      "archived_at": "2026-10-31T23:23:24.313394+00:00"
+    },
+    "INC-l2_broadcast_storm-1793489004": {
+      "incident_id": "INC-l2_broadcast_storm-1793489004",
+      "created_at": "2026-10-31T23:24:43.184176+00:00",
+      "updated_at": "2026-10-31T23:24:43.250080+00:00",
+      "status": "diagnosed",
+      "rounds": {
+        "1": {
+          "hypothesis": "Broadcast storm caused by excessive Layer 2 traffic flooding the network, leading to 100% CPU/link utilization and significant queue drops.",
+          "votes": {
+            "infrastructure_agent": {
+              "vote": "APPROVE",
+              "reason": "Evaluated via Context-Aware Evidence Engine",
+              "alternative": null,
+              "question": null,
+              "pivot_hint": null
+            },
+            "traffic_agent": {
+              "vote": "APPROVE",
+              "reason": "Evaluated via Context-Aware Evidence Engine",
+              "alternative": null,
+              "question": null,
+              "pivot_hint": null
+            },
+            "l4_l7_agent": {
+              "vote": "APPROVE",
+              "reason": "Evaluated via Context-Aware Evidence Engine",
+              "alternative": null,
+              "question": null,
+              "pivot_hint": null
+            }
+          }
+        }
+      },
+      "feedback": [],
+      "final_report": {
+        "incident_id": "INC-l2_broadcast_storm-1793489004",
+        "status": "diagnosed",
+        "suspected_root_cause": "Broadcast storm caused by excessive Layer 2 traffic flooding the network, leading to 100% CPU/link utilization and significant queue drops.",
+        "confidence": 1.0,
+        "affected_devices": [
+          "LIBRARY_ACCESS_SW"
+        ],
+        "supporting_evidence": [
+          {
+            "evidence_extracted": "LIBRARY_ACCESS_SW.cpu_utilization_pct confirms 100% CPU utilization"
+          },
+          {
+            "evidence_extracted": "LIBRARY_ACCESS_SW.queue_drops confirms significant queue drops"
+          },
+          {
+            "evidence_extracted": "link_utilization_pct confirms 100% CPU/link utilization"
+          },
+          {
+            "evidence_extracted": "latency_ms confirms significant queue drops"
+          },
+          {
+            "evidence_extracted": "dns_latency_ms confirms normal DNS performance"
+          },
+          {
+            "evidence_extracted": "dhcp_pool_utilization_pct confirms normal DHCP pool usage"
+          }
+        ],
+        "alternative_causes": [],
+        "recommended_actions": [
+          "Check for switched network loops using Spanning Tree Protocol (STP) status",
+          "Inspect connected devices for misconfigured VLANs or broadcast-intensive applications",
+          "Implement traffic shaping rules to limit broadcast domain size",
+          "Monitor MAC address table for unexpected flooding patterns",
+          "Check for rogue devices generating excessive ARP requests"
+        ],
+        "evidence_sources": [
+          "infrastructure_agent",
+          "traffic_agent",
+          "l4_l7_agent"
+        ],
+        "limitations": [
+          "Consensus reached in round 1"
+        ]
+      },
+      "archived_at": "2026-10-31T23:24:43.267884+00:00"
+    },
+    "INC-l2_stp_loop-1793489083": {
+      "incident_id": "INC-l2_stp_loop-1793489083",
+      "created_at": "2026-10-31T23:25:56.239261+00:00",
+      "updated_at": "2026-10-31T23:25:56.338425+00:00",
+      "status": "diagnosed",
+      "rounds": {
+        "1": {
+          "hypothesis": "Layer 2 spanning tree protocol (STP) loop causing broadcast storm and CPU overutilization",
+          "votes": {
+            "infrastructure_agent": {
+              "vote": "APPROVE",
+              "reason": "Evaluated via Context-Aware Evidence Engine",
+              "alternative": null,
+              "question": null,
+              "pivot_hint": null
+            },
+            "traffic_agent": {
+              "vote": "APPROVE",
+              "reason": "Evaluated via Context-Aware Evidence Engine",
+              "alternative": null,
+              "question": null,
+              "pivot_hint": null
+            },
+            "l4_l7_agent": {
+              "vote": "APPROVE",
+              "reason": "Evaluated via Context-Aware Evidence Engine",
+              "alternative": null,
+              "question": null,
+              "pivot_hint": null
+            }
+          }
+        }
+      },
+      "feedback": [],
+      "final_report": {
+        "incident_id": "INC-l2_stp_loop-1793489083",
+        "status": "diagnosed",
+        "suspected_root_cause": "Layer 2 spanning tree protocol (STP) loop causing broadcast storm and CPU overutilization",
+        "confidence": 1.0,
+        "affected_devices": [
+          "SMS_DEPT_SW"
+        ],
+        "supporting_evidence": [
+          {
+            "evidence_extracted": "SMS_DEPT_SW cpu_utilization_pct confirms CPU overutilization"
+          },
+          {
+            "evidence_extracted": "SMS_DEPT_SW interface_errors confirms no interface errors"
+          },
+          {
+            "evidence_extracted": "packet_loss_pct confirms 25.0"
+          },
+          {
+            "evidence_extracted": "latency_ms confirms 944.76"
+          },
+          {
+            "evidence_extracted": "dns_latency_ms confirms normal DNS performance"
+          },
+          {
+            "evidence_extracted": "dhcp_pool_utilization_pct confirms normal DHCP pool utilization"
+          }
+        ],
+        "alternative_causes": [],
+        "recommended_actions": [
+          "Check for redundant Layer 2 links without proper STP blocking",
+          "Verify STP configuration on SMS_DEPT_SW and connected devices",
+          "Inspect BPDU traffic patterns for abnormal rates",
+          "Temporarily disable suspected redundant links to test loop elimination",
+          "Monitor CPU usage and packet loss after mitigation steps"
+        ],
+        "evidence_sources": [
+          "infrastructure_agent",
+          "traffic_agent",
+          "l4_l7_agent"
+        ],
+        "limitations": [
+          "Consensus reached in round 1"
+        ]
+      },
+      "archived_at": "2026-10-31T23:25:56.360326+00:00"
+    },
+    "INC-l1_cable_damage_lhc-1793489391": {
+      "incident_id": "INC-l1_cable_damage_lhc-1793489391",
+      "created_at": "2026-10-31T23:30:54.841073+00:00",
+      "updated_at": "2026-10-31T23:30:54.908756+00:00",
+      "status": "diagnosed",
+      "rounds": {
+        "1": {
+          "hypothesis": "Physical layer fault due to damaged network cable or faulty switch port causing high interface errors and packet loss.",
+          "votes": {
+            "infrastructure_agent": {
+              "vote": "APPROVE",
+              "reason": "Evaluated via Context-Aware Evidence Engine",
+              "alternative": null,
+              "question": null,
+              "pivot_hint": null
+            },
+            "traffic_agent": {
+              "vote": "APPROVE",
+              "reason": "Evaluated via Context-Aware Evidence Engine",
+              "alternative": null,
+              "question": null,
+              "pivot_hint": null
+            },
+            "l4_l7_agent": {
+              "vote": "ABSTAIN",
+              "reason": "Evaluated via Context-Aware Evidence Engine",
+              "alternative": null,
+              "question": null,
+              "pivot_hint": null
+            }
+          }
+        }
+      },
+      "feedback": [],
+      "final_report": {
+        "incident_id": "INC-l1_cable_damage_lhc-1793489391",
+        "status": "diagnosed",
+        "suspected_root_cause": "Physical layer fault due to damaged network cable or faulty switch port causing high interface errors and packet loss.",
+        "confidence": 1.0,
+        "affected_devices": [
+          "LHC_ROOM_104_SW"
+        ],
+        "supporting_evidence": [
+          {
+            "evidence_extracted": "interface_errors confirms Physical layer fault due to damaged network cable or faulty switch port causing high interface errors and packet loss."
+          },
+          {
+            "evidence_extracted": "packet_loss_pct confirms 17.02"
+          },
+          {
+            "evidence_extracted": "latency_ms confirms 10.14"
+          }
+        ],
+        "alternative_causes": [],
+        "recommended_actions": [
+          "Inspect and replace the network cable connected to LHC_ROOM_104_SW",
+          "Check for hardware failures in the switch's physical ports",
+          "Verify connected devices for compatibility issues",
+          "Test with a known-good cable to isolate the fault"
+        ],
+        "evidence_sources": [
+          "infrastructure_agent",
+          "traffic_agent"
+        ],
+        "limitations": [
+          "Consensus reached in round 1"
+        ]
+      },
+      "archived_at": "2026-10-31T23:30:54.923295+00:00"
+    },
+    "INC-l1_fiber_bend_core-1793489454": {
+      "incident_id": "INC-l1_fiber_bend_core-1793489454",
+      "created_at": "2026-10-31T23:32:08.438988+00:00",
+      "updated_at": "2026-10-31T23:32:08.520143+00:00",
+      "status": "diagnosed",
+      "rounds": {
+        "1": {
+          "hypothesis": "Physical layer (L1) fiber optic cable degradation due to excessive bending, causing signal attenuation and interface errors.",
+          "votes": {
+            "infrastructure_agent": {
+              "vote": "APPROVE",
+              "reason": "Evaluated via Context-Aware Evidence Engine",
+              "alternative": null,
+              "question": null,
+              "pivot_hint": null
+            },
+            "traffic_agent": {
+              "vote": "APPROVE",
+              "reason": "Evaluated via Context-Aware Evidence Engine",
+              "alternative": null,
+              "question": null,
+              "pivot_hint": null
+            },
+            "l4_l7_agent": {
+              "vote": "ABSTAIN",
+              "reason": "Evaluated via Context-Aware Evidence Engine",
+              "alternative": null,
+              "question": null,
+              "pivot_hint": null
+            }
+          }
+        }
+      },
+      "feedback": [],
+      "final_report": {
+        "incident_id": "INC-l1_fiber_bend_core-1793489454",
+        "status": "diagnosed",
+        "suspected_root_cause": "Physical layer (L1) fiber optic cable degradation due to excessive bending, causing signal attenuation and interface errors.",
+        "confidence": 1.0,
+        "affected_devices": [
+          "ADMIN_CORE_RTR"
+        ],
+        "supporting_evidence": [
+          {
+            "evidence_extracted": "interface_errors confirms Physical layer (L1) fiber optic cable degradation due to excessive bending, causing signal attenuation and interface errors."
+          },
+          {
+            "evidence_extracted": "packet_loss_pct confirms 5.61"
+          },
+          {
+            "evidence_extracted": "latency_ms confirms 45.0"
+          }
+        ],
+        "alternative_causes": [],
+        "recommended_actions": [
+          "Inspect fiber optic cable routing for sharp bends or physical damage near ADMIN_CORE_RTR interfaces",
+          "Verify optical power levels on affected links using an optical power meter",
+          "Check for interface error counter increments on ADMIN_CORE_RTR's physical layer ports",
+          "Test with a known good fiber patch cable to isolate cable faults",
+          "Review environmental monitoring data for temperature/humidity anomalies that could exacerbate fiber issues"
+        ],
+        "evidence_sources": [
+          "infrastructure_agent",
+          "traffic_agent"
+        ],
+        "limitations": [
+          "Consensus reached in round 1"
+        ]
+      },
+      "archived_at": "2026-10-31T23:32:08.542244+00:00"
+    },
+    "INC-l1_sfp_failure_ses-1793489528": {
+      "incident_id": "INC-l1_sfp_failure_ses-1793489528",
+      "created_at": "2026-10-31T23:33:08.730909+00:00",
+      "updated_at": "2026-10-31T23:33:08.830902+00:00",
+      "status": "diagnosed",
+      "rounds": {
+        "1": {
+          "hypothesis": "Faulty SFP module or physical layer degradation on SES_DEPT_SW causing high interface errors (6199) and packet loss (14.44%).",
+          "votes": {
+            "infrastructure_agent": {
+              "vote": "APPROVE",
+              "reason": "Evaluated via Context-Aware Evidence Engine",
+              "alternative": null,
+              "question": null,
+              "pivot_hint": null
+            },
+            "traffic_agent": {
+              "vote": "APPROVE",
+              "reason": "Evaluated via Context-Aware Evidence Engine",
+              "alternative": null,
+              "question": null,
+              "pivot_hint": null
+            },
+            "l4_l7_agent": {
+              "vote": "ABSTAIN",
+              "reason": "Evaluated via Context-Aware Evidence Engine",
+              "alternative": null,
+              "question": null,
+              "pivot_hint": null
+            }
+          }
+        }
+      },
+      "feedback": [],
+      "final_report": {
+        "incident_id": "INC-l1_sfp_failure_ses-1793489528",
+        "status": "diagnosed",
+        "suspected_root_cause": "Faulty SFP module or physical layer degradation on SES_DEPT_SW causing high interface errors (6199) and packet loss (14.44%).",
+        "confidence": 1.0,
+        "affected_devices": [
+          "SES_DEPT_SW"
+        ],
+        "supporting_evidence": [
+          {
+            "evidence_extracted": "interface_errors confirms high interface errors (6199)"
+          },
+          {
+            "evidence_extracted": "packet_loss confirms packet loss (14.44%)"
+          },
+          {
+            "evidence_extracted": "packet_loss_pct confirms 14.44%"
+          },
+          {
+            "evidence_extracted": "latency_ms confirms 11.03"
+          }
+        ],
+        "alternative_causes": [],
+        "recommended_actions": [
+          "Inspect and replace SFP modules on SES_DEPT_SW",
+          "Verify all physical cable connections",
+          "Check for hardware errors in switch logs",
+          "Test link with known good cable/SFP",
+          "Monitor interface error counts after intervention"
+        ],
+        "evidence_sources": [
+          "infrastructure_agent",
+          "traffic_agent"
+        ],
+        "limitations": [
+          "Consensus reached in round 1"
+        ]
+      },
+      "archived_at": "2026-10-31T23:33:08.855480+00:00"
+    },
+    "INC-l1_overheating_switch-1793489588": {
+      "incident_id": "INC-l1_overheating_switch-1793489588",
+      "created_at": "2026-10-31T23:34:12.127142+00:00",
+      "updated_at": "2026-10-31T23:34:12.220405+00:00",
+      "status": "diagnosed",
+      "rounds": {
+        "1": {
+          "hypothesis": "The HOSTEL_M_CLOSET_SW switch is experiencing critical CPU overutilization (91.97%) likely due to overheating, leading to queue drops (181) and infrastructure domain anomalies.",
+          "votes": {
+            "infrastructure_agent": {
+              "vote": "APPROVE",
+              "reason": "Evaluated via Context-Aware Evidence Engine",
+              "alternative": null,
+              "question": null,
+              "pivot_hint": null
+            },
+            "traffic_agent": {
+              "vote": "ABSTAIN",
+              "reason": "Evaluated via Context-Aware Evidence Engine",
+              "alternative": null,
+              "question": null,
+              "pivot_hint": null
+            },
+            "l4_l7_agent": {
+              "vote": "ABSTAIN",
+              "reason": "Evaluated via Context-Aware Evidence Engine",
+              "alternative": null,
+              "question": null,
+              "pivot_hint": null
+            }
+          }
+        }
+      },
+      "feedback": [],
+      "final_report": {
+        "incident_id": "INC-l1_overheating_switch-1793489588",
+        "status": "diagnosed",
+        "suspected_root_cause": "The HOSTEL_M_CLOSET_SW switch is experiencing critical CPU overutilization (91.97%) likely due to overheating, leading to queue drops (181) and infrastructure domain anomalies.",
+        "confidence": 1.0,
+        "affected_devices": [
+          "HOSTEL_M_CLOSET_SW"
+        ],
+        "supporting_evidence": [
+          {
+            "evidence_extracted": "HOSTEL_M_CLOSET_SW cpu_utilization_pct confirms 91.97%"
+          },
+          {
+            "evidence_extracted": "HOSTEL_M_CLOSET_SW queue_drops confirms 181"
+          }
+        ],
+        "alternative_causes": [],
+        "recommended_actions": [
+          "Check switch temperature sensors and ensure proper cooling",
+          "Verify firmware is up-to-date for thermal management",
+          "Inspect for hardware faults or excessive traffic loops",
+          "Monitor CPU usage trends over time",
+          "Check for recent configuration changes"
+        ],
+        "evidence_sources": [
+          "infrastructure_agent"
+        ],
+        "limitations": [
+          "Consensus reached in round 1"
+        ]
+      },
+      "archived_at": "2026-10-31T23:34:12.245826+00:00"
+    },
+    "INC-l1_speed_duplex-1793489652": {
+      "incident_id": "INC-l1_speed_duplex-1793489652",
+      "created_at": "2026-10-31T23:35:15.101189+00:00",
+      "updated_at": "2026-10-31T23:35:15.192163+00:00",
+      "status": "diagnosed",
+      "rounds": {
+        "1": {
+          "hypothesis": "Misconfigured or faulty physical interface on ADMIN_PRINTER_SW causing high interface errors and increased latency.",
+          "votes": {
+            "infrastructure_agent": {
+              "vote": "APPROVE",
+              "reason": "Evaluated via Context-Aware Evidence Engine",
+              "alternative": null,
+              "question": null,
+              "pivot_hint": null
+            },
+            "traffic_agent": {
+              "vote": "APPROVE",
+              "reason": "Evaluated via Context-Aware Evidence Engine",
+              "alternative": null,
+              "question": null,
+              "pivot_hint": null
+            },
+            "l4_l7_agent": {
+              "vote": "ABSTAIN",
+              "reason": "Evaluated via Context-Aware Evidence Engine",
+              "alternative": null,
+              "question": null,
+              "pivot_hint": null
+            }
+          }
+        }
+      },
+      "feedback": [],
+      "final_report": {
+        "incident_id": "INC-l1_speed_duplex-1793489652",
+        "status": "diagnosed",
+        "suspected_root_cause": "Misconfigured or faulty physical interface on ADMIN_PRINTER_SW causing high interface errors and increased latency.",
+        "confidence": 1.0,
+        "affected_devices": [
+          "ADMIN_PRINTER_SW"
+        ],
+        "supporting_evidence": [
+          {
+            "evidence_extracted": "interface_errors confirms high interface errors"
+          },
+          {
+            "evidence_extracted": "queue_drops confirms no packet drops"
+          },
+          {
+            "evidence_extracted": "latency_ms confirms increased latency"
+          }
+        ],
+        "alternative_causes": [],
+        "recommended_actions": [
+          "Inspect and replace any damaged Ethernet cables connected to ADMIN_PRINTER_SW",
+          "Verify speed/duplex settings are correctly configured (e.g., both ends of the link use same settings)",
+          "Check for hardware failures in the switch's interface module",
+          "Monitor interface error counts over time to confirm if the issue persists"
+        ],
+        "evidence_sources": [
+          "infrastructure_agent",
+          "traffic_agent"
+        ],
+        "limitations": [
+          "Consensus reached in round 1"
+        ]
+      },
+      "archived_at": "2026-10-31T23:35:15.214973+00:00"
+    },
+    "INC-l1_dying_asic-1793489715": {
+      "incident_id": "INC-l1_dying_asic-1793489715",
+      "created_at": "2026-10-31T23:36:36.865969+00:00",
+      "updated_at": "2026-10-31T23:36:36.946685+00:00",
+      "status": "diagnosed",
+      "rounds": {
+        "1": {
+          "hypothesis": "CAMPUS_CORE_02 is experiencing a critical CPU overload (100% utilization) leading to massive packet loss (99%), extreme latency (5000ms), and excessive queue drops (99999). This suggests the device is unable to process traffic due to either a hardware failure, resource exhaustion, or a malicious process consuming computational resources.",
+          "votes": {
+            "infrastructure_agent": {
+              "vote": "APPROVE",
+              "reason": "Evaluated via Context-Aware Evidence Engine",
+              "alternative": null,
+              "question": null,
+              "pivot_hint": null
+            },
+            "traffic_agent": {
+              "vote": "APPROVE",
+              "reason": "Evaluated via Context-Aware Evidence Engine",
+              "alternative": null,
+              "question": null,
+              "pivot_hint": null
+            },
+            "l4_l7_agent": {
+              "vote": "ABSTAIN",
+              "reason": "Evaluated via Context-Aware Evidence Engine",
+              "alternative": null,
+              "question": null,
+              "pivot_hint": null
+            }
+          }
+        }
+      },
+      "feedback": [],
+      "final_report": {
+        "incident_id": "INC-l1_dying_asic-1793489715",
+        "status": "diagnosed",
+        "suspected_root_cause": "CAMPUS_CORE_02 is experiencing a critical CPU overload (100% utilization) leading to massive packet loss (99%), extreme latency (5000ms), and excessive queue drops (99999). This suggests the device is unable to process traffic due to either a hardware failure, resource exhaustion, or a malicious process consuming computational resources.",
+        "confidence": 1.0,
+        "affected_devices": [
+          "CAMPUS_CORE_02"
+        ],
+        "supporting_evidence": [
+          {
+            "evidence_extracted": "CAMPUS_CORE_02 cpu_utilization_pct confirms 100% utilization"
+          },
+          {
+            "evidence_extracted": "CAMPUS_CORE_02 queue_drops confirms 99999"
+          },
+          {
+            "evidence_extracted": "packet_loss_pct confirms 99%"
+          },
+          {
+            "evidence_extracted": "latency_ms confirms 5000ms"
+          }
+        ],
+        "alternative_causes": [],
+        "recommended_actions": [
+          "Initiate a hardware health check for CAMPUS_CORE_02",
+          "Review CPU resource allocation and identify processes consuming 100% utilization",
+          "Check for firmware/software bugs causing abnormal CPU spikes",
+          "Implement temporary traffic shaping rules to reduce load",
+          "Consider hardware replacement if CPU failure is confirmed"
+        ],
+        "evidence_sources": [
+          "infrastructure_agent",
+          "traffic_agent"
+        ],
+        "limitations": [
+          "Consensus reached in round 1"
+        ]
+      },
+      "archived_at": "2026-10-31T23:36:36.969306+00:00"
+    },
+    "INC-l1_cable_length-1793489796": {
+      "incident_id": "INC-l1_cable_length-1793489796",
+      "created_at": "2026-10-31T23:37:22.252627+00:00",
+      "updated_at": "2026-10-31T23:37:22.351465+00:00",
+      "status": "diagnosed",
+      "rounds": {
+        "1": {
+          "hypothesis": "Physical layer degradation due to excessive cable length causing signal integrity issues and interface errors",
+          "votes": {
+            "infrastructure_agent": {
+              "vote": "APPROVE",
+              "reason": "Evaluated via Context-Aware Evidence Engine",
+              "alternative": null,
+              "question": null,
+              "pivot_hint": null
+            },
+            "traffic_agent": {
+              "vote": "ABSTAIN",
+              "reason": "Evaluated via Context-Aware Evidence Engine",
+              "alternative": null,
+              "question": null,
+              "pivot_hint": null
+            },
+            "l4_l7_agent": {
+              "vote": "ABSTAIN",
+              "reason": "Evaluated via Context-Aware Evidence Engine",
+              "alternative": null,
+              "question": null,
+              "pivot_hint": null
+            }
+          }
+        }
+      },
+      "feedback": [],
+      "final_report": {
+        "incident_id": "INC-l1_cable_length-1793489796",
+        "status": "diagnosed",
+        "suspected_root_cause": "Physical layer degradation due to excessive cable length causing signal integrity issues and interface errors",
+        "confidence": 1.0,
+        "affected_devices": [
+          "CCTV_OUTDOOR_SW"
+        ],
+        "supporting_evidence": [
+          {
+            "evidence_extracted": "interface_errors confirms Physical layer degradation due to excessive cable length causing signal integrity issues and interface errors"
+          }
+        ],
+        "alternative_causes": [],
+        "recommended_actions": [
+          "Verify cable length against manufacturer specifications",
+          "Test with a known good cable",
+          "Check for electromagnetic interference sources",
+          "Inspect RJ45 connectors for physical damage",
+          "Measure signal attenuation using a network analyzer"
+        ],
+        "evidence_sources": [
+          "infrastructure_agent"
+        ],
+        "limitations": [
+          "Consensus reached in round 1"
+        ]
+      },
+      "archived_at": "2026-10-31T23:37:22.386978+00:00"
+    },
+    "INC-l1_ups_dip-1793489842": {
+      "incident_id": "INC-l1_ups_dip-1793489842",
+      "created_at": "2026-10-31T23:38:29.864741+00:00",
+      "updated_at": "2026-10-31T23:38:29.961932+00:00",
+      "status": "diagnosed",
+      "rounds": {
+        "1": {
+          "hypothesis": "High CPU utilization (99%) on DATA_CENTER_SW_04 is causing packet processing delays and queue drops (5000), likely due to a resource exhaustion or abnormal traffic pattern.",
+          "votes": {
+            "infrastructure_agent": {
+              "vote": "APPROVE",
+              "reason": "Evaluated via Context-Aware Evidence Engine",
+              "alternative": null,
+              "question": null,
+              "pivot_hint": null
+            },
+            "traffic_agent": {
+              "vote": "REJECT",
+              "reason": "Evaluated via Context-Aware Evidence Engine",
+              "alternative": null,
+              "question": null,
+              "pivot_hint": null
+            },
+            "l4_l7_agent": {
+              "vote": "ABSTAIN",
+              "reason": "Evaluated via Context-Aware Evidence Engine",
+              "alternative": null,
+              "question": null,
+              "pivot_hint": null
+            }
+          }
+        }
+      },
+      "feedback": [],
+      "final_report": {
+        "incident_id": "INC-l1_ups_dip-1793489842",
+        "status": "diagnosed",
+        "suspected_root_cause": "High CPU utilization (99%) on DATA_CENTER_SW_04 is causing packet processing delays and queue drops (5000), likely due to a resource exhaustion or abnormal traffic pattern.",
+        "confidence": 0.75,
+        "affected_devices": [
+          "DATA_CENTER_SW_04"
+        ],
+        "supporting_evidence": [
+          {
+            "evidence_extracted": "DATA_CENTER_SW_04 cpu_utilization_pct confirms High CPU utilization (99%)"
+          },
+          {
+            "evidence_extracted": "DATA_CENTER_SW_04 queue_drops confirms packet processing delays and queue drops (5000)"
+          }
+        ],
+        "alternative_causes": [],
+        "recommended_actions": [
+          "Check for CPU-intensive processes or loops on DATA_CENTER_SW_04",
+          "Investigate recent configuration changes on the switch",
+          "Monitor traffic patterns for potential DoS attacks",
+          "Verify hardware health and cooling systems",
+          "Consider temporary traffic shaping if anomaly persists"
+        ],
+        "evidence_sources": [
+          "infrastructure_agent"
+        ],
+        "limitations": [
+          "Consensus reached in round 1"
+        ]
+      },
+      "archived_at": "2026-10-31T23:38:29.982233+00:00"
+    },
+    "INC-l2_broadcast_storm-1793489910": {
+      "incident_id": "INC-l2_broadcast_storm-1793489910",
+      "created_at": "2026-10-31T23:39:53.593208+00:00",
+      "updated_at": "2026-10-31T23:39:53.681891+00:00",
+      "status": "diagnosed",
+      "rounds": {
+        "1": {
+          "hypothesis": "Broadcast storm caused by a network loop or faulty device generating excessive broadcast traffic, leading to 100% CPU/link utilization and massive queue drops.",
+          "votes": {
+            "infrastructure_agent": {
+              "vote": "APPROVE",
+              "reason": "Evaluated via Context-Aware Evidence Engine",
+              "alternative": null,
+              "question": null,
+              "pivot_hint": null
+            },
+            "traffic_agent": {
+              "vote": "APPROVE",
+              "reason": "Evaluated via Context-Aware Evidence Engine",
+              "alternative": null,
+              "question": null,
+              "pivot_hint": null
+            },
+            "l4_l7_agent": {
+              "vote": "ABSTAIN",
+              "reason": "Evaluated via Context-Aware Evidence Engine",
+              "alternative": null,
+              "question": null,
+              "pivot_hint": null
+            }
+          }
+        }
+      },
+      "feedback": [],
+      "final_report": {
+        "incident_id": "INC-l2_broadcast_storm-1793489910",
+        "status": "diagnosed",
+        "suspected_root_cause": "Broadcast storm caused by a network loop or faulty device generating excessive broadcast traffic, leading to 100% CPU/link utilization and massive queue drops.",
+        "confidence": 1.0,
+        "affected_devices": [
+          "LIBRARY_ACCESS_SW"
+        ],
+        "supporting_evidence": [
+          {
+            "evidence_extracted": "LIBRARY_ACCESS_SW cpu_utilization_pct confirms 100% CPU utilization"
+          },
+          {
+            "evidence_extracted": "LIBRARY_ACCESS_SW queue_drops confirms massive queue drops"
+          },
+          {
+            "evidence_extracted": "LIBRARY_ACCESS_SW link_utilization_pct confirms 100% CPU/link utilization"
+          },
+          {
+            "evidence_extracted": "LIBRARY_ACCESS_SW packet_loss_pct confirms massive queue drops"
+          }
+        ],
+        "alternative_causes": [],
+        "recommended_actions": [
+          "Check for switched network loops using Spanning Tree Protocol (STP) status and port roles",
+          "Inspect connected devices for faulty hardware generating abnormal broadcast traffic",
+          "Implement broadcast storm control limits on LIBRARY_ACCESS_SW interfaces",
+          "Monitor traffic patterns for excessive multicast/broadcast traffic sources",
+          "Check for rogue devices with misconfigured VLANs or broadcast domains"
+        ],
+        "evidence_sources": [
+          "infrastructure_agent",
+          "traffic_agent"
+        ],
+        "limitations": [
+          "Consensus reached in round 1"
+        ]
+      },
+      "archived_at": "2026-10-31T23:39:53.700082+00:00"
+    },
+    "INC-l2_stp_loop-1793489993": {
+      "incident_id": "INC-l2_stp_loop-1793489993",
+      "created_at": "2026-10-31T23:40:53.038893+00:00",
+      "updated_at": "2026-10-31T23:40:53.110637+00:00",
+      "status": "diagnosed",
+      "rounds": {
+        "1": {
+          "hypothesis": "L2 STP loop causing broadcast storm and network congestion",
+          "votes": {
+            "infrastructure_agent": {
+              "vote": "APPROVE",
+              "reason": "Evaluated via Context-Aware Evidence Engine",
+              "alternative": null,
+              "question": null,
+              "pivot_hint": null
+            },
+            "traffic_agent": {
+              "vote": "APPROVE",
+              "reason": "Evaluated via Context-Aware Evidence Engine",
+              "alternative": null,
+              "question": null,
+              "pivot_hint": null
+            },
+            "l4_l7_agent": {
+              "vote": "ABSTAIN",
+              "reason": "Evaluated via Context-Aware Evidence Engine",
+              "alternative": null,
+              "question": null,
+              "pivot_hint": null
+            }
+          }
+        }
+      },
+      "feedback": [],
+      "final_report": {
+        "incident_id": "INC-l2_stp_loop-1793489993",
+        "status": "diagnosed",
+        "suspected_root_cause": "L2 STP loop causing broadcast storm and network congestion",
+        "confidence": 1.0,
+        "affected_devices": [
+          "SMS_DEPT_SW"
+        ],
+        "supporting_evidence": [
+          {
+            "evidence_extracted": "SMS_DEPT_SW cpu_utilization_pct confirms high CPU usage due to L2 STP loop"
+          },
+          {
+            "evidence_extracted": "SMS_DEPT_SW queue_drops confirms network congestion"
+          },
+          {
+            "evidence_extracted": "packet_loss_pct confirms 25.0%"
+          },
+          {
+            "evidence_extracted": "latency_ms confirms 944.76ms"
+          }
+        ],
+        "alternative_causes": [],
+        "recommended_actions": [
+          "Check spanning tree protocol (STP) status and port states on SMS_DEPT_SW",
+          "Verify for redundant Layer 2 paths between switches",
+          "Inspect recent configuration changes affecting STP topology",
+          "Analyze MAC address table for duplicate entries",
+          "Monitor for excessive broadcast/multicast traffic"
+        ],
+        "evidence_sources": [
+          "infrastructure_agent",
+          "traffic_agent"
+        ],
+        "limitations": [
+          "Consensus reached in round 1"
+        ]
+      },
+      "archived_at": "2026-10-31T23:40:53.132082+00:00"
+    },
+    "INC-l2_mac_flap-1793490053": {
+      "incident_id": "INC-l2_mac_flap-1793490053",
+      "created_at": "2026-10-31T23:42:07.987384+00:00",
+      "updated_at": "2026-10-31T23:42:08.069614+00:00",
+      "status": "diagnosed",
+      "rounds": {
+        "1": {
+          "hypothesis": "L2 MAC address flapping causing excessive CPU utilization and network instability on WIFI_CTRL_01",
+          "votes": {
+            "infrastructure_agent": {
+              "vote": "APPROVE",
+              "reason": "Evaluated via Context-Aware Evidence Engine",
+              "alternative": null,
+              "question": null,
+              "pivot_hint": null
+            },
+            "traffic_agent": {
+              "vote": "ABSTAIN",
+              "reason": "Evaluated via Context-Aware Evidence Engine",
+              "alternative": null,
+              "question": null,
+              "pivot_hint": null
+            },
+            "l4_l7_agent": {
+              "vote": "ABSTAIN",
+              "reason": "Evaluated via Context-Aware Evidence Engine",
+              "alternative": null,
+              "question": null,
+              "pivot_hint": null
+            }
+          }
+        }
+      },
+      "feedback": [],
+      "final_report": {
+        "incident_id": "INC-l2_mac_flap-1793490053",
+        "status": "diagnosed",
+        "suspected_root_cause": "L2 MAC address flapping causing excessive CPU utilization and network instability on WIFI_CTRL_01",
+        "confidence": 1.0,
+        "affected_devices": [
+          "WIFI_CTRL_01"
+        ],
+        "supporting_evidence": [
+          {
+            "evidence_extracted": "WIFI_CTRL_01 cpu_utilization_pct confirms excessive CPU utilization"
+          },
+          {
+            "evidence_extracted": "WIFI_CTRL_01 interface_errors confirms network instability"
+          }
+        ],
+        "alternative_causes": [],
+        "recommended_actions": [
+          "Check for duplicate MAC addresses on the network",
+          "Inspect switch port statistics for MAC flapping alerts",
+          "Verify no devices have multiple active network connections",
+          "Monitor CPU usage trends on WIFI_CTRL_01",
+          "Check for misconfigured VLANs or looped network segments"
+        ],
+        "evidence_sources": [
+          "infrastructure_agent"
+        ],
+        "limitations": [
+          "Consensus reached in round 1"
+        ]
+      },
+      "archived_at": "2026-10-31T23:42:08.091260+00:00"
+    },
+    "INC-l2_mtu_mismatch-1793490128": {
+      "incident_id": "INC-l2_mtu_mismatch-1793490128",
+      "created_at": "2026-10-31T23:43:02.594201+00:00",
+      "updated_at": "2026-10-31T23:43:02.676763+00:00",
+      "status": "diagnosed",
+      "rounds": {
+        "1": {
+          "hypothesis": "MTU mismatch on CORE_TO_FW_LINK causing packet fragmentation and interface errors",
+          "votes": {
+            "infrastructure_agent": {
+              "vote": "APPROVE",
+              "reason": "Evaluated via Context-Aware Evidence Engine",
+              "alternative": null,
+              "question": null,
+              "pivot_hint": null
+            },
+            "traffic_agent": {
+              "vote": "APPROVE",
+              "reason": "Evaluated via Context-Aware Evidence Engine",
+              "alternative": null,
+              "question": null,
+              "pivot_hint": null
+            },
+            "l4_l7_agent": {
+              "vote": "ABSTAIN",
+              "reason": "Evaluated via Context-Aware Evidence Engine",
+              "alternative": null,
+              "question": null,
+              "pivot_hint": null
+            }
+          }
+        }
+      },
+      "feedback": [],
+      "final_report": {
+        "incident_id": "INC-l2_mtu_mismatch-1793490128",
+        "status": "diagnosed",
+        "suspected_root_cause": "MTU mismatch on CORE_TO_FW_LINK causing packet fragmentation and interface errors",
+        "confidence": 1.0,
+        "affected_devices": [
+          "CORE_TO_FW_LINK"
+        ],
+        "supporting_evidence": [
+          {
+            "evidence_extracted": "interface_errors confirms MTU mismatch on CORE_TO_FW_LINK"
+          },
+          {
+            "evidence_extracted": "queue_drops confirms packet fragmentation on CORE_TO_FW_LINK"
+          },
+          {
+            "evidence_extracted": "packet_loss_pct confirms packet fragmentation"
+          },
+          {
+            "evidence_extracted": "latency_ms confirms increased delay due to fragmentation"
+          }
+        ],
+        "alternative_causes": [],
+        "recommended_actions": [
+          "Verify MTU configuration on both ends of the CORE_TO_FW_LINK",
+          "Check for inconsistent MTU settings between core switch and firewall devices",
+          "Monitor interface error counts after MTU alignment",
+          "Inspect switch/firewall logs for fragmentation-related drops"
+        ],
+        "evidence_sources": [
+          "infrastructure_agent",
+          "traffic_agent"
+        ],
+        "limitations": [
+          "Consensus reached in round 1"
+        ]
+      },
+      "archived_at": "2026-10-31T23:43:02.720395+00:00"
+    },
+    "INC-l2_vlan_mismatch-1793490182": {
+      "incident_id": "INC-l2_vlan_mismatch-1793490182",
+      "created_at": "2026-10-31T23:43:53.654659+00:00",
+      "updated_at": "2026-10-31T23:43:53.734724+00:00",
+      "status": "diagnosed",
+      "rounds": {
+        "1": {
+          "hypothesis": "Layer 2 VLAN mismatch on TRUNK_PORT_01 causing traffic anomalies",
+          "votes": {
+            "infrastructure_agent": {
+              "vote": "ABSTAIN",
+              "reason": "Evaluated via Context-Aware Evidence Engine",
+              "alternative": null,
+              "question": null,
+              "pivot_hint": null
+            },
+            "traffic_agent": {
+              "vote": "APPROVE",
+              "reason": "Evaluated via Context-Aware Evidence Engine",
+              "alternative": null,
+              "question": null,
+              "pivot_hint": null
+            },
+            "l4_l7_agent": {
+              "vote": "ABSTAIN",
+              "reason": "Evaluated via Context-Aware Evidence Engine",
+              "alternative": null,
+              "question": null,
+              "pivot_hint": null
+            }
+          }
+        }
+      },
+      "feedback": [],
+      "final_report": {
+        "incident_id": "INC-l2_vlan_mismatch-1793490182",
+        "status": "diagnosed",
+        "suspected_root_cause": "Layer 2 VLAN mismatch on TRUNK_PORT_01 causing traffic anomalies",
+        "confidence": 1.0,
+        "affected_devices": [
+          "TRUNK_PORT_01"
+        ],
+        "supporting_evidence": [
+          {
+            "evidence_extracted": "TRUNK_PORT_01 latency_ms confirms 179.09"
+          },
+          {
+            "evidence_extracted": "TRUNK_PORT_01 jitter_ms confirms 2.45"
+          }
+        ],
+        "alternative_causes": [],
+        "recommended_actions": [
+          "Verify VLAN configuration on TRUNK_PORT_01 and connected devices",
+          "Check trunk port allowed VLANs configuration",
+          "Inspect switchport trunk allowed vlan settings",
+          "Validate VLAN ID consistency across connected devices"
+        ],
+        "evidence_sources": [
+          "traffic_agent"
+        ],
+        "limitations": [
+          "Consensus reached in round 1"
+        ]
+      },
+      "archived_at": "2026-10-31T23:43:53.757405+00:00"
+    },
+    "INC-l2_port_security-1793490233": {
+      "incident_id": "INC-l2_port_security-1793490233",
+      "created_at": "2026-10-31T23:44:45.588193+00:00",
+      "updated_at": "2026-10-31T23:44:45.687116+00:00",
+      "status": "diagnosed",
+      "rounds": {
+        "1": {
+          "hypothesis": "Port security configuration on HOSTEL_S_ROOM_SW is blocking legitimate traffic due to MAC address conflicts or unauthorized device connections.",
+          "votes": {
+            "infrastructure_agent": {
+              "vote": "ABSTAIN",
+              "reason": "Evaluated via Context-Aware Evidence Engine",
+              "alternative": null,
+              "question": null,
+              "pivot_hint": null
+            },
+            "traffic_agent": {
+              "vote": "APPROVE",
+              "reason": "Evaluated via Context-Aware Evidence Engine",
+              "alternative": null,
+              "question": null,
+              "pivot_hint": null
+            },
+            "l4_l7_agent": {
+              "vote": "ABSTAIN",
+              "reason": "Evaluated via Context-Aware Evidence Engine",
+              "alternative": null,
+              "question": null,
+              "pivot_hint": null
+            }
+          }
+        }
+      },
+      "feedback": [],
+      "final_report": {
+        "incident_id": "INC-l2_port_security-1793490233",
+        "status": "diagnosed",
+        "suspected_root_cause": "Port security configuration on HOSTEL_S_ROOM_SW is blocking legitimate traffic due to MAC address conflicts or unauthorized device connections.",
+        "confidence": 1.0,
+        "affected_devices": [
+          "HOSTEL_S_ROOM_SW"
+        ],
+        "supporting_evidence": [
+          {
+            "evidence_extracted": "packet_loss_pct confirms 100.0% packet loss"
+          },
+          {
+            "evidence_extracted": "link_utilization_pct confirms 0.0% utilization"
+          }
+        ],
+        "alternative_causes": [],
+        "recommended_actions": [
+          "Check switch port security settings for MAC address limit violations",
+          "Verify connected devices' MAC addresses against authorized lists",
+          "Temporarily disable port security to test traffic restoration",
+          "Inspect switch logs for security violation alerts",
+          "Inspect physical connections for loose or damaged cables"
+        ],
+        "evidence_sources": [
+          "traffic_agent"
+        ],
+        "limitations": [
+          "Consensus reached in round 1"
+        ]
+      },
+      "archived_at": "2026-10-31T23:44:45.715983+00:00"
+    },
+    "INC-l2_arp_storm-1793490285": {
+      "incident_id": "INC-l2_arp_storm-1793490285",
+      "created_at": "2026-10-31T23:45:50.606190+00:00",
+      "updated_at": "2026-10-31T23:45:50.697580+00:00",
+      "status": "diagnosed",
+      "rounds": {
+        "1": {
+          "hypothesis": "ARP storm causing excessive CPU utilization and increased latency on GUEST_WIFI_VLAN",
+          "votes": {
+            "infrastructure_agent": {
+              "vote": "APPROVE",
+              "reason": "Evaluated via Context-Aware Evidence Engine",
+              "alternative": null,
+              "question": null,
+              "pivot_hint": null
+            },
+            "traffic_agent": {
+              "vote": "APPROVE",
+              "reason": "Evaluated via Context-Aware Evidence Engine",
+              "alternative": null,
+              "question": null,
+              "pivot_hint": null
+            },
+            "l4_l7_agent": {
+              "vote": "ABSTAIN",
+              "reason": "Evaluated via Context-Aware Evidence Engine",
+              "alternative": null,
+              "question": null,
+              "pivot_hint": null
+            }
+          }
+        }
+      },
+      "feedback": [],
+      "final_report": {
+        "incident_id": "INC-l2_arp_storm-1793490285",
+        "status": "diagnosed",
+        "suspected_root_cause": "ARP storm causing excessive CPU utilization and increased latency on GUEST_WIFI_VLAN",
+        "confidence": 1.0,
+        "affected_devices": [
+          "GUEST_WIFI_VLAN"
+        ],
+        "supporting_evidence": [
+          {
+            "evidence_extracted": "GUEST_WIFI_VLAN cpu_utilization_pct confirms excessive CPU utilization"
+          },
+          {
+            "evidence_extracted": "GUEST_WIFI_VLAN interface_errors confirms no interface errors"
+          },
+          {
+            "evidence_extracted": "latency_ms confirms increased latency on GUEST_WIFI_VLAN"
+          }
+        ],
+        "alternative_causes": [],
+        "recommended_actions": [
+          "Check for abnormal ARP traffic patterns",
+          "Inspect connected devices for loops or rogue devices",
+          "Implement ARP rate limiting",
+          "Monitor CPU usage after mitigation steps"
+        ],
+        "evidence_sources": [
+          "infrastructure_agent",
+          "traffic_agent"
+        ],
+        "limitations": [
+          "Consensus reached in round 1"
+        ]
+      },
+      "archived_at": "2026-10-31T23:45:50.721708+00:00"
+    },
+    "INC-l2_udld_err-1793490350": {
+      "incident_id": "INC-l2_udld_err-1793490350",
+      "created_at": "2026-10-31T23:46:59.517068+00:00",
+      "updated_at": "2026-10-31T23:46:59.601885+00:00",
+      "status": "diagnosed",
+      "rounds": {
+        "1": {
+          "hypothesis": "Severe physical layer degradation due to high packet loss (50%) and excessive interface errors (5000), likely caused by faulty cabling, SFP module failure, or switch port misconfiguration. The UDLD error context suggests potential unidirectional link issues.",
+          "votes": {
+            "infrastructure_agent": {
+              "vote": "APPROVE",
+              "reason": "Evaluated via Context-Aware Evidence Engine",
+              "alternative": null,
+              "question": null,
+              "pivot_hint": null
+            },
+            "traffic_agent": {
+              "vote": "APPROVE",
+              "reason": "Evaluated via Context-Aware Evidence Engine",
+              "alternative": null,
+              "question": null,
+              "pivot_hint": null
+            },
+            "l4_l7_agent": {
+              "vote": "ABSTAIN",
+              "reason": "Evaluated via Context-Aware Evidence Engine",
+              "alternative": null,
+              "question": null,
+              "pivot_hint": null
+            }
+          }
+        }
+      },
+      "feedback": [],
+      "final_report": {
+        "incident_id": "INC-l2_udld_err-1793490350",
+        "status": "diagnosed",
+        "suspected_root_cause": "Severe physical layer degradation due to high packet loss (50%) and excessive interface errors (5000), likely caused by faulty cabling, SFP module failure, or switch port misconfiguration. The UDLD error context suggests potential unidirectional link issues.",
+        "confidence": 1.0,
+        "affected_devices": [
+          "FIBER_RUN_SES_SMS"
+        ],
+        "supporting_evidence": [
+          {
+            "evidence_extracted": "interface_errors confirms excessive interface errors (5000)"
+          },
+          {
+            "evidence_extracted": "FIBER_RUN_SES_SMS confirms high packet loss (50%)"
+          },
+          {
+            "evidence_extracted": "packet_loss_pct confirms 50.0%"
+          },
+          {
+            "evidence_extracted": "FIBER_RUN_SES_SMS confirms packet_loss_pct"
+          }
+        ],
+        "alternative_causes": [],
+        "recommended_actions": [
+          "Inspect and replace suspect SFP modules on FIBER_RUN_SES_SMS",
+          "Verify switch port configuration and link status",
+          "Check for physical cable damage or loose connections",
+          "Examine interface error logs for pattern analysis",
+          "Test with known-good cabling to isolate hardware faults"
+        ],
+        "evidence_sources": [
+          "infrastructure_agent",
+          "traffic_agent"
+        ],
+        "limitations": [
+          "Consensus reached in round 1"
+        ]
+      },
+      "archived_at": "2026-10-31T23:46:59.625739+00:00"
+    },
+    "INC-l2_storm_control-1793490419": {
+      "incident_id": "INC-l2_storm_control-1793490419",
+      "created_at": "2026-10-31T23:47:56.344818+00:00",
+      "updated_at": "2026-10-31T23:47:56.417612+00:00",
+      "status": "diagnosed",
+      "rounds": {
+        "1": {
+          "hypothesis": "Excessive broadcast/multicast traffic triggering storm control mechanisms, leading to packet loss and queue drops on LAB_COMPLEX_SW.",
+          "votes": {
+            "infrastructure_agent": {
+              "vote": "APPROVE",
+              "reason": "Evaluated via Context-Aware Evidence Engine",
+              "alternative": null,
+              "question": null,
+              "pivot_hint": null
+            },
+            "traffic_agent": {
+              "vote": "APPROVE",
+              "reason": "Evaluated via Context-Aware Evidence Engine",
+              "alternative": null,
+              "question": null,
+              "pivot_hint": null
+            },
+            "l4_l7_agent": {
+              "vote": "ABSTAIN",
+              "reason": "Evaluated via Context-Aware Evidence Engine",
+              "alternative": null,
+              "question": null,
+              "pivot_hint": null
+            }
+          }
+        }
+      },
+      "feedback": [],
+      "final_report": {
+        "incident_id": "INC-l2_storm_control-1793490419",
+        "status": "diagnosed",
+        "suspected_root_cause": "Excessive broadcast/multicast traffic triggering storm control mechanisms, leading to packet loss and queue drops on LAB_COMPLEX_SW.",
+        "confidence": 1.0,
+        "affected_devices": [
+          "LAB_COMPLEX_SW"
+        ],
+        "supporting_evidence": [
+          {
+            "evidence_extracted": "queue_drops confirms excessive traffic triggering storm control"
+          },
+          {
+            "evidence_extracted": "cpu_utilization_pct confirms increased processing due to traffic"
+          },
+          {
+            "evidence_extracted": "packet_loss_pct confirms 9.47%"
+          },
+          {
+            "evidence_extracted": "latency_ms confirms 10.41ms"
+          }
+        ],
+        "alternative_causes": [],
+        "recommended_actions": [
+          "Check storm control thresholds and logs for broadcast/multicast traffic spikes",
+          "Monitor real-time traffic patterns for abnormal broadcast domains",
+          "Verify proper VLAN segmentation to contain broadcast traffic",
+          "Review recent configuration changes affecting Layer 2 traffic behavior"
+        ],
+        "evidence_sources": [
+          "infrastructure_agent",
+          "traffic_agent"
+        ],
+        "limitations": [
+          "Consensus reached in round 1"
+        ]
+      },
+      "archived_at": "2026-10-31T23:47:56.435619+00:00"
     }
   }
 }

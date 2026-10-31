@@ -71,10 +71,23 @@ async def run_massive_benchmark():
     
     # Initialize your 14B vLLM Agents
     reasoner = ReasoningEngine()
+    # Initialize your 14B vLLM Agents with STRICT DATA MASKING
     voters = [
-        LLMDomainVoter("infrastructure_agent", "Layer 1/2 hardware, CPU, and physical interfaces"),
-        LLMDomainVoter("traffic_agent", "L2/L3 bandwidth, latency, and packet loss"),
-        LLMDomainVoter("l4_l7_agent", "DNS, DHCP, and application layer health")
+        LLMDomainVoter(
+            "infrastructure_agent", 
+            "Layer 1/2 hardware, CPU, and physical interfaces",
+            monitored_metrics=["cpu_utilization_pct", "interface_errors", "queue_drops"]
+        ),
+        LLMDomainVoter(
+            "traffic_agent", 
+            "L2/L3 bandwidth, latency, and packet loss",
+            monitored_metrics=["link_utilization_pct", "packet_loss_pct", "latency_ms", "jitter_ms"]
+        ),
+        LLMDomainVoter(
+            "l4_l7_agent", 
+            "DNS, DHCP, and application layer health",
+            monitored_metrics=["dns_latency_ms", "dhcp_pool_utilization_pct"]
+        )
     ]
     iterator = AsyncConsensusIterator(voters, reasoner, output_file="massive_audit.json")
 
@@ -98,8 +111,14 @@ async def run_massive_benchmark():
         # Translate and Inject Telemetry
         active_alerts = translate_to_active_alerts(payload)
         
-        # Inject telemetry into the global state so Voters can read it
+        # FIX: Wipe the state clean before injecting the new telemetry
+        global_state.device_states.clear()
+        if hasattr(global_state, "latest_device"):
+            global_state.latest_device = payload["device_id"]
+            
+        # Inject current telemetry
         global_state.device_states[payload["device_id"]] = payload["metrics"]
+        
         
         # Execute the 14B Logic Loop
         incident_id = f"INC-{scenario_name}-{int(time.time())}"

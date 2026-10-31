@@ -18,7 +18,7 @@ class AsyncConsensusIterator:
 
     def calculate_heuristic_consensus(self, agent_responses, active_alerts, round_num=1):
         """
-        Calculates consensus using Dynamic Severity Multipliers and verbosely logs the math.
+        Calculates consensus using Dynamic Severity Multipliers and the new Evidence Arrays.
         """
         print(f"\n[EPOCH {round_num}: MIDDLEWARE & CONSENSUS MATH]")
         print("Middleware: All JSON payloads validated successfully. No semantic drift detected.")
@@ -37,16 +37,15 @@ class AsyncConsensusIterator:
             if agent_key:
                 domain_weights[agent_key] = max(domain_weights[agent_key], current_weight)
 
-        # 2. Tally the weighted votes and log the agent decisions
+        # 2. Tally the weighted votes based on EVIDENCE, not the "vote" string.
         weighted_approves = 0.0
         weighted_total = 0.0
 
         print("\n--- AGENT VOTE TALLY ---")
         for response in agent_responses:
             agent_id = response.get("agent_id", "unknown_agent")
-            vote = response.get("vote", "ABSTAIN")
-            reason = response.get("reason", "No reason provided.")
-            hint = response.get("pivot_hint")
+            contradictions = response.get("contradicting_evidence", [])
+            supports = response.get("supporting_evidence", [])
             
             weight = domain_weights.get(agent_id, 0.0)
             
@@ -57,16 +56,22 @@ class AsyncConsensusIterator:
             elif weight > 0.0: severity_label = "MINOR"
 
             print(f"--> {agent_id} (Active Multiplier: {weight} - {severity_label})")
-            print(f"    Decision: {vote}")
-            print(f"    Reasoning: {reason}")
-            if hint:
-                print(f"    Pivot Hint: {hint}")
-
-            if vote == "APPROVE":
+            
+            # MATH LOGIC: If a bleeding agent finds a contradiction, it rejects.
+            # If a healthy agent finds a contradiction, it rejects (vetoes the hypothesis).
+            if len(contradictions) > 0:
+                print(f"    Decision: REJECT (Found {len(contradictions)} contradicting metrics)")
+                weighted_total += weight
+                # Even if weight is 0 (healthy), we force a rejection by adding artificial weight
+                if weight == 0.0:
+                    weighted_total += 1.0 
+            elif len(supports) > 0:
+                print(f"    Decision: APPROVE (Found {len(supports)} supporting metrics)")
                 weighted_approves += weight
                 weighted_total += weight
-            elif vote == "REJECT":
-                weighted_total += weight
+            else:
+                print(f"    Decision: ABSTAIN (No evidence found for or against)")
+                # Abstains do not affect the math
 
         # 3. Calculate final heuristic score
         confidence = 0.0
@@ -87,6 +92,24 @@ class AsyncConsensusIterator:
         target_output_file = output_file or self.output_file
         current_confidence = 0.0
         best_report = None
+        
+        # ==========================================
+        # STEP 1: THE GLOBAL FAST-PATH EXIT
+        # ==========================================
+        # If all domains report an anomaly score of 0.0, do not wake the LLMs.
+        highest_anomaly = max([alert.get("anomaly_score", 0.0) for alert in active_alerts], default=0.0)
+        
+        if highest_anomaly == 0.0:
+            print("[FAST-PATH EXIT] All telemetry domains report 0.0 anomaly score. Network is fully HEALTHY.")
+            return {
+                "incident_id": incident_id,
+                "status": "diagnosed",
+                "confidence": 1.0,
+                "suspected_root_cause": "Network is operating within healthy baseline parameters. No anomalies detected.",
+                "recommended_actions": ["No action required. Continue standard monitoring."],
+                "affected_devices": list(set([a.get("device_id") for a in active_alerts if a.get("device_id")]))
+            }
+        # ==========================================
         
         try:
             for round_num in range(1, self.max_rounds + 1):
@@ -110,7 +133,14 @@ class AsyncConsensusIterator:
                 # 2. Broadcast to voters concurrently
                 tasks = []
                 for voter in self.voter_agents:
-                    task = voter.evaluate_hypothesis(incident_id, proposed_cause)
+                    agent_score = 0.0
+                    for alert in active_alerts:
+                        mapping = {"infrastructure": "infrastructure_agent", "traffic": "traffic_agent", "l4_l7": "l4_l7_agent"}
+                        if mapping.get(alert.get("domain", "")) == voter.agent_id:
+                            agent_score = max(agent_score, alert.get("anomaly_score", 0.0))
+                            
+                    task = voter.evaluate_hypothesis(incident_id, proposed_cause, anomaly_score=agent_score)
+                    
                     if asyncio.iscoroutine(task):
                         tasks.append(task)
                     else:
@@ -120,7 +150,6 @@ class AsyncConsensusIterator:
                 raw_responses = await asyncio.gather(*tasks, return_exceptions=True)
                 
                 valid_responses = [] 
-
                 for idx, res in enumerate(raw_responses):
                     if isinstance(res, Exception):
                         agent_name = self.voter_agents[idx].agent_id
@@ -129,12 +158,13 @@ class AsyncConsensusIterator:
                             "agent_id": agent_name,
                             "vote": "ABSTAIN",
                             "reason": "vLLM Network Timeout or Cloudflare Drop.",
-                            "pivot_hint": None
+                            "pivot_hint": None,
+                            "contradicting_evidence": [],
+                            "supporting_evidence": []
                         })
                     else:
                         valid_responses.append(res)
 
-            
                 # Record round hypothesis and votes in shared memory
                 shared_memory.record_hypothesis(incident_id, round_num, proposed_cause)
                 for r in valid_responses:
@@ -148,13 +178,13 @@ class AsyncConsensusIterator:
                         pivot_hint=r.get("pivot_hint")
                     )
 
-                # 4. Calculate weighted consensus with verbose trace
+                # 4. Calculate weighted consensus with Evidence Math
                 current_confidence = self.calculate_heuristic_consensus(valid_responses, active_alerts, round_num)
                 
                 # Collect evidence from APPROVE votes
                 round_evidence = []
                 for r in valid_responses:
-                    if r.get("vote") == "APPROVE" and "supporting_evidence" in r:
+                    if "supporting_evidence" in r and len(r["supporting_evidence"]) > 0:
                         round_evidence.extend(r["supporting_evidence"])
                 
                 target_devs = list(set([a.get("device_id") for a in active_alerts if a.get("device_id")])) or list(global_state.device_states.keys())
@@ -167,7 +197,7 @@ class AsyncConsensusIterator:
                     "supporting_evidence": round_evidence,
                     "alternative_causes": [r.get("suggested_alternative") for r in valid_responses if r.get("suggested_alternative")],
                     "recommended_actions": hypothesis_payload.get("recommended_actions", ["Manual review required"]),
-                    "evidence_sources": [r.get("agent_id") for r in valid_responses if r.get("vote") != "ABSTAIN"],
+                    "evidence_sources": [r.get("agent_id") for r in valid_responses if len(r.get("supporting_evidence", [])) > 0],
                     "limitations": [f"Consensus reached in round {round_num}"] if current_confidence >= 0.70 else ["Failed to reach consensus"]
                 }
 
@@ -177,138 +207,28 @@ class AsyncConsensusIterator:
                 else:
                     print(f"\n=> STATUS: FAILED. Confidence {current_confidence} < 0.70. Forcing Memory Loop.")
                     
-                    # 1. Map which agents actually have anomalous metrics
-                    anomalous_agents = set()
-                    for alert in active_alerts:
-                        agent_mapping = {"infrastructure": "infrastructure_agent", "traffic": "traffic_agent", "l4_l7": "l4_l7_agent"}
-                        key = agent_mapping.get(alert.get("source") or alert.get("domain"))
-                        if key: anomalous_agents.add(key)
-
-                    # 2. Build feedback, stripping hallucinated hints from healthy agents
-                    round_feedback = f"Round {round_num} Failed. Hypothesis: '{proposed_cause}'\n"
+                    # Build strictly factual feedback based on CONTRADICTING evidence
+                    round_feedback = f"Round {round_num} Failed. Your hypothesis: '{proposed_cause}'\n"
+                    round_feedback += "The following metrics CONTRADICT your hypothesis:\n"
+                    
+                    found_contradictions = False
                     for response in valid_responses:
-                        vote = response.get("vote")
                         agent = response.get("agent_id")
-                        hint = response.get("pivot_hint")
-                        
-                        if vote == "REJECT":
-                            round_feedback += f"- {agent} VOTED REJECT. "
-                            # Only inject the pivot hint if this agent has active anomalies
-                            if hint and agent in anomalous_agents:
-                                round_feedback += f"CRITICAL PIVOT HINT: {hint}\n"
-                            else:
-                                round_feedback += f"Reason: {response.get('reason')}\n"
+                        contra = response.get("contradicting_evidence", [])
+                        if len(contra) > 0:
+                            found_contradictions = True
+                            round_feedback += f"- From {agent}:\n"
+                            for item in contra:
+                                round_feedback += f"  * {item}\n"
+                                
+                    if not found_contradictions:
+                        round_feedback += "No direct contradicting metrics, but consensus was not reached. Refine your guess.\n"
 
                     if hasattr(self.reasoner, "memory") and isinstance(self.reasoner.memory, list):
                         self.reasoner.memory.append(round_feedback)
                     shared_memory.add_failed_round(incident_id, proposed_cause, round_feedback)
             
             # Record final report to persistent memory
-            if best_report:
-                shared_memory.record_final_report(incident_id, best_report)
-                if target_output_file:
-                    save_output_json(best_report, filepath=target_output_file)
-
-            return best_report
-        finally:
-            shared_memory.clear_incident(incident_id, archive=True)
-
-    def execute_voting_loop_sync(self, incident_id, active_alerts, output_file: Optional[str] = None):
-        """
-        Synchronous counterpart to execute_voting_loop with identical verbose logging and persistence.
-        """
-        target_output_file = output_file or self.output_file
-        current_confidence = 0.0
-        best_report = None
-
-        try:
-            for round_num in range(1, self.max_rounds + 1):
-                print(f"\n=======================================================")
-                print(f"[EPOCH {round_num}: HYPOTHESIS GENERATION]")
-                print(f"=======================================================")
-
-                memory_context = shared_memory.get_reasoner_context(incident_id)
-                if hasattr(self.reasoner, "generate_hypothesis_sync"):
-                    hypothesis_payload = self.reasoner.generate_hypothesis_sync(incident_id, active_alerts, memory_context)
-                else:
-                    hypothesis_payload = self.reasoner.generate_hypothesis(incident_id, active_alerts)
-
-                proposed_cause = hypothesis_payload.get("proposed_cause") or hypothesis_payload.get("proposed_root_cause", "Unknown network anomaly.")
-                print(f"Brain Agent: {proposed_cause}")
-
-                print(f"\n[EPOCH {round_num}: ASYNC VOTER BROADCAST]")
-
-                valid_responses = []
-                for voter in self.voter_agents:
-                    res = voter.evaluate_hypothesis(incident_id, proposed_cause)
-                    valid_responses.append(res)
-
-                # Record round hypothesis and votes in shared memory
-                shared_memory.record_hypothesis(incident_id, round_num, proposed_cause)
-                for r in valid_responses:
-                    shared_memory.record_vote(
-                        incident_id=incident_id,
-                        round_num=round_num,
-                        agent_id=r.get("agent_id", "unknown_agent"),
-                        vote=r.get("vote", "ABSTAIN"),
-                        reason=r.get("reason", ""),
-                        alternative=r.get("suggested_alternative"),
-                        pivot_hint=r.get("pivot_hint")
-                    )
-
-                current_confidence = self.calculate_heuristic_consensus(valid_responses, active_alerts, round_num)
-
-                round_evidence = []
-                for r in valid_responses:
-                    if r.get("vote") == "APPROVE" and "supporting_evidence" in r:
-                        round_evidence.extend(r["supporting_evidence"])
-
-                target_devs = list(set([a.get("device_id") for a in active_alerts if a.get("device_id")])) or list(global_state.device_states.keys())
-                best_report = {
-                    "incident_id": incident_id,
-                    "status": "diagnosed" if current_confidence >= 0.70 else "investigating",
-                    "suspected_root_cause": proposed_cause,
-                    "confidence": current_confidence,
-                    "affected_devices": target_devs,
-                    "supporting_evidence": round_evidence,
-                    "alternative_causes": [r.get("suggested_alternative") for r in valid_responses if r.get("suggested_alternative")],
-                    "recommended_actions": hypothesis_payload.get("recommended_actions", ["Manual review required"]),
-                    "evidence_sources": [r.get("agent_id") for r in valid_responses if r.get("vote") != "ABSTAIN"],
-                    "limitations": [f"Consensus reached in round {round_num}"] if current_confidence >= 0.70 else ["Failed to reach consensus"]
-                }
-
-                if current_confidence >= 0.70:
-                    print(f"\n=> STATUS: SUCCESS. Consensus Exit Condition ({current_confidence} >= 0.70) Met.")
-                    break
-                else:
-                    print(f"\n=> STATUS: FAILED. Confidence {current_confidence} < 0.70. Forcing Memory Loop.")
-                    
-                    # 1. Map which agents actually have anomalous metrics
-                    anomalous_agents = set()
-                    for alert in active_alerts:
-                        agent_mapping = {"infrastructure": "infrastructure_agent", "traffic": "traffic_agent", "l4_l7": "l4_l7_agent"}
-                        key = agent_mapping.get(alert.get("source") or alert.get("domain"))
-                        if key: anomalous_agents.add(key)
-
-                    # 2. Build feedback, stripping hallucinated hints from healthy agents
-                    round_feedback = f"Round {round_num} Failed. Hypothesis: '{proposed_cause}'\n"
-                    for response in valid_responses:
-                        vote = response.get("vote")
-                        agent = response.get("agent_id")
-                        hint = response.get("pivot_hint")
-                        
-                        if vote == "REJECT":
-                            round_feedback += f"- {agent} VOTED REJECT. "
-                            # Only inject the pivot hint if this agent has active anomalies
-                            if hint and agent in anomalous_agents:
-                                round_feedback += f"CRITICAL PIVOT HINT: {hint}\n"
-                            else:
-                                round_feedback += f"Reason: {response.get('reason')}\n"
-
-                    if hasattr(self.reasoner, "memory") and isinstance(self.reasoner.memory, list):
-                        self.reasoner.memory.append(round_feedback)
-                    shared_memory.add_failed_round(incident_id, proposed_cause, round_feedback)
-
             if best_report:
                 shared_memory.record_final_report(incident_id, best_report)
                 if target_output_file:
