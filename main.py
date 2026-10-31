@@ -74,7 +74,7 @@ async def run_full_system():
 
     print("\n=== FINAL DIAGNOSTIC REPORT ===")
     print(json.dumps(final_report, indent=2))
+    print(f"\n[PERSISTENCE] Diagnostic report saved to output.json and incident memory archived.")
 
 if __name__ == "__main__":
-    # Ensure API key is present
-        asyncio.run(run_full_system())
+    asyncio.run(run_full_system())

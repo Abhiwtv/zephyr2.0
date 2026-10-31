@@ -1,24 +1,28 @@
 import asyncio
+import os
 from core.memory import shared_memory
+from core.output_store import save_output_json
 import time
 
 class AsyncConsensusIterator:
     """Orchestrates voting rounds asynchronously to minimize LLM latency."""
-    def __init__(self, voter_agents, reasoner):
+    def __init__(self, voter_agents, reasoner, output_file: str = "output.json"):
         self.voters = voter_agents  # List of instantiated LLMDomainVoter objects
         self.reasoner = reasoner
         self.max_rounds = 3
+        self.output_file = output_file
 
     async def _async_get_vote(self, voter, hypothesis):
         """Wraps the synchronous Gemini call in an async thread."""
         # For a hackathon, running blocking IO in an async wrapper is sufficient
         return await asyncio.to_thread(voter.evaluate_hypothesis, hypothesis)
     
-    async def route_and_resolve_batch(self, all_active_alerts):
+    async def route_and_resolve_batch(self, all_active_alerts, output_file: str = None):
         """
         SYSTEM ORCHESTRATOR: Takes a chaotic stream of multi-device alerts, 
         groups them logically, and queues them sequentially to protect local LLM VRAM.
         """
+        target_output_file = output_file or self.output_file
         if not all_active_alerts:
             return []
 
@@ -49,12 +53,17 @@ class AsyncConsensusIterator:
             print("="*50)
             
             # Await pauses the router until this specific switch's debate is 100% finished
-            report = await self.execute_voting_loop(incident_id, alerts)
+            report = await self.execute_voting_loop(incident_id, alerts, output_file=target_output_file)
             all_reports.append(report)
+
+        # Save all reports in the exact same format as OUTPUT
+        if all_reports and target_output_file:
+            save_output_json(all_reports, filepath=target_output_file)
 
         return all_reports
     
-    async def execute_voting_loop(self, incident_id, initial_alerts):
+    async def execute_voting_loop(self, incident_id, initial_alerts, output_file: str = None):
+        target_output_file = output_file or self.output_file
         current_round = 1
         best_report = None
         highest_confidence = -1.0
@@ -133,10 +142,18 @@ class AsyncConsensusIterator:
                     
                 current_round += 1
 
+            # Persist generated report to memory and save to JSON file in exact OUTPUT format
+            if best_report:
+                shared_memory.record_final_report(incident_id, best_report)
+                if target_output_file:
+                    save_output_json(best_report, filepath=target_output_file)
+                # Also save individual incident report
+                save_output_json(best_report, filepath=os.path.join("outputs", f"{incident_id}.json"))
+
             return best_report
             
         finally:
-            # This guarantees memory wipes even if Ollama or the Python script crashes mid-loop
+            # Archives working memory to persistent long-term storage
             shared_memory.clear_incident(incident_id)
 
     def _build_report(self, incident_id, hypothesis, initial_alerts, votes, confidence):
