@@ -1,0 +1,44 @@
+{
+  "last_updated": "2026-10-31T12:48:53.158075+00:00",
+  "active_incidents": {},
+  "history": {
+    "INC-TEST-99": {
+      "incident_id": "INC-TEST-99",
+      "created_at": "2026-10-31T12:48:53.151554+00:00",
+      "updated_at": "2026-10-31T12:48:53.157063+00:00",
+      "status": "in_progress",
+      "rounds": {
+        "1": {
+          "hypothesis": "Hardware failure on uplink",
+          "votes": {
+            "infrastructure_agent": {
+              "vote": "APPROVE",
+              "reason": "High interface errors detected.",
+              "alternative": null,
+              "question": null
+            },
+            "traffic_agent": {
+              "vote": "REJECT",
+              "reason": "No packet loss detected.",
+              "alternative": "Look into L4-L7 services",
+              "question": null
+            }
+          }
+        },
+        "2": {
+          "hypothesis": "L4-L7 service failure",
+          "votes": {
+            "traffic_agent": {
+              "vote": "ABSTAIN",
+              "reason": "Out of my domain.",
+              "alternative": null,
+              "question": null
+            }
+          }
+        }
+      },
+      "final_report": null,
+      "archived_at": "2026-10-31T12:48:53.158075+00:00"
+    }
+  }
+}

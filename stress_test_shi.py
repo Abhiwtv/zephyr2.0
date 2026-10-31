@@ -141,6 +141,7 @@ async def run_stress_test():
     reasoner = ReasoningEngine()
     
     test_counter = 1
+    all_final_reports = []
     
     # 2. Loop through each hardcoded scenario one by one
     for scenario_name, faulty_payload in SCENARIOS.items():
@@ -172,6 +173,8 @@ async def run_stress_test():
         
         # 4. Execute the consensus loop for this specific scenario
         final_report = await iterator.execute_voting_loop(incident_id, active_alerts)
+        if final_report:
+            all_final_reports.append(final_report)
 
         print(f"\n=== FINAL DIAGNOSTIC REPORT: {scenario_name} ===")
         print(json.dumps(final_report, indent=2))
@@ -179,6 +182,11 @@ async def run_stress_test():
         
         test_counter += 1
         await asyncio.sleep(3) 
+
+    if all_final_reports:
+        from core.output_store import save_output_json
+        save_output_json(all_final_reports, filepath="output.json")
+        print(f"\n[PERSISTENCE] Successfully saved all {len(all_final_reports)} diagnostic reports to output.json")
 
     print("=== ALL CAMPUS NETWORK DIAGNOSTICS COMPLETED SUCCESSFULLY ===")
 
