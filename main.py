@@ -44,9 +44,13 @@ logging.basicConfig(
 )
 logger = logging.getLogger("NetCoop-Engine")
 
+# Global state to track engine boot times
+ignition_telemetry = {"start_time": None, "last_boot_duration": None}
+
 
 def listen_to_ntfy():
     """Background thread that listens to the ntfy.sh stream continuously."""
+    global ignition_telemetry
     url = "https://ntfy.sh/zephyr-gpu-status-k92a/json"
     print(f"[*] Starting background listener on {url}")
     logger.info(f"[*] Starting background listener on {url}")
@@ -65,6 +69,18 @@ def listen_to_ntfy():
                                 settings.ENGINE_URL = new_engine_url
                                 print(f"\n[+] BOOM! Engine URL autonomously updated to: {EngineState.url}\n")
                                 logger.info(f"[+] BOOM! Engine URL autonomously updated to: {EngineState.url}")
+
+                                # --- NEW TELEMETRY LOGIC ---
+                                if ignition_telemetry.get("start_time"):
+                                    elapsed = time.time() - ignition_telemetry["start_time"]
+                                    mins = int(elapsed // 60)
+                                    secs = int(elapsed % 60)
+                                    boot_msg = f"[*] TELEMETRY: GPU Engine boot sequence completed in {mins}m {secs}s."
+                                    print(f"\n{boot_msg}\n")
+                                    logger.info(boot_msg)
+                                    ignition_telemetry["last_boot_duration"] = f"{mins}m {secs}s"
+                                    ignition_telemetry["start_time"] = None  # Reset for next run
+                                # ---------------------------
         except Exception as e:
             print(f"[!] ntfy.sh stream disconnected, reconnecting in 5s... ({e})")
             logger.warning(f"[!] ntfy.sh stream disconnected, reconnecting in 5s... ({e})")
@@ -536,6 +552,8 @@ class EngineURLPayload(BaseModel):
 
 def trigger_kaggle_push():
     """Background task to fire the Kaggle batch job with a unique UUID."""
+    global ignition_telemetry
+    ignition_telemetry["start_time"] = time.time()
     try:
         kaggle_user = os.getenv("KAGGLE_USER", "")
         if not kaggle_user:
@@ -626,7 +644,9 @@ async def get_engine_status():
     return {
         "status": "online" if EngineState.url else "offline",
         "active_engine": EngineState.url,
-        "model": settings.OLLAMA_MODEL
+        "model": settings.OLLAMA_MODEL,
+        "boot_in_progress": ignition_telemetry.get("start_time") is not None,
+        "last_boot_duration": ignition_telemetry.get("last_boot_duration")
     }
 
 
