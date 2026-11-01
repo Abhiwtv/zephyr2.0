@@ -21,7 +21,7 @@ jobs:
           source: "."
           target: "/home/ubuntu/zephyr-control"
 
-      - name: Restart FastAPI Server
+      - name: Boot the Pipeline
         uses: appleboy/ssh-action@v1.0.3
         with:
           host: ${{ secrets.ORACLE_HOST }}
@@ -30,21 +30,22 @@ jobs:
           script: |
             cd /home/ubuntu/zephyr-control
             
-            # 1. Install required python venv package (runs quietly)
+            # 1. Ensure system dependencies are installed silently
             sudo apt-get update -yq
-            sudo apt-get install -yq python3-venv python3-pip
+            sudo apt-get install -yq python3-venv python3-pip python3-full
             
-            # 2. Create the virtual environment if it doesn't exist
+            # 2. Build the virtual environment if missing
             if [ ! -d "venv" ]; then
               python3 -m venv venv
             fi
             
-            # 3. Activate and install dependencies
+            # 3. Activate and update project dependencies
             source venv/bin/activate
             pip install -r requirements.txt
             
-            # 4. Kill existing uvicorn process safely
+            # 4. Terminate the old engine instance securely
             pkill -f "uvicorn main:app" || true
             
-            # 5. Restart in background
-            nohup uvicorn main:app --host 127.0.0.1 --port 5000 > backend.log 2>&1 &
+            # 5. Ignite the new engine in the background completely detached
+            nohup uvicorn main:app --host 127.0.0.1 --port 5000 </dev/null > backend.log 2>&1 &
+            sleep 2
