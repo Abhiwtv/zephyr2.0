@@ -649,14 +649,14 @@ async def set_engine_url(payload: EngineURLPayload):
 async def receive_runner_telemetry(payload: RunnerTelemetry):
     """Catches live download/boot logs from Kaggle and streams them to the UI."""
     global ignition_telemetry
-    ignition_telemetry["latest_telemetry"] = {
-        "message": payload.message,
-        "progress": payload.progress,
-        "timestamp": datetime.now(timezone.utc).isoformat()
-    }
+    
+    # Save the exact payload to memory
+    ignition_telemetry["latest_telemetry"] = payload.model_dump()
+    
     log_msg = f"[KAGGLE_RUNNER] {payload.message}"
-    if payload.progress is not None:
+    if payload.progress:
         log_msg += f" ({payload.progress}%)"
+    
     await noc_logger.emit(log_msg)
     return {"status": "received"}
 
@@ -667,6 +667,7 @@ async def receive_runner_telemetry(payload: RunnerTelemetry):
 )
 async def get_engine_status():
     """Returns current active LLM engine URL and configuration."""
+    global ignition_telemetry
     is_online = bool(EngineState.url)
     return {
         "status": "online" if is_online else "offline",
