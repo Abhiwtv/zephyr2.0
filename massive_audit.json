@@ -1,35 +1,43 @@
 {
-  "incident_id": "INC-l2_storm_control-1793490419",
+  "incident_id": "INC-compound_sfp_dhcp-1793492545",
   "status": "diagnosed",
-  "suspected_root_cause": "Excessive broadcast/multicast traffic triggering storm control mechanisms, leading to packet loss and queue drops on LAB_COMPLEX_SW.",
+  "suspected_root_cause": "High interface error count (12,000) combined with packet loss (15%) and near-maxed DHCP pool (98% utilization) suggests a combination of physical layer degradation and DHCP exhaustion. The consistent metrics across infrastructure/traffic/l4_l7 domains indicate a systemic issue at the core switch.",
   "confidence": 1.0,
   "affected_devices": [
-    "LAB_COMPLEX_SW"
+    "HOSTEL_CORE_SW"
   ],
   "supporting_evidence": [
     {
-      "evidence_extracted": "queue_drops confirms excessive traffic triggering storm control"
+      "evidence_extracted": "interface_errors confirms High interface error count (12,000)"
     },
     {
-      "evidence_extracted": "cpu_utilization_pct confirms increased processing due to traffic"
+      "evidence_extracted": "queue_drops confirms packet loss (0 drops, implying no packet loss)"
     },
     {
-      "evidence_extracted": "packet_loss_pct confirms 9.47%"
+      "evidence_extracted": "packet_loss_pct confirms 15%"
     },
     {
-      "evidence_extracted": "latency_ms confirms 10.41ms"
+      "evidence_extracted": "latency_ms confirms 6.48"
+    },
+    {
+      "evidence_extracted": "dhcp_pool_utilization_pct confirms near-maxed DHCP pool (98% utilization)"
+    },
+    {
+      "evidence_extracted": "dns_latency_ms confirms increased latency (15.11 ms)"
     }
   ],
   "alternative_causes": [],
   "recommended_actions": [
-    "Check storm control thresholds and logs for broadcast/multicast traffic spikes",
-    "Monitor real-time traffic patterns for abnormal broadcast domains",
-    "Verify proper VLAN segmentation to contain broadcast traffic",
-    "Review recent configuration changes affecting Layer 2 traffic behavior"
+    "Inspect physical connections on HOSTEL_CORE_SW for faulty cables/ports",
+    "Check DHCP pool configuration and available IP ranges",
+    "Verify switch hardware health (fan/temperature/PSU status)",
+    "Monitor interface error trends over time",
+    "Test alternative DHCP server redundancy if available"
   ],
   "evidence_sources": [
     "infrastructure_agent",
-    "traffic_agent"
+    "traffic_agent",
+    "l4_l7_agent"
   ],
   "limitations": [
     "Consensus reached in round 1"

@@ -1,5 +1,5 @@
 {
-  "last_updated": "2026-10-31T23:47:56.435619+00:00",
+  "last_updated": "2026-11-01T00:23:42.758274+00:00",
   "active_incidents": {
     "INC-l1_fiber_bend_core-1793486343": {
       "incident_id": "INC-l1_fiber_bend_core-1793486343",
@@ -18077,6 +18077,1935 @@
         ]
       },
       "archived_at": "2026-10-31T23:47:56.435619+00:00"
+    },
+    "INC-l2_stp_recalc-1793490476": {
+      "incident_id": "INC-l2_stp_recalc-1793490476",
+      "created_at": "2026-10-31T23:48:47.642150+00:00",
+      "updated_at": "2026-10-31T23:48:47.711869+00:00",
+      "status": "diagnosed",
+      "rounds": {
+        "1": {
+          "hypothesis": "Spanning Tree Protocol (STP) recalculation triggered by a network loop involving DISTRIBUTION_SW_02, causing transient traffic congestion and increased latency/jitter.",
+          "votes": {
+            "infrastructure_agent": {
+              "vote": "ABSTAIN",
+              "reason": "Evaluated via Context-Aware Evidence Engine",
+              "alternative": null,
+              "question": null,
+              "pivot_hint": null
+            },
+            "traffic_agent": {
+              "vote": "APPROVE",
+              "reason": "Evaluated via Context-Aware Evidence Engine",
+              "alternative": null,
+              "question": null,
+              "pivot_hint": null
+            },
+            "l4_l7_agent": {
+              "vote": "ABSTAIN",
+              "reason": "Evaluated via Context-Aware Evidence Engine",
+              "alternative": null,
+              "question": null,
+              "pivot_hint": null
+            }
+          }
+        }
+      },
+      "feedback": [],
+      "final_report": {
+        "incident_id": "INC-l2_stp_recalc-1793490476",
+        "status": "diagnosed",
+        "suspected_root_cause": "Spanning Tree Protocol (STP) recalculation triggered by a network loop involving DISTRIBUTION_SW_02, causing transient traffic congestion and increased latency/jitter.",
+        "confidence": 1.0,
+        "affected_devices": [
+          "DISTRIBUTION_SW_02"
+        ],
+        "supporting_evidence": [
+          {
+            "evidence_extracted": "DISTRIBUTION_SW_02 latency_ms confirms increased latency"
+          },
+          {
+            "evidence_extracted": "DISTRIBUTION_SW_02 jitter_ms confirms increased jitter"
+          }
+        ],
+        "alternative_causes": [],
+        "recommended_actions": [
+          "Check for unauthorized devices creating loops in the Layer 2 topology",
+          "Verify STP configurations and port states on DISTRIBUTION_SW_02",
+          "Inspect recent changes to network cabling or switch configurations",
+          "Monitor for recurring STP topology changes in the incident memory"
+        ],
+        "evidence_sources": [
+          "traffic_agent"
+        ],
+        "limitations": [
+          "Consensus reached in round 1"
+        ]
+      },
+      "archived_at": "2026-10-31T23:48:47.727912+00:00"
+    },
+    "INC-l3_hostel_congestion-1793490527": {
+      "incident_id": "INC-l3_hostel_congestion-1793490527",
+      "created_at": "2026-10-31T23:49:56.450482+00:00",
+      "updated_at": "2026-10-31T23:49:56.522844+00:00",
+      "status": "diagnosed",
+      "rounds": {
+        "1": {
+          "hypothesis": "Network congestion on MAHANADI_UPLINK due to near-maxed link utilization (99.5%) and excessive queue drops (7093)",
+          "votes": {
+            "infrastructure_agent": {
+              "vote": "APPROVE",
+              "reason": "Evaluated via Context-Aware Evidence Engine",
+              "alternative": null,
+              "question": null,
+              "pivot_hint": null
+            },
+            "traffic_agent": {
+              "vote": "APPROVE",
+              "reason": "Evaluated via Context-Aware Evidence Engine",
+              "alternative": null,
+              "question": null,
+              "pivot_hint": null
+            },
+            "l4_l7_agent": {
+              "vote": "ABSTAIN",
+              "reason": "Evaluated via Context-Aware Evidence Engine",
+              "alternative": null,
+              "question": null,
+              "pivot_hint": null
+            }
+          }
+        }
+      },
+      "feedback": [],
+      "final_report": {
+        "incident_id": "INC-l3_hostel_congestion-1793490527",
+        "status": "diagnosed",
+        "suspected_root_cause": "Network congestion on MAHANADI_UPLINK due to near-maxed link utilization (99.5%) and excessive queue drops (7093)",
+        "confidence": 1.0,
+        "affected_devices": [
+          "MAHANADI_UPLINK"
+        ],
+        "supporting_evidence": [
+          {
+            "evidence_extracted": "queue_drops confirms excessive queue drops (7093)"
+          },
+          {
+            "evidence_extracted": "MAHANADI_UPLINK confirms near-maxed link utilization (99.5%)"
+          },
+          {
+            "evidence_extracted": "MAHANADI_UPLINK link_utilization_pct confirms near-maxed link utilization (99.5%)"
+          },
+          {
+            "evidence_extracted": "MAHANADI_UPLINK latency_ms confirms excessive latency (390.15 ms)"
+          }
+        ],
+        "alternative_causes": [],
+        "recommended_actions": [
+          "Monitor real-time traffic patterns for abnormal bandwidth consumption",
+          "Implement QoS policies to prioritize critical traffic",
+          "Check for unauthorized devices consuming excessive bandwidth",
+          "Consider temporary link capacity increase or traffic shaping"
+        ],
+        "evidence_sources": [
+          "infrastructure_agent",
+          "traffic_agent"
+        ],
+        "limitations": [
+          "Consensus reached in round 1"
+        ]
+      },
+      "archived_at": "2026-10-31T23:49:56.534950+00:00"
+    },
+    "INC-l3_erp_microburst-1793490596": {
+      "incident_id": "INC-l3_erp_microburst-1793490596",
+      "created_at": "2026-10-31T23:51:15.716794+00:00",
+      "updated_at": "2026-10-31T23:51:15.793328+00:00",
+      "status": "diagnosed",
+      "rounds": {
+        "1": {
+          "hypothesis": "Network congestion due to a microburst on the ERP_SERVER_SW link, causing high link utilization (98%) and excessive queue drops (18,775), leading to increased latency and jitter.",
+          "votes": {
+            "infrastructure_agent": {
+              "vote": "APPROVE",
+              "reason": "Evaluated via Context-Aware Evidence Engine",
+              "alternative": null,
+              "question": null,
+              "pivot_hint": null
+            },
+            "traffic_agent": {
+              "vote": "APPROVE",
+              "reason": "Evaluated via Context-Aware Evidence Engine",
+              "alternative": null,
+              "question": null,
+              "pivot_hint": null
+            },
+            "l4_l7_agent": {
+              "vote": "ABSTAIN",
+              "reason": "Evaluated via Context-Aware Evidence Engine",
+              "alternative": null,
+              "question": null,
+              "pivot_hint": null
+            }
+          }
+        }
+      },
+      "feedback": [],
+      "final_report": {
+        "incident_id": "INC-l3_erp_microburst-1793490596",
+        "status": "diagnosed",
+        "suspected_root_cause": "Network congestion due to a microburst on the ERP_SERVER_SW link, causing high link utilization (98%) and excessive queue drops (18,775), leading to increased latency and jitter.",
+        "confidence": 1.0,
+        "affected_devices": [
+          "ERP_SERVER_SW"
+        ],
+        "supporting_evidence": [
+          {
+            "evidence_extracted": "queue_drops confirms excessive queue drops (18,775)"
+          },
+          {
+            "evidence_extracted": "ERP_SERVER_SW link utilization is at 98% (implied by context)"
+          },
+          {
+            "evidence_extracted": "ERP_SERVER_SW link_utilization_pct confirms high link utilization (98%)"
+          },
+          {
+            "evidence_extracted": "ERP_SERVER_SW jitter_ms confirms excessive jitter (4.26)"
+          }
+        ],
+        "alternative_causes": [],
+        "recommended_actions": [
+          "Monitor traffic patterns for sudden spikes or DDoS activity",
+          "Check link capacity and consider bandwidth upgrades",
+          "Implement traffic shaping/QoS policies to prioritize critical traffic",
+          "Inspect upstream/downstream devices for misconfigured rate limits",
+          "Review recent changes to network topology or application workloads"
+        ],
+        "evidence_sources": [
+          "infrastructure_agent",
+          "traffic_agent"
+        ],
+        "limitations": [
+          "Consensus reached in round 1"
+        ]
+      },
+      "archived_at": "2026-10-31T23:51:15.813553+00:00"
+    },
+    "INC-l3_bgp_flap-1793490675": {
+      "incident_id": "INC-l3_bgp_flap-1793490675",
+      "created_at": "2026-10-31T23:52:14.831138+00:00",
+      "updated_at": "2026-10-31T23:52:14.946207+00:00",
+      "status": "diagnosed",
+      "rounds": {
+        "1": {
+          "hypothesis": "BGP route instability causing intermittent routing flaps and increased latency",
+          "votes": {
+            "infrastructure_agent": {
+              "vote": "ABSTAIN",
+              "reason": "Evaluated via Context-Aware Evidence Engine",
+              "alternative": null,
+              "question": null,
+              "pivot_hint": null
+            },
+            "traffic_agent": {
+              "vote": "APPROVE",
+              "reason": "Evaluated via Context-Aware Evidence Engine",
+              "alternative": null,
+              "question": null,
+              "pivot_hint": null
+            },
+            "l4_l7_agent": {
+              "vote": "ABSTAIN",
+              "reason": "Evaluated via Context-Aware Evidence Engine",
+              "alternative": null,
+              "question": null,
+              "pivot_hint": null
+            }
+          }
+        }
+      },
+      "feedback": [],
+      "final_report": {
+        "incident_id": "INC-l3_bgp_flap-1793490675",
+        "status": "diagnosed",
+        "suspected_root_cause": "BGP route instability causing intermittent routing flaps and increased latency",
+        "confidence": 1.0,
+        "affected_devices": [
+          "NKN_GATEWAY_RTR"
+        ],
+        "supporting_evidence": [
+          {
+            "evidence_extracted": "packet_loss_pct confirms 5.63"
+          },
+          {
+            "evidence_extracted": "latency_ms confirms 527.5"
+          }
+        ],
+        "alternative_causes": [],
+        "recommended_actions": [
+          "Check BGP neighbor status and flap counters",
+          "Review routing table changes over time",
+          "Verify link stability on NKN_GATEWAY_RTR interfaces",
+          "Investigate recent BGP configuration changes",
+          "Monitor traffic patterns for asymmetric routing"
+        ],
+        "evidence_sources": [
+          "traffic_agent"
+        ],
+        "limitations": [
+          "Consensus reached in round 1"
+        ]
+      },
+      "archived_at": "2026-10-31T23:52:14.976800+00:00"
+    },
+    "INC-l3_dataset_download-1793490734": {
+      "incident_id": "INC-l3_dataset_download-1793490734",
+      "created_at": "2026-10-31T23:53:12.765405+00:00",
+      "updated_at": "2026-10-31T23:53:12.840806+00:00",
+      "status": "diagnosed",
+      "rounds": {
+        "1": {
+          "hypothesis": "The AI_LAB_SW switch is experiencing link saturation (100% utilization) leading to packet queue drops (1900 drops) and increased latency (126.4ms), likely causing downstream congestion and traffic degradation.",
+          "votes": {
+            "infrastructure_agent": {
+              "vote": "APPROVE",
+              "reason": "Evaluated via Context-Aware Evidence Engine",
+              "alternative": null,
+              "question": null,
+              "pivot_hint": null
+            },
+            "traffic_agent": {
+              "vote": "APPROVE",
+              "reason": "Evaluated via Context-Aware Evidence Engine",
+              "alternative": null,
+              "question": null,
+              "pivot_hint": null
+            },
+            "l4_l7_agent": {
+              "vote": "ABSTAIN",
+              "reason": "Evaluated via Context-Aware Evidence Engine",
+              "alternative": null,
+              "question": null,
+              "pivot_hint": null
+            }
+          }
+        }
+      },
+      "feedback": [],
+      "final_report": {
+        "incident_id": "INC-l3_dataset_download-1793490734",
+        "status": "diagnosed",
+        "suspected_root_cause": "The AI_LAB_SW switch is experiencing link saturation (100% utilization) leading to packet queue drops (1900 drops) and increased latency (126.4ms), likely causing downstream congestion and traffic degradation.",
+        "confidence": 1.0,
+        "affected_devices": [
+          "AI_LAB_SW"
+        ],
+        "supporting_evidence": [
+          {
+            "evidence_extracted": "queue_drops confirms packet queue drops"
+          },
+          {
+            "evidence_extracted": "AI_LAB_SW interface_errors confirms no interface errors"
+          },
+          {
+            "evidence_extracted": "AI_LAB_SW link_utilization_pct confirms 100% utilization"
+          },
+          {
+            "evidence_extracted": "AI_LAB_SW latency_ms confirms 126.4ms latency"
+          }
+        ],
+        "alternative_causes": [],
+        "recommended_actions": [
+          "Check for abnormal traffic spikes or unauthorized high-bandwidth transfers on the AI_LAB_SW uplink",
+          "Verify QoS policies are properly configured to prioritize critical traffic",
+          "Temporarily increase link bandwidth or implement traffic shaping",
+          "Monitor traffic patterns during peak hours to identify potential bottlenecks",
+          "Inspect switch port statistics for error counters or misconfigured VLANs"
+        ],
+        "evidence_sources": [
+          "infrastructure_agent",
+          "traffic_agent"
+        ],
+        "limitations": [
+          "Consensus reached in round 1"
+        ]
+      },
+      "archived_at": "2026-10-31T23:53:12.864992+00:00"
+    },
+    "INC-l3_10g_1g_bottleneck-1793490792": {
+      "incident_id": "INC-l3_10g_1g_bottleneck-1793490792",
+      "created_at": "2026-10-31T23:54:58.051310+00:00",
+      "updated_at": "2026-10-31T23:54:58.124395+00:00",
+      "status": "diagnosed",
+      "rounds": {
+        "1": {
+          "hypothesis": "Congestion and packet loss on the CORE_TO_EDGE_1G link due to excessive queue drops (31,039) and 13.11% packet loss, likely caused by insufficient bandwidth or misconfigured Quality of Service (QoS) policies leading to buffer overflow.",
+          "votes": {
+            "infrastructure_agent": {
+              "vote": "APPROVE",
+              "reason": "Evaluated via Context-Aware Evidence Engine",
+              "alternative": null,
+              "question": null,
+              "pivot_hint": null
+            },
+            "traffic_agent": {
+              "vote": "APPROVE",
+              "reason": "Evaluated via Context-Aware Evidence Engine",
+              "alternative": null,
+              "question": null,
+              "pivot_hint": null
+            },
+            "l4_l7_agent": {
+              "vote": "ABSTAIN",
+              "reason": "Evaluated via Context-Aware Evidence Engine",
+              "alternative": null,
+              "question": null,
+              "pivot_hint": null
+            }
+          }
+        }
+      },
+      "feedback": [],
+      "final_report": {
+        "incident_id": "INC-l3_10g_1g_bottleneck-1793490792",
+        "status": "diagnosed",
+        "suspected_root_cause": "Congestion and packet loss on the CORE_TO_EDGE_1G link due to excessive queue drops (31,039) and 13.11% packet loss, likely caused by insufficient bandwidth or misconfigured Quality of Service (QoS) policies leading to buffer overflow.",
+        "confidence": 1.0,
+        "affected_devices": [
+          "CORE_TO_EDGE_1G"
+        ],
+        "supporting_evidence": [
+          {
+            "evidence_extracted": "queue_drops confirms congestion"
+          },
+          {
+            "evidence_extracted": "CORE_TO_EDGE_1G has 31,039 queue drops"
+          },
+          {
+            "evidence_extracted": "CORE_TO_EDGE_1G packet_loss_pct confirms 13.11% packet loss"
+          },
+          {
+            "evidence_extracted": "CORE_TO_EDGE_1G link_utilization_pct confirms 23.51% utilization"
+          }
+        ],
+        "alternative_causes": [],
+        "recommended_actions": [
+          "Check QoS policies on CORE_TO_EDGE_1G for traffic prioritization issues",
+          "Monitor real-time traffic patterns for bursty flows causing congestion",
+          "Verify link capacity against current traffic demands",
+          "Inspect switch/router buffer configurations",
+          "Test DNS server performance and routing paths"
+        ],
+        "evidence_sources": [
+          "infrastructure_agent",
+          "traffic_agent"
+        ],
+        "limitations": [
+          "Consensus reached in round 1"
+        ]
+      },
+      "archived_at": "2026-10-31T23:54:58.140193+00:00"
+    },
+    "INC-l3_qos_voip_drop-1793490898": {
+      "incident_id": "INC-l3_qos_voip_drop-1793490898",
+      "created_at": "2026-10-31T23:55:59.873636+00:00",
+      "updated_at": "2026-10-31T23:55:59.948448+00:00",
+      "status": "diagnosed",
+      "rounds": {
+        "1": {
+          "hypothesis": "Congestion on the DIRECTOR_OFFICE_SW switch due to 95% link utilization, combined with high jitter (122.42 ms) and 500 queue drops, is causing VoIP traffic to be dropped despite 0% packet loss.",
+          "votes": {
+            "infrastructure_agent": {
+              "vote": "APPROVE",
+              "reason": "Evaluated via Context-Aware Evidence Engine",
+              "alternative": null,
+              "question": null,
+              "pivot_hint": null
+            },
+            "traffic_agent": {
+              "vote": "APPROVE",
+              "reason": "Evaluated via Context-Aware Evidence Engine",
+              "alternative": null,
+              "question": null,
+              "pivot_hint": null
+            },
+            "l4_l7_agent": {
+              "vote": "ABSTAIN",
+              "reason": "Evaluated via Context-Aware Evidence Engine",
+              "alternative": null,
+              "question": null,
+              "pivot_hint": null
+            }
+          }
+        }
+      },
+      "feedback": [],
+      "final_report": {
+        "incident_id": "INC-l3_qos_voip_drop-1793490898",
+        "status": "diagnosed",
+        "suspected_root_cause": "Congestion on the DIRECTOR_OFFICE_SW switch due to 95% link utilization, combined with high jitter (122.42 ms) and 500 queue drops, is causing VoIP traffic to be dropped despite 0% packet loss.",
+        "confidence": 1.0,
+        "affected_devices": [
+          "DIRECTOR_OFFICE_SW"
+        ],
+        "supporting_evidence": [
+          {
+            "evidence_extracted": "queue_drops confirms 500 queue drops"
+          },
+          {
+            "evidence_extracted": "interface_errors confirms 0% packet loss"
+          },
+          {
+            "evidence_extracted": "DIRECTOR_OFFICE_SW link_utilization_pct confirms 95% link utilization"
+          },
+          {
+            "evidence_extracted": "DIRECTOR_OFFICE_SW jitter_ms confirms 122.42 ms jitter"
+          }
+        ],
+        "alternative_causes": [],
+        "recommended_actions": [
+          "Check QoS policies on DIRECTOR_OFFICE_SW to ensure VoIP traffic is prioritized",
+          "Monitor link utilization and consider upgrading bandwidth or implementing traffic shaping",
+          "Investigate queue drop thresholds and adjust buffer sizes to prevent congestion-related drops"
+        ],
+        "evidence_sources": [
+          "infrastructure_agent",
+          "traffic_agent"
+        ],
+        "limitations": [
+          "Consensus reached in round 1"
+        ]
+      },
+      "archived_at": "2026-10-31T23:55:59.970540+00:00"
+    },
+    "INC-l3_icmp_flood-1793490959": {
+      "incident_id": "INC-l3_icmp_flood-1793490959",
+      "created_at": "2026-10-31T23:57:00.699517+00:00",
+      "updated_at": "2026-10-31T23:57:00.787874+00:00",
+      "status": "diagnosed",
+      "rounds": {
+        "1": {
+          "hypothesis": "ICMP flood attack causing excessive latency and traffic anomalies",
+          "votes": {
+            "infrastructure_agent": {
+              "vote": "ABSTAIN",
+              "reason": "Evaluated via Context-Aware Evidence Engine",
+              "alternative": null,
+              "question": null,
+              "pivot_hint": null
+            },
+            "traffic_agent": {
+              "vote": "APPROVE",
+              "reason": "Evaluated via Context-Aware Evidence Engine",
+              "alternative": null,
+              "question": null,
+              "pivot_hint": null
+            },
+            "l4_l7_agent": {
+              "vote": "ABSTAIN",
+              "reason": "Evaluated via Context-Aware Evidence Engine",
+              "alternative": null,
+              "question": null,
+              "pivot_hint": null
+            }
+          }
+        }
+      },
+      "feedback": [],
+      "final_report": {
+        "incident_id": "INC-l3_icmp_flood-1793490959",
+        "status": "diagnosed",
+        "suspected_root_cause": "ICMP flood attack causing excessive latency and traffic anomalies",
+        "confidence": 1.0,
+        "affected_devices": [
+          "CYBERSEC_LAB_SW"
+        ],
+        "supporting_evidence": [
+          {
+            "evidence_extracted": "latency_ms confirms excessive latency"
+          },
+          {
+            "evidence_extracted": "link_utilization_pct confirms traffic anomalies"
+          }
+        ],
+        "alternative_causes": [],
+        "recommended_actions": [
+          "Check ICMP traffic volume and source IPs",
+          "Review firewall/ACL rules for ICMP restrictions",
+          "Implement rate limiting on ICMP traffic",
+          "Monitor traffic patterns for unusual spikes",
+          "Verify device CPU utilization correlation with traffic volume"
+        ],
+        "evidence_sources": [
+          "traffic_agent"
+        ],
+        "limitations": [
+          "Consensus reached in round 1"
+        ]
+      },
+      "archived_at": "2026-10-31T23:57:00.821551+00:00"
+    },
+    "INC-l3_tcam_full-1793491020": {
+      "incident_id": "INC-l3_tcam_full-1793491020",
+      "created_at": "2026-10-31T23:58:19.336758+00:00",
+      "updated_at": "2026-10-31T23:58:19.421221+00:00",
+      "status": "diagnosed",
+      "rounds": {
+        "1": {
+          "hypothesis": "CORE_ROUTER_01 is experiencing 100% CPU utilization, likely causing excessive latency (1051.17ms) and triggering infrastructure/traffic domain anomalies despite normal link utilization and absence of packet loss.",
+          "votes": {
+            "infrastructure_agent": {
+              "vote": "APPROVE",
+              "reason": "Evaluated via Context-Aware Evidence Engine",
+              "alternative": null,
+              "question": null,
+              "pivot_hint": null
+            },
+            "traffic_agent": {
+              "vote": "APPROVE",
+              "reason": "Evaluated via Context-Aware Evidence Engine",
+              "alternative": null,
+              "question": null,
+              "pivot_hint": null
+            },
+            "l4_l7_agent": {
+              "vote": "ABSTAIN",
+              "reason": "Evaluated via Context-Aware Evidence Engine",
+              "alternative": null,
+              "question": null,
+              "pivot_hint": null
+            }
+          }
+        }
+      },
+      "feedback": [],
+      "final_report": {
+        "incident_id": "INC-l3_tcam_full-1793491020",
+        "status": "diagnosed",
+        "suspected_root_cause": "CORE_ROUTER_01 is experiencing 100% CPU utilization, likely causing excessive latency (1051.17ms) and triggering infrastructure/traffic domain anomalies despite normal link utilization and absence of packet loss.",
+        "confidence": 1.0,
+        "affected_devices": [
+          "CORE_ROUTER_01"
+        ],
+        "supporting_evidence": [
+          {
+            "evidence_extracted": "CORE_ROUTER_01 cpu_utilization_pct confirms 100% CPU utilization"
+          },
+          {
+            "evidence_extracted": "CORE_ROUTER_01 interface_errors confirms no interface errors"
+          },
+          {
+            "evidence_extracted": "latency_ms confirms excessive latency (1051.17ms)"
+          },
+          {
+            "evidence_extracted": "link_utilization_pct confirms normal link utilization (22.89%)"
+          },
+          {
+            "evidence_extracted": "packet_loss_pct confirms absence of packet loss (0.0%)"
+          }
+        ],
+        "alternative_causes": [],
+        "recommended_actions": [
+          "Check router CPU usage trends over time",
+          "Review system logs for CPU-intensive processes or errors",
+          "Verify no malicious traffic or DoS attacks",
+          "Restart the router if no critical processes are identified",
+          "Check for misconfigured routing protocols or ACLs"
+        ],
+        "evidence_sources": [
+          "infrastructure_agent",
+          "traffic_agent"
+        ],
+        "limitations": [
+          "Consensus reached in round 1"
+        ]
+      },
+      "archived_at": "2026-10-31T23:58:19.440960+00:00"
+    },
+    "INC-l3_multicast_flood-1793491099": {
+      "incident_id": "INC-l3_multicast_flood-1793491099",
+      "created_at": "2026-10-31T23:59:28.142597+00:00",
+      "updated_at": "2026-10-31T23:59:28.231465+00:00",
+      "status": "diagnosed",
+      "rounds": {
+        "1": {
+          "hypothesis": "Multicast traffic flooding due to misconfigured switchport or VLAN settings on LHC_VIDEO_SW, causing excessive link utilization and queue drops without packet loss.",
+          "votes": {
+            "infrastructure_agent": {
+              "vote": "APPROVE",
+              "reason": "Evaluated via Context-Aware Evidence Engine",
+              "alternative": null,
+              "question": null,
+              "pivot_hint": null
+            },
+            "traffic_agent": {
+              "vote": "APPROVE",
+              "reason": "Evaluated via Context-Aware Evidence Engine",
+              "alternative": null,
+              "question": null,
+              "pivot_hint": null
+            },
+            "l4_l7_agent": {
+              "vote": "ABSTAIN",
+              "reason": "Evaluated via Context-Aware Evidence Engine",
+              "alternative": null,
+              "question": null,
+              "pivot_hint": null
+            }
+          }
+        }
+      },
+      "feedback": [],
+      "final_report": {
+        "incident_id": "INC-l3_multicast_flood-1793491099",
+        "status": "diagnosed",
+        "suspected_root_cause": "Multicast traffic flooding due to misconfigured switchport or VLAN settings on LHC_VIDEO_SW, causing excessive link utilization and queue drops without packet loss.",
+        "confidence": 1.0,
+        "affected_devices": [
+          "LHC_VIDEO_SW"
+        ],
+        "supporting_evidence": [
+          {
+            "evidence_extracted": "queue_drops confirms excessive link utilization"
+          },
+          {
+            "evidence_extracted": "cpu_utilization_pct confirms increased processing load"
+          },
+          {
+            "evidence_extracted": "LHC_VIDEO_SW link_utilization_pct confirms excessive link utilization"
+          },
+          {
+            "evidence_extracted": "LHC_VIDEO_SW packet_loss_pct confirms no packet loss"
+          }
+        ],
+        "alternative_causes": [],
+        "recommended_actions": [
+          "Check multicast traffic patterns and IGMP snooping configuration on LHC_VIDEO_SW",
+          "Verify VLAN membership and port security settings for video traffic",
+          "Inspect switchport configurations for unintended broadcast/multicast forwarding",
+          "Monitor multicast traffic sources and destinations for anomalies",
+          "Check for recent changes to QoS policies or multicast routing protocols"
+        ],
+        "evidence_sources": [
+          "infrastructure_agent",
+          "traffic_agent"
+        ],
+        "limitations": [
+          "Consensus reached in round 1"
+        ]
+      },
+      "archived_at": "2026-10-31T23:59:28.251459+00:00"
+    },
+    "INC-rf_rogue_ap-1793491168": {
+      "incident_id": "INC-rf_rogue_ap-1793491168",
+      "created_at": "2026-11-01T00:00:25.602566+00:00",
+      "updated_at": "2026-11-01T00:00:25.675951+00:00",
+      "status": "diagnosed",
+      "rounds": {
+        "1": {
+          "hypothesis": "Rogue access point interference causing packet loss and network jitter",
+          "votes": {
+            "infrastructure_agent": {
+              "vote": "ABSTAIN",
+              "reason": "Evaluated via Context-Aware Evidence Engine",
+              "alternative": null,
+              "question": null,
+              "pivot_hint": null
+            },
+            "traffic_agent": {
+              "vote": "APPROVE",
+              "reason": "Evaluated via Context-Aware Evidence Engine",
+              "alternative": null,
+              "question": null,
+              "pivot_hint": null
+            },
+            "l4_l7_agent": {
+              "vote": "ABSTAIN",
+              "reason": "Evaluated via Context-Aware Evidence Engine",
+              "alternative": null,
+              "question": null,
+              "pivot_hint": null
+            }
+          }
+        }
+      },
+      "feedback": [],
+      "final_report": {
+        "incident_id": "INC-rf_rogue_ap-1793491168",
+        "status": "diagnosed",
+        "suspected_root_cause": "Rogue access point interference causing packet loss and network jitter",
+        "confidence": 1.0,
+        "affected_devices": [
+          "SUBARNAREKHA_WIFI_22"
+        ],
+        "supporting_evidence": [
+          {
+            "evidence_extracted": "packet_loss_pct confirms 9.96"
+          },
+          {
+            "evidence_extracted": "jitter_ms confirms 153.14"
+          }
+        ],
+        "alternative_causes": [],
+        "recommended_actions": [
+          "Scan for unauthorized wireless devices",
+          "Check for RF interference on 2.4 GHz/5 GHz bands",
+          "Verify physical layer connectivity",
+          "Inspect wireless channel utilization",
+          "Implement spectrum analysis for rogue AP detection"
+        ],
+        "evidence_sources": [
+          "traffic_agent"
+        ],
+        "limitations": [
+          "Consensus reached in round 1"
+        ]
+      },
+      "archived_at": "2026-11-01T00:00:25.698995+00:00"
+    },
+    "INC-rf_weak_signal-1793491225": {
+      "incident_id": "INC-rf_weak_signal-1793491225",
+      "created_at": "2026-11-01T00:01:20.283432+00:00",
+      "updated_at": "2026-11-01T00:01:20.361951+00:00",
+      "status": "diagnosed",
+      "rounds": {
+        "1": {
+          "hypothesis": "Degraded wireless signal quality due to high packet loss (21.21%) and elevated latency (395.46 ms) in the HOSTEL_BASEMENT_AP, likely caused by physical layer interference, faulty hardware, or environmental obstructions.",
+          "votes": {
+            "infrastructure_agent": {
+              "vote": "ABSTAIN",
+              "reason": "Evaluated via Context-Aware Evidence Engine",
+              "alternative": null,
+              "question": null,
+              "pivot_hint": null
+            },
+            "traffic_agent": {
+              "vote": "APPROVE",
+              "reason": "Evaluated via Context-Aware Evidence Engine",
+              "alternative": null,
+              "question": null,
+              "pivot_hint": null
+            },
+            "l4_l7_agent": {
+              "vote": "ABSTAIN",
+              "reason": "Evaluated via Context-Aware Evidence Engine",
+              "alternative": null,
+              "question": null,
+              "pivot_hint": null
+            }
+          }
+        }
+      },
+      "feedback": [],
+      "final_report": {
+        "incident_id": "INC-rf_weak_signal-1793491225",
+        "status": "diagnosed",
+        "suspected_root_cause": "Degraded wireless signal quality due to high packet loss (21.21%) and elevated latency (395.46 ms) in the HOSTEL_BASEMENT_AP, likely caused by physical layer interference, faulty hardware, or environmental obstructions.",
+        "confidence": 1.0,
+        "affected_devices": [
+          "HOSTEL_BASEMENT_AP"
+        ],
+        "supporting_evidence": [
+          {
+            "evidence_extracted": "packet_loss_pct confirms 21.21%"
+          },
+          {
+            "evidence_extracted": "latency_ms confirms 395.46 ms"
+          }
+        ],
+        "alternative_causes": [],
+        "recommended_actions": [
+          "Inspect physical connections and antenna placement for obstructions/interference",
+          "Check for nearby devices causing RF interference",
+          "Verify AP firmware is up-to-date",
+          "Test with a different client device to rule out endpoint issues",
+          "Monitor signal strength and noise ratio over time"
+        ],
+        "evidence_sources": [
+          "traffic_agent"
+        ],
+        "limitations": [
+          "Consensus reached in round 1"
+        ]
+      },
+      "archived_at": "2026-11-01T00:01:20.390961+00:00"
+    },
+    "INC-rf_high_density_lhc-1793491280": {
+      "incident_id": "INC-rf_high_density_lhc-1793491280",
+      "created_at": "2026-11-01T00:02:39.232282+00:00",
+      "updated_at": "2026-11-01T00:02:39.309315+00:00",
+      "status": "diagnosed",
+      "rounds": {
+        "1": {
+          "hypothesis": "High user density in the auditorium has caused the LHC_AUDITORIUM_AP to experience network congestion, leading to increased latency (516.12 ms), queue drops (4147), and near-maxed DHCP pool utilization (95%).",
+          "votes": {
+            "infrastructure_agent": {
+              "vote": "APPROVE",
+              "reason": "Evaluated via Context-Aware Evidence Engine",
+              "alternative": null,
+              "question": null,
+              "pivot_hint": null
+            },
+            "traffic_agent": {
+              "vote": "APPROVE",
+              "reason": "Evaluated via Context-Aware Evidence Engine",
+              "alternative": null,
+              "question": null,
+              "pivot_hint": null
+            },
+            "l4_l7_agent": {
+              "vote": "APPROVE",
+              "reason": "Evaluated via Context-Aware Evidence Engine",
+              "alternative": null,
+              "question": null,
+              "pivot_hint": null
+            }
+          }
+        }
+      },
+      "feedback": [],
+      "final_report": {
+        "incident_id": "INC-rf_high_density_lhc-1793491280",
+        "status": "diagnosed",
+        "suspected_root_cause": "High user density in the auditorium has caused the LHC_AUDITORIUM_AP to experience network congestion, leading to increased latency (516.12 ms), queue drops (4147), and near-maxed DHCP pool utilization (95%).",
+        "confidence": 1.0,
+        "affected_devices": [
+          "LHC_AUDITORIUM_AP"
+        ],
+        "supporting_evidence": [
+          {
+            "evidence_extracted": "queue_drops confirms network congestion"
+          },
+          {
+            "evidence_extracted": "LHC_AUDITORIUM_AP queue_drops value of 4147 confirms hypothesis"
+          },
+          {
+            "evidence_extracted": "latency_ms confirms increased latency (516.12 ms)"
+          },
+          {
+            "evidence_extracted": "packet_loss_pct confirms no packet loss (0.0%)"
+          },
+          {
+            "evidence_extracted": "dhcp_pool_utilization_pct confirms 95.0% utilization"
+          },
+          {
+            "evidence_extracted": "dns_latency_ms confirms 22.42 ms latency"
+          }
+        ],
+        "alternative_causes": [],
+        "recommended_actions": [
+          "Check connected device count and identify potential rogue devices",
+          "Monitor DHCP pool usage and consider expanding IP address allocation",
+          "Upgrade to higher-capacity access point hardware",
+          "Implement traffic shaping rules to prioritize critical services",
+          "Check for RF interference or physical obstructions affecting signal quality"
+        ],
+        "evidence_sources": [
+          "infrastructure_agent",
+          "traffic_agent",
+          "l4_l7_agent"
+        ],
+        "limitations": [
+          "Consensus reached in round 1"
+        ]
+      },
+      "archived_at": "2026-11-01T00:02:39.339185+00:00"
+    },
+    "INC-rf_microwave_interf-1793491359": {
+      "incident_id": "INC-rf_microwave_interf-1793491359",
+      "created_at": "2026-11-01T00:03:31.051273+00:00",
+      "updated_at": "2026-11-01T00:03:31.134480+00:00",
+      "status": "diagnosed",
+      "rounds": {
+        "1": {
+          "hypothesis": "RF interference from microwave ovens or other devices causing high packet loss and jitter in the MESS_HALL_AP network traffic.",
+          "votes": {
+            "infrastructure_agent": {
+              "vote": "ABSTAIN",
+              "reason": "Evaluated via Context-Aware Evidence Engine",
+              "alternative": null,
+              "question": null,
+              "pivot_hint": null
+            },
+            "traffic_agent": {
+              "vote": "APPROVE",
+              "reason": "Evaluated via Context-Aware Evidence Engine",
+              "alternative": null,
+              "question": null,
+              "pivot_hint": null
+            },
+            "l4_l7_agent": {
+              "vote": "ABSTAIN",
+              "reason": "Evaluated via Context-Aware Evidence Engine",
+              "alternative": null,
+              "question": null,
+              "pivot_hint": null
+            }
+          }
+        }
+      },
+      "feedback": [],
+      "final_report": {
+        "incident_id": "INC-rf_microwave_interf-1793491359",
+        "status": "diagnosed",
+        "suspected_root_cause": "RF interference from microwave ovens or other devices causing high packet loss and jitter in the MESS_HALL_AP network traffic.",
+        "confidence": 1.0,
+        "affected_devices": [
+          "MESS_HALL_AP"
+        ],
+        "supporting_evidence": [
+          {
+            "evidence_extracted": "packet_loss_pct confirms high packet loss"
+          },
+          {
+            "evidence_extracted": "jitter_ms confirms high jitter"
+          }
+        ],
+        "alternative_causes": [],
+        "recommended_actions": [
+          "Check for nearby microwave ovens or RF-emitting devices near the MESS_HALL_AP access point",
+          "Perform a spectrum analysis to identify sources of RF interference",
+          "Restart the MESS_HALL_AP device to reset transient interference effects",
+          "Monitor traffic patterns during peak microwave usage hours"
+        ],
+        "evidence_sources": [
+          "traffic_agent"
+        ],
+        "limitations": [
+          "Consensus reached in round 1"
+        ]
+      },
+      "archived_at": "2026-11-01T00:03:31.158135+00:00"
+    },
+    "INC-rf_sticky_client-1793491411": {
+      "incident_id": "INC-rf_sticky_client-1793491411",
+      "created_at": "2026-11-01T00:04:36.625529+00:00",
+      "updated_at": "2026-11-01T00:04:36.714338+00:00",
+      "status": "diagnosed",
+      "rounds": {
+        "1": {
+          "hypothesis": "High link utilization (82.93%) combined with elevated latency (164.92 ms) and traffic domain anomaly score of 1.0 indicates potential network congestion or misconfigured Quality of Service (QoS) policies on LIBRARY_AP_02.",
+          "votes": {
+            "infrastructure_agent": {
+              "vote": "ABSTAIN",
+              "reason": "Evaluated via Context-Aware Evidence Engine",
+              "alternative": null,
+              "question": null,
+              "pivot_hint": null
+            },
+            "traffic_agent": {
+              "vote": "APPROVE",
+              "reason": "Evaluated via Context-Aware Evidence Engine",
+              "alternative": null,
+              "question": null,
+              "pivot_hint": null
+            },
+            "l4_l7_agent": {
+              "vote": "ABSTAIN",
+              "reason": "Evaluated via Context-Aware Evidence Engine",
+              "alternative": null,
+              "question": null,
+              "pivot_hint": null
+            }
+          }
+        }
+      },
+      "feedback": [],
+      "final_report": {
+        "incident_id": "INC-rf_sticky_client-1793491411",
+        "status": "diagnosed",
+        "suspected_root_cause": "High link utilization (82.93%) combined with elevated latency (164.92 ms) and traffic domain anomaly score of 1.0 indicates potential network congestion or misconfigured Quality of Service (QoS) policies on LIBRARY_AP_02.",
+        "confidence": 1.0,
+        "affected_devices": [
+          "LIBRARY_AP_02"
+        ],
+        "supporting_evidence": [
+          {
+            "evidence_extracted": "link_utilization_pct confirms High link utilization (82.93%)"
+          },
+          {
+            "evidence_extracted": "latency_ms confirms elevated latency (164.92 ms)"
+          }
+        ],
+        "alternative_causes": [],
+        "recommended_actions": [
+          "Monitor real-time traffic patterns for abnormal spikes",
+          "Check QoS policy configurations on the access point",
+          "Verify if DNS latency (18.32 ms) correlates with external DNS server issues",
+          "Test connectivity to identify latency sources",
+          "Review recent changes to network topology or device firmware"
+        ],
+        "evidence_sources": [
+          "traffic_agent"
+        ],
+        "limitations": [
+          "Consensus reached in round 1"
+        ]
+      },
+      "archived_at": "2026-11-01T00:04:36.736605+00:00"
+    },
+    "INC-rf_radius_timeout-1793491476": {
+      "incident_id": "INC-rf_radius_timeout-1793491476",
+      "created_at": "2026-11-01T00:05:38.073675+00:00",
+      "updated_at": "2026-11-01T00:05:38.168620+00:00",
+      "status": "diagnosed",
+      "rounds": {
+        "1": {
+          "hypothesis": "High latency (1250.4ms) on RADIUS authentication server network path causing authentication timeouts",
+          "votes": {
+            "infrastructure_agent": {
+              "vote": "ABSTAIN",
+              "reason": "Evaluated via Context-Aware Evidence Engine",
+              "alternative": null,
+              "question": null,
+              "pivot_hint": null
+            },
+            "traffic_agent": {
+              "vote": "APPROVE",
+              "reason": "Evaluated via Context-Aware Evidence Engine",
+              "alternative": null,
+              "question": null,
+              "pivot_hint": null
+            },
+            "l4_l7_agent": {
+              "vote": "ABSTAIN",
+              "reason": "Evaluated via Context-Aware Evidence Engine",
+              "alternative": null,
+              "question": null,
+              "pivot_hint": null
+            }
+          }
+        }
+      },
+      "feedback": [],
+      "final_report": {
+        "incident_id": "INC-rf_radius_timeout-1793491476",
+        "status": "diagnosed",
+        "suspected_root_cause": "High latency (1250.4ms) on RADIUS authentication server network path causing authentication timeouts",
+        "confidence": 1.0,
+        "affected_devices": [
+          "RADIUS_AUTH_SERVER"
+        ],
+        "supporting_evidence": [
+          {
+            "evidence_extracted": "RADIUS_AUTH_SERVER latency_ms confirms High latency (1250.4ms)"
+          }
+        ],
+        "alternative_causes": [],
+        "recommended_actions": [
+          "Check network path latency between RADIUS server and authentication clients",
+          "Verify routing configurations for potential suboptimal paths",
+          "Test authentication response times with packet capture analysis",
+          "Restart RADIUS service to clear potential transient issues"
+        ],
+        "evidence_sources": [
+          "traffic_agent"
+        ],
+        "limitations": [
+          "Consensus reached in round 1"
+        ]
+      },
+      "archived_at": "2026-11-01T00:05:38.192877+00:00"
+    },
+    "INC-rf_beacon_overhead-1793491538": {
+      "incident_id": "INC-rf_beacon_overhead-1793491538",
+      "created_at": "2026-11-01T00:06:44.703316+00:00",
+      "updated_at": "2026-11-01T00:06:44.777749+00:00",
+      "status": "diagnosed",
+      "rounds": {
+        "1": {
+          "hypothesis": "High link utilization (99%) combined with significant queue drops (1350) indicates network congestion or insufficient bandwidth capacity on the SAC_WIFI_AP device.",
+          "votes": {
+            "infrastructure_agent": {
+              "vote": "APPROVE",
+              "reason": "Evaluated via Context-Aware Evidence Engine",
+              "alternative": null,
+              "question": null,
+              "pivot_hint": null
+            },
+            "traffic_agent": {
+              "vote": "APPROVE",
+              "reason": "Evaluated via Context-Aware Evidence Engine",
+              "alternative": null,
+              "question": null,
+              "pivot_hint": null
+            },
+            "l4_l7_agent": {
+              "vote": "ABSTAIN",
+              "reason": "Evaluated via Context-Aware Evidence Engine",
+              "alternative": null,
+              "question": null,
+              "pivot_hint": null
+            }
+          }
+        }
+      },
+      "feedback": [],
+      "final_report": {
+        "incident_id": "INC-rf_beacon_overhead-1793491538",
+        "status": "diagnosed",
+        "suspected_root_cause": "High link utilization (99%) combined with significant queue drops (1350) indicates network congestion or insufficient bandwidth capacity on the SAC_WIFI_AP device.",
+        "confidence": 1.0,
+        "affected_devices": [
+          "SAC_WIFI_AP"
+        ],
+        "supporting_evidence": [
+          {
+            "evidence_extracted": "queue_drops confirms significant queue drops"
+          },
+          {
+            "evidence_extracted": "SAC_WIFI_AP confirms network congestion or insufficient bandwidth capacity"
+          },
+          {
+            "evidence_extracted": "SAC_WIFI_AP link_utilization_pct confirms High link utilization (99%)"
+          },
+          {
+            "evidence_extracted": "SAC_WIFI_AP latency_ms confirms significant queue drops"
+          }
+        ],
+        "alternative_causes": [],
+        "recommended_actions": [
+          "Check for bandwidth-intensive applications or devices connected to the AP",
+          "Verify if the link capacity matches current traffic demands",
+          "Implement QoS policies to prioritize critical traffic",
+          "Consider upgrading to a higher-capacity link",
+          "Monitor traffic patterns during peak hours"
+        ],
+        "evidence_sources": [
+          "infrastructure_agent",
+          "traffic_agent"
+        ],
+        "limitations": [
+          "Consensus reached in round 1"
+        ]
+      },
+      "archived_at": "2026-11-01T00:06:44.814414+00:00"
+    },
+    "INC-rf_ap_memory_leak-1793491604": {
+      "incident_id": "INC-rf_ap_memory_leak-1793491604",
+      "created_at": "2026-11-01T00:08:03.942841+00:00",
+      "updated_at": "2026-11-01T00:08:04.015955+00:00",
+      "status": "diagnosed",
+      "rounds": {
+        "1": {
+          "hypothesis": "Memory leak in the access point's firmware causing excessive CPU utilization and degraded network performance.",
+          "votes": {
+            "infrastructure_agent": {
+              "vote": "APPROVE",
+              "reason": "Evaluated via Context-Aware Evidence Engine",
+              "alternative": null,
+              "question": null,
+              "pivot_hint": null
+            },
+            "traffic_agent": {
+              "vote": "APPROVE",
+              "reason": "Evaluated via Context-Aware Evidence Engine",
+              "alternative": null,
+              "question": null,
+              "pivot_hint": null
+            },
+            "l4_l7_agent": {
+              "vote": "ABSTAIN",
+              "reason": "Evaluated via Context-Aware Evidence Engine",
+              "alternative": null,
+              "question": null,
+              "pivot_hint": null
+            }
+          }
+        }
+      },
+      "feedback": [],
+      "final_report": {
+        "incident_id": "INC-rf_ap_memory_leak-1793491604",
+        "status": "diagnosed",
+        "suspected_root_cause": "Memory leak in the access point's firmware causing excessive CPU utilization and degraded network performance.",
+        "confidence": 1.0,
+        "affected_devices": [
+          "STAFF_QTRS_AP_14"
+        ],
+        "supporting_evidence": [
+          {
+            "evidence_extracted": "cpu_utilization_pct confirms excessive CPU utilization"
+          },
+          {
+            "evidence_extracted": "queue_drops confirms no packet loss due to queue overflow"
+          },
+          {
+            "evidence_extracted": "interface_errors confirms no physical layer issues"
+          },
+          {
+            "evidence_extracted": "latency_ms confirms degraded network performance"
+          }
+        ],
+        "alternative_causes": [],
+        "recommended_actions": [
+          "Reboot the access point (STAFF_QTRS_AP_14) to clear potential memory leaks",
+          "Check firmware version and apply updates if available",
+          "Monitor CPU utilization and latency metrics post-reboot",
+          "Inspect system logs for memory allocation errors or process anomalies",
+          "Verify DHCP pool configuration and ensure no rogue devices are exhausting resources"
+        ],
+        "evidence_sources": [
+          "infrastructure_agent",
+          "traffic_agent"
+        ],
+        "limitations": [
+          "Consensus reached in round 1"
+        ]
+      },
+      "archived_at": "2026-11-01T00:08:04.039830+00:00"
+    },
+    "INC-rf_channel_overlap-1793491684": {
+      "incident_id": "INC-rf_channel_overlap-1793491684",
+      "created_at": "2026-11-01T00:08:58.313057+00:00",
+      "updated_at": "2026-11-01T00:08:58.396682+00:00",
+      "status": "diagnosed",
+      "rounds": {
+        "1": {
+          "hypothesis": "RF channel overlap causing intermittent interference and degradation in wireless performance",
+          "votes": {
+            "infrastructure_agent": {
+              "vote": "ABSTAIN",
+              "reason": "Evaluated via Context-Aware Evidence Engine",
+              "alternative": null,
+              "question": null,
+              "pivot_hint": null
+            },
+            "traffic_agent": {
+              "vote": "APPROVE",
+              "reason": "Evaluated via Context-Aware Evidence Engine",
+              "alternative": null,
+              "question": null,
+              "pivot_hint": null
+            },
+            "l4_l7_agent": {
+              "vote": "ABSTAIN",
+              "reason": "Evaluated via Context-Aware Evidence Engine",
+              "alternative": null,
+              "question": null,
+              "pivot_hint": null
+            }
+          }
+        }
+      },
+      "feedback": [],
+      "final_report": {
+        "incident_id": "INC-rf_channel_overlap-1793491684",
+        "status": "diagnosed",
+        "suspected_root_cause": "RF channel overlap causing intermittent interference and degradation in wireless performance",
+        "confidence": 1.0,
+        "affected_devices": [
+          "DEPT_CORRIDOR_AP"
+        ],
+        "supporting_evidence": [
+          {
+            "evidence_extracted": "DEPT_CORRIDOR_AP packet_loss_pct confirms 11.69"
+          },
+          {
+            "evidence_extracted": "DEPT_CORRIDOR_AP jitter_ms confirms 103.92"
+          }
+        ],
+        "alternative_causes": [],
+        "recommended_actions": [
+          "Check RF channel utilization and overlap using spectrum analysis tools",
+          "Restart the DEPT_CORRIDOR_AP to clear transient interference",
+          "Monitor traffic patterns during peak hours to confirm congestion correlation"
+        ],
+        "evidence_sources": [
+          "traffic_agent"
+        ],
+        "limitations": [
+          "Consensus reached in round 1"
+        ]
+      },
+      "archived_at": "2026-11-01T00:08:58.420757+00:00"
+    },
+    "INC-svc_dhcp_exhaust-1793491738": {
+      "incident_id": "INC-svc_dhcp_exhaust-1793491738",
+      "created_at": "2026-11-01T00:09:57.305483+00:00",
+      "updated_at": "2026-11-01T00:09:57.383489+00:00",
+      "status": "diagnosed",
+      "rounds": {
+        "1": {
+          "hypothesis": "DHCP pool exhaustion in LIBRARY_DHCP_SCOPE has reached 100% utilization, preventing new devices from obtaining IP addresses.",
+          "votes": {
+            "infrastructure_agent": {
+              "vote": "ABSTAIN",
+              "reason": "Evaluated via Context-Aware Evidence Engine",
+              "alternative": null,
+              "question": null,
+              "pivot_hint": null
+            },
+            "traffic_agent": {
+              "vote": "ABSTAIN",
+              "reason": "Evaluated via Context-Aware Evidence Engine",
+              "alternative": null,
+              "question": null,
+              "pivot_hint": null
+            },
+            "l4_l7_agent": {
+              "vote": "APPROVE",
+              "reason": "Evaluated via Context-Aware Evidence Engine",
+              "alternative": null,
+              "question": null,
+              "pivot_hint": null
+            }
+          }
+        }
+      },
+      "feedback": [],
+      "final_report": {
+        "incident_id": "INC-svc_dhcp_exhaust-1793491738",
+        "status": "diagnosed",
+        "suspected_root_cause": "DHCP pool exhaustion in LIBRARY_DHCP_SCOPE has reached 100% utilization, preventing new devices from obtaining IP addresses.",
+        "confidence": 1.0,
+        "affected_devices": [
+          "LIBRARY_DHCP_SCOPE"
+        ],
+        "supporting_evidence": [
+          {
+            "evidence_extracted": "dhcp_pool_utilization_pct confirms 100% utilization"
+          }
+        ],
+        "alternative_causes": [],
+        "recommended_actions": [
+          "Check DHCP scope configuration for maximum address limits",
+          "Verify lease duration settings to prevent excessive renewals",
+          "Monitor for abnormal device connection spikes",
+          "Consider expanding DHCP pool size or implementing IP address recycling policies",
+          "Restart DHCP service to clear temporary allocation issues"
+        ],
+        "evidence_sources": [
+          "l4_l7_agent"
+        ],
+        "limitations": [
+          "Consensus reached in round 1"
+        ]
+      },
+      "archived_at": "2026-11-01T00:09:57.405349+00:00"
+    },
+    "INC-svc_dns_timeout-1793491797": {
+      "incident_id": "INC-svc_dns_timeout-1793491797",
+      "created_at": "2026-11-01T00:11:09.411632+00:00",
+      "updated_at": "2026-11-01T00:11:09.495709+00:00",
+      "status": "diagnosed",
+      "rounds": {
+        "1": {
+          "hypothesis": "High DNS latency (2118.18 ms) indicates a DNS resolution failure or misconfiguration in INSTITUTE_DNS_01, likely causing service timeouts.",
+          "votes": {
+            "infrastructure_agent": {
+              "vote": "ABSTAIN",
+              "reason": "Evaluated via Context-Aware Evidence Engine",
+              "alternative": null,
+              "question": null,
+              "pivot_hint": null
+            },
+            "traffic_agent": {
+              "vote": "REJECT",
+              "reason": "Evaluated via Context-Aware Evidence Engine",
+              "alternative": null,
+              "question": null,
+              "pivot_hint": null
+            },
+            "l4_l7_agent": {
+              "vote": "APPROVE",
+              "reason": "Evaluated via Context-Aware Evidence Engine",
+              "alternative": null,
+              "question": null,
+              "pivot_hint": null
+            }
+          }
+        }
+      },
+      "feedback": [],
+      "final_report": {
+        "incident_id": "INC-svc_dns_timeout-1793491797",
+        "status": "diagnosed",
+        "suspected_root_cause": "High DNS latency (2118.18 ms) indicates a DNS resolution failure or misconfiguration in INSTITUTE_DNS_01, likely causing service timeouts.",
+        "confidence": 0.75,
+        "affected_devices": [
+          "INSTITUTE_DNS_01"
+        ],
+        "supporting_evidence": [
+          {
+            "evidence_extracted": "INSTITUTE_DNS_01 dns_latency_ms confirms High DNS latency (2118.18 ms)"
+          }
+        ],
+        "alternative_causes": [],
+        "recommended_actions": [
+          "Check DNS server logs for resolution errors",
+          "Verify DNS zone configurations and TTL settings",
+          "Test DNS resolution from the server itself using nslookup/dig",
+          "Inspect firewall rules for DNS traffic (port 53)"
+        ],
+        "evidence_sources": [
+          "l4_l7_agent"
+        ],
+        "limitations": [
+          "Consensus reached in round 1"
+        ]
+      },
+      "archived_at": "2026-11-01T00:11:09.520089+00:00"
+    },
+    "INC-svc_nat_exhaust-1793491869": {
+      "incident_id": "INC-svc_nat_exhaust-1793491869",
+      "created_at": "2026-11-01T00:12:22.923761+00:00",
+      "updated_at": "2026-11-01T00:12:23.015061+00:00",
+      "status": "diagnosed",
+      "rounds": {
+        "1": {
+          "hypothesis": "EDGE_FIREWALL_01 is experiencing CPU resource exhaustion due to high traffic processing demands, leading to packet loss and increased latency.",
+          "votes": {
+            "infrastructure_agent": {
+              "vote": "APPROVE",
+              "reason": "Evaluated via Context-Aware Evidence Engine",
+              "alternative": null,
+              "question": null,
+              "pivot_hint": null
+            },
+            "traffic_agent": {
+              "vote": "APPROVE",
+              "reason": "Evaluated via Context-Aware Evidence Engine",
+              "alternative": null,
+              "question": null,
+              "pivot_hint": null
+            },
+            "l4_l7_agent": {
+              "vote": "ABSTAIN",
+              "reason": "Evaluated via Context-Aware Evidence Engine",
+              "alternative": null,
+              "question": null,
+              "pivot_hint": null
+            }
+          }
+        }
+      },
+      "feedback": [],
+      "final_report": {
+        "incident_id": "INC-svc_nat_exhaust-1793491869",
+        "status": "diagnosed",
+        "suspected_root_cause": "EDGE_FIREWALL_01 is experiencing CPU resource exhaustion due to high traffic processing demands, leading to packet loss and increased latency.",
+        "confidence": 1.0,
+        "affected_devices": [
+          "EDGE_FIREWALL_01"
+        ],
+        "supporting_evidence": [
+          {
+            "evidence_extracted": "EDGE_FIREWALL_01 cpu_utilization_pct confirms CPU resource exhaustion"
+          },
+          {
+            "evidence_extracted": "EDGE_FIREWALL_01 queue_drops confirms packet loss"
+          },
+          {
+            "evidence_extracted": "EDGE_FIREWALL_01 packet_loss_pct confirms 18.84"
+          },
+          {
+            "evidence_extracted": "EDGE_FIREWALL_01 latency_ms confirms 19.42"
+          }
+        ],
+        "alternative_causes": [],
+        "recommended_actions": [
+          "Check CPU utilization trends over time to confirm sustained high usage",
+          "Review firewall rule sets for misconfigurations or inefficient policies",
+          "Investigate potential DDoS attacks or abnormal traffic patterns",
+          "Verify hardware health and consider temporary traffic shaping measures"
+        ],
+        "evidence_sources": [
+          "infrastructure_agent",
+          "traffic_agent"
+        ],
+        "limitations": [
+          "Consensus reached in round 1"
+        ]
+      },
+      "archived_at": "2026-11-01T00:12:23.034807+00:00"
+    },
+    "INC-svc_captive_portal-1793491943": {
+      "incident_id": "INC-svc_captive_portal-1793491943",
+      "created_at": "2026-11-01T00:14:01.535617+00:00",
+      "updated_at": "2026-11-01T00:16:59.787727+00:00",
+      "status": "diagnosed",
+      "rounds": {
+        "1": {
+          "hypothesis": "The GUEST_PORTAL_SVR is experiencing excessive CPU utilization (95%) and abnormally high DNS latency (791.5 ms), likely due to a resource exhaustion event or a malicious process consuming system resources.",
+          "votes": {
+            "infrastructure_agent": {
+              "vote": "APPROVE",
+              "reason": "Evaluated via Context-Aware Evidence Engine",
+              "alternative": null,
+              "question": null,
+              "pivot_hint": null
+            },
+            "traffic_agent": {
+              "vote": "REJECT",
+              "reason": "Evaluated via Context-Aware Evidence Engine",
+              "alternative": null,
+              "question": null,
+              "pivot_hint": null
+            },
+            "l4_l7_agent": {
+              "vote": "APPROVE",
+              "reason": "Evaluated via Context-Aware Evidence Engine",
+              "alternative": null,
+              "question": null,
+              "pivot_hint": null
+            }
+          }
+        },
+        "2": {
+          "hypothesis": "The GUEST_PORTAL_SVR is experiencing abnormally high DNS latency (791.5 ms) combined with near-maximum CPU utilization (95%), likely due to a misconfigured DNS resolver or a local process consuming excessive CPU resources while handling DNS queries.",
+          "votes": {
+            "infrastructure_agent": {
+              "vote": "APPROVE",
+              "reason": "Evaluated via Context-Aware Evidence Engine",
+              "alternative": null,
+              "question": null,
+              "pivot_hint": null
+            },
+            "traffic_agent": {
+              "vote": "REJECT",
+              "reason": "Evaluated via Context-Aware Evidence Engine",
+              "alternative": null,
+              "question": null,
+              "pivot_hint": null
+            },
+            "l4_l7_agent": {
+              "vote": "APPROVE",
+              "reason": "Evaluated via Context-Aware Evidence Engine",
+              "alternative": null,
+              "question": null,
+              "pivot_hint": null
+            }
+          }
+        },
+        "3": {
+          "hypothesis": "The GUEST_PORTAL_SVR is experiencing abnormally high DNS latency (791.5 ms) and near-maximum CPU utilization (95%) due to a misconfigured DNS resolver or a local process consuming excessive CPU resources, unrelated to network traffic performance.",
+          "votes": {
+            "infrastructure_agent": {
+              "vote": "APPROVE",
+              "reason": "Evaluated via Context-Aware Evidence Engine",
+              "alternative": null,
+              "question": null,
+              "pivot_hint": null
+            },
+            "traffic_agent": {
+              "vote": "ABSTAIN",
+              "reason": "Evaluated via Context-Aware Evidence Engine",
+              "alternative": null,
+              "question": null,
+              "pivot_hint": null
+            },
+            "l4_l7_agent": {
+              "vote": "APPROVE",
+              "reason": "Evaluated via Context-Aware Evidence Engine",
+              "alternative": null,
+              "question": null,
+              "pivot_hint": null
+            }
+          }
+        }
+      },
+      "feedback": [
+        "Round 1 Failed. Your hypothesis: 'The GUEST_PORTAL_SVR is experiencing excessive CPU utilization (95%) and abnormally high DNS latency (791.5 ms), likely due to a resource exhaustion event or a malicious process consuming system resources.'\nThe following metrics CONTRADICT your hypothesis:\n- From traffic_agent:\n  * GUEST_PORTAL_SVR has normal link utilization (40.92%)\n  * GUEST_PORTAL_SVR has no packet loss (0.0%)\n  * GUEST_PORTAL_SVR has normal latency (16.94 ms)\n  * GUEST_PORTAL_SVR has normal jitter (1.73 ms)\n",
+        "Round 2 Failed. Your hypothesis: 'The GUEST_PORTAL_SVR is experiencing abnormally high DNS latency (791.5 ms) combined with near-maximum CPU utilization (95%), likely due to a misconfigured DNS resolver or a local process consuming excessive CPU resources while handling DNS queries.'\nThe following metrics CONTRADICT your hypothesis:\n- From traffic_agent:\n  * GUEST_PORTAL_SVR has normal latency (16.94 ms) contradicting the hypothesis of abnormally high DNS latency (791.5 ms)\n  * GUEST_PORTAL_SVR has normal link utilization (40.92%) contradicting the hypothesis of near-maximum CPU utilization (95%)\n"
+      ],
+      "final_report": {
+        "incident_id": "INC-svc_captive_portal-1793491943",
+        "status": "diagnosed",
+        "suspected_root_cause": "The GUEST_PORTAL_SVR is experiencing abnormally high DNS latency (791.5 ms) and near-maximum CPU utilization (95%) due to a misconfigured DNS resolver or a local process consuming excessive CPU resources, unrelated to network traffic performance.",
+        "confidence": 1.0,
+        "affected_devices": [
+          "GUEST_PORTAL_SVR"
+        ],
+        "supporting_evidence": [
+          {
+            "evidence_extracted": "GUEST_PORTAL_SVR cpu_utilization_pct confirms high CPU utilization (95%)"
+          },
+          {
+            "evidence_extracted": "GUEST_PORTAL_SVR queue_drops confirms no packet drops"
+          },
+          {
+            "evidence_extracted": "dns_latency_ms confirms abnormally high DNS latency (791.5 ms)"
+          },
+          {
+            "evidence_extracted": "dhcp_pool_utilization_pct does not confirm maximum CPU utilization as it is not related to CPU metrics"
+          }
+        ],
+        "alternative_causes": [],
+        "recommended_actions": [
+          "Check the DNS resolver configuration on GUEST_PORTAL_SVR for errors or misconfigurations",
+          "Investigate processes running on GUEST_PORTAL_SVR to identify any resource-intensive tasks or potential malicious activity",
+          "Monitor system logs and CPU usage patterns on GUEST_PORTAL_SVR for anomalies",
+          "Verify if DNS queries are being handled internally by the server or routed externally, and test DNS resolution directly on the device"
+        ],
+        "evidence_sources": [
+          "infrastructure_agent",
+          "l4_l7_agent"
+        ],
+        "limitations": [
+          "Consensus reached in round 3"
+        ]
+      },
+      "archived_at": "2026-11-01T00:16:59.810724+00:00"
+    },
+    "INC-edge_missing_cpu-1793492219": {
+      "incident_id": "INC-edge_missing_cpu-1793492219",
+      "created_at": "2026-11-01T00:18:01.448096+00:00",
+      "updated_at": "2026-11-01T00:21:17.250652+00:00",
+      "status": "investigating",
+      "rounds": {
+        "1": {
+          "hypothesis": "Excessive queue drops on LEGACY_SW_01 due to insufficient CPU resources or processing capacity, leading to packet loss and potential traffic congestion despite normal link utilization metrics.",
+          "votes": {
+            "infrastructure_agent": {
+              "vote": "APPROVE",
+              "reason": "Evaluated via Context-Aware Evidence Engine",
+              "alternative": null,
+              "question": null,
+              "pivot_hint": null
+            },
+            "traffic_agent": {
+              "vote": "REJECT",
+              "reason": "Evaluated via Context-Aware Evidence Engine",
+              "alternative": null,
+              "question": null,
+              "pivot_hint": null
+            },
+            "l4_l7_agent": {
+              "vote": "ABSTAIN",
+              "reason": "Evaluated via Context-Aware Evidence Engine",
+              "alternative": null,
+              "question": null,
+              "pivot_hint": null
+            }
+          }
+        },
+        "2": {
+          "hypothesis": "Unknown network anomaly",
+          "votes": {
+            "infrastructure_agent": {
+              "vote": "ABSTAIN",
+              "reason": "Evaluated via Context-Aware Evidence Engine",
+              "alternative": null,
+              "question": null,
+              "pivot_hint": null
+            },
+            "traffic_agent": {
+              "vote": "ABSTAIN",
+              "reason": "Evaluated via Context-Aware Evidence Engine",
+              "alternative": null,
+              "question": null,
+              "pivot_hint": null
+            },
+            "l4_l7_agent": {
+              "vote": "ABSTAIN",
+              "reason": "Evaluated via Context-Aware Evidence Engine",
+              "alternative": null,
+              "question": null,
+              "pivot_hint": null
+            }
+          }
+        },
+        "3": {
+          "hypothesis": "Unknown network anomaly",
+          "votes": {
+            "infrastructure_agent": {
+              "vote": "ABSTAIN",
+              "reason": "Evaluated via Context-Aware Evidence Engine",
+              "alternative": null,
+              "question": null,
+              "pivot_hint": null
+            },
+            "traffic_agent": {
+              "vote": "ABSTAIN",
+              "reason": "Evaluated via Context-Aware Evidence Engine",
+              "alternative": null,
+              "question": null,
+              "pivot_hint": null
+            },
+            "l4_l7_agent": {
+              "vote": "ABSTAIN",
+              "reason": "Evaluated via Context-Aware Evidence Engine",
+              "alternative": null,
+              "question": null,
+              "pivot_hint": null
+            }
+          }
+        }
+      },
+      "feedback": [
+        "Round 1 Failed. Your hypothesis: 'Excessive queue drops on LEGACY_SW_01 due to insufficient CPU resources or processing capacity, leading to packet loss and potential traffic congestion despite normal link utilization metrics.'\nThe following metrics CONTRADICT your hypothesis:\n- From traffic_agent:\n  * LEGACY_SW_01 has 0.0% packet loss\n  * LEGACY_SW_01 has normal link utilization (29.88%)\n",
+        "Round 2 Failed. Your hypothesis: 'Unknown network anomaly'\nThe following metrics CONTRADICT your hypothesis:\nNo direct contradicting metrics, but consensus was not reached. Refine your guess.\n",
+        "Round 3 Failed. Your hypothesis: 'Unknown network anomaly'\nThe following metrics CONTRADICT your hypothesis:\nNo direct contradicting metrics, but consensus was not reached. Refine your guess.\n"
+      ],
+      "final_report": {
+        "incident_id": "INC-edge_missing_cpu-1793492219",
+        "status": "investigating",
+        "suspected_root_cause": "Unknown network anomaly",
+        "confidence": 0.0,
+        "affected_devices": [
+          "LEGACY_SW_01"
+        ],
+        "supporting_evidence": [],
+        "alternative_causes": [],
+        "recommended_actions": [
+          "Manual review required"
+        ],
+        "evidence_sources": [],
+        "limitations": [
+          "Failed to reach consensus"
+        ]
+      },
+      "archived_at": "2026-11-01T00:21:17.267017+00:00"
+    },
+    "INC-edge_outdated_time-1793492477": {
+      "incident_id": "INC-edge_outdated_time-1793492477",
+      "created_at": "2026-11-01T00:22:25.665552+00:00",
+      "updated_at": "2026-11-01T00:22:25.788564+00:00",
+      "status": "diagnosed",
+      "rounds": {
+        "1": {
+          "hypothesis": "NTP synchronization failure due to high CPU utilization (99%) on the device, likely causing the NTP service to become unresponsive or fail to synchronize time correctly.",
+          "votes": {
+            "infrastructure_agent": {
+              "vote": "APPROVE",
+              "reason": "Evaluated via Context-Aware Evidence Engine",
+              "alternative": null,
+              "question": null,
+              "pivot_hint": null
+            },
+            "traffic_agent": {
+              "vote": "ABSTAIN",
+              "reason": "Evaluated via Context-Aware Evidence Engine",
+              "alternative": null,
+              "question": null,
+              "pivot_hint": null
+            },
+            "l4_l7_agent": {
+              "vote": "ABSTAIN",
+              "reason": "Evaluated via Context-Aware Evidence Engine",
+              "alternative": null,
+              "question": null,
+              "pivot_hint": null
+            }
+          }
+        }
+      },
+      "feedback": [],
+      "final_report": {
+        "incident_id": "INC-edge_outdated_time-1793492477",
+        "status": "diagnosed",
+        "suspected_root_cause": "NTP synchronization failure due to high CPU utilization (99%) on the device, likely causing the NTP service to become unresponsive or fail to synchronize time correctly.",
+        "confidence": 1.0,
+        "affected_devices": [
+          "NTP_SYNC_FAIL_SW"
+        ],
+        "supporting_evidence": [
+          {
+            "evidence_extracted": "NTP_SYNC_FAIL_SW confirms high CPU utilization (99%)"
+          },
+          {
+            "evidence_extracted": "NTP_SYNC_FAIL_SW confirms no queue drops"
+          },
+          {
+            "evidence_extracted": "NTP_SYNC_FAIL_SW confirms no interface errors"
+          }
+        ],
+        "alternative_causes": [],
+        "recommended_actions": [
+          "Check the device's CPU usage trends and identify processes consuming excessive resources",
+          "Verify NTP service status and logs for errors or restart the service if unresponsive",
+          "Review system resource allocation and ensure no misconfigured processes are causing CPU exhaustion"
+        ],
+        "evidence_sources": [
+          "infrastructure_agent"
+        ],
+        "limitations": [
+          "Consensus reached in round 1"
+        ]
+      },
+      "archived_at": "2026-11-01T00:22:25.811086+00:00"
+    },
+    "INC-compound_sfp_dhcp-1793492545": {
+      "incident_id": "INC-compound_sfp_dhcp-1793492545",
+      "created_at": "2026-11-01T00:23:42.624751+00:00",
+      "updated_at": "2026-11-01T00:23:42.735475+00:00",
+      "status": "diagnosed",
+      "rounds": {
+        "1": {
+          "hypothesis": "High interface error count (12,000) combined with packet loss (15%) and near-maxed DHCP pool (98% utilization) suggests a combination of physical layer degradation and DHCP exhaustion. The consistent metrics across infrastructure/traffic/l4_l7 domains indicate a systemic issue at the core switch.",
+          "votes": {
+            "infrastructure_agent": {
+              "vote": "APPROVE",
+              "reason": "Evaluated via Context-Aware Evidence Engine",
+              "alternative": null,
+              "question": null,
+              "pivot_hint": null
+            },
+            "traffic_agent": {
+              "vote": "APPROVE",
+              "reason": "Evaluated via Context-Aware Evidence Engine",
+              "alternative": null,
+              "question": null,
+              "pivot_hint": null
+            },
+            "l4_l7_agent": {
+              "vote": "APPROVE",
+              "reason": "Evaluated via Context-Aware Evidence Engine",
+              "alternative": null,
+              "question": null,
+              "pivot_hint": null
+            }
+          }
+        }
+      },
+      "feedback": [],
+      "final_report": {
+        "incident_id": "INC-compound_sfp_dhcp-1793492545",
+        "status": "diagnosed",
+        "suspected_root_cause": "High interface error count (12,000) combined with packet loss (15%) and near-maxed DHCP pool (98% utilization) suggests a combination of physical layer degradation and DHCP exhaustion. The consistent metrics across infrastructure/traffic/l4_l7 domains indicate a systemic issue at the core switch.",
+        "confidence": 1.0,
+        "affected_devices": [
+          "HOSTEL_CORE_SW"
+        ],
+        "supporting_evidence": [
+          {
+            "evidence_extracted": "interface_errors confirms High interface error count (12,000)"
+          },
+          {
+            "evidence_extracted": "queue_drops confirms packet loss (0 drops, implying no packet loss)"
+          },
+          {
+            "evidence_extracted": "packet_loss_pct confirms 15%"
+          },
+          {
+            "evidence_extracted": "latency_ms confirms 6.48"
+          },
+          {
+            "evidence_extracted": "dhcp_pool_utilization_pct confirms near-maxed DHCP pool (98% utilization)"
+          },
+          {
+            "evidence_extracted": "dns_latency_ms confirms increased latency (15.11 ms)"
+          }
+        ],
+        "alternative_causes": [],
+        "recommended_actions": [
+          "Inspect physical connections on HOSTEL_CORE_SW for faulty cables/ports",
+          "Check DHCP pool configuration and available IP ranges",
+          "Verify switch hardware health (fan/temperature/PSU status)",
+          "Monitor interface error trends over time",
+          "Test alternative DHCP server redundancy if available"
+        ],
+        "evidence_sources": [
+          "infrastructure_agent",
+          "traffic_agent",
+          "l4_l7_agent"
+        ],
+        "limitations": [
+          "Consensus reached in round 1"
+        ]
+      },
+      "archived_at": "2026-11-01T00:23:42.758274+00:00"
     }
   }
 }
