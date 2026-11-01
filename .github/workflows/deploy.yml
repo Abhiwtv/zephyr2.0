@@ -30,17 +30,21 @@ jobs:
           script: |
             cd /home/ubuntu/zephyr-control
             
-            # 1. Create the virtual environment if it doesn't exist yet
+            # 1. Install required python venv package (runs quietly)
+            sudo apt-get update -yq
+            sudo apt-get install -yq python3-venv python3-pip
+            
+            # 2. Create the virtual environment if it doesn't exist
             if [ ! -d "venv" ]; then
               python3 -m venv venv
             fi
             
-            # 2. Activate and install dependencies
+            # 3. Activate and install dependencies
             source venv/bin/activate
             pip install -r requirements.txt
             
-            # 3. Kill existing uvicorn process safely
+            # 4. Kill existing uvicorn process safely
             pkill -f "uvicorn main:app" || true
             
-            # 4. Restart in background
+            # 5. Restart in background
             nohup uvicorn main:app --host 127.0.0.1 --port 5000 > backend.log 2>&1 &
