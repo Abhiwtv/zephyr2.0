@@ -1,285 +1,306 @@
-# Zephyr 2.0 (NetCoop AI) — Autonomous Multi-Agent Network Diagnostic Architecture
+# NetCoop AI · Zephyr 2.0
 
-## 1. Executive Summary
+A neuro-symbolic multi-agent engine for diagnosing network faults. Deterministic Python handles scoring, masking and the final verdict. Stateless LLM agents (**Qwen2.5-14B-Instruct-AWQ**) handle only the semantic reasoning.
 
-**Zephyr 2.0 (NetCoop AI)** is a resilient, neuro-symbolic multi-agent consensus system designed for autonomous fault isolation and root-cause diagnosis in complex campus networks.
+**Compute:** inference runs on a modular **Bring-Your-Own-Compute (BYOC)** layer. The always-on Oracle VM control plane starts an **ephemeral Google Cloud T4 GPU** only when a diagnosis needs it, so idle GPU cost is zero and the inference layer stays decoupled from the control plane.
 
-Traditional network diagnostic systems rely either on brittle, static threshold rules or on monolithic LLM prompts that suffer from hallucinations, high latency, and control-plane bias. Zephyr 2.0 resolves these challenges by introducing a **decentralized, adversarial debate architecture**:
-
-1. **Fuzzy Edge Sensors** pre-filter raw telemetry using triangular membership functions (TRIMF) to strip baseline noise and assign continuous anomaly weights.
-2. A central **Brain Orchestrator & Reasoning Engine** formulates candidate root-cause hypotheses using LLMs (Qwen 14B) with deterministic symbolic correlation fallbacks.
-3. Skeptical, domain-isolated **LLM Voter Agents** (Infrastructure, Traffic, L4–L7 Services) evaluate hypotheses against local ground-truth metrics.
-4. An inter-agent **Coordination Middleware** validates all communication against strict Pydantic schemas, preventing semantic drift.
-5. A **Dynamic Severity Consensus Engine** weighs votes proportionally to real-time anomaly severity, enabling catastrophic alerts to out-vote minor symptoms and prevent consensus gridlock.
-6. A **Thread-Safe Persistent Memory** archives debate histories, hypotheses, and diagnostic outputs.
+![Architecture](docs/NetCoop_Zephyr2_Architecture.png)
 
 ---
 
-## 2. High-Level Architecture Diagram
+## 1. Agent Responsibilities
 
-```mermaid
-graph TB
-    subgraph SENSORS ["1. Edge Ingestion & Neuro-Symbolic Fuzzy Sensors"]
-        RawTel["Raw Network Telemetry<br>(JSON Payload)"] --> GlobalState[("core/shared_state.py<br>Thread-Safe StateStore")]
-        RawTel --> InfraSensor["agents/infrastructure/sensor.py<br>InfrastructureSensor"]
-        RawTel --> TrafficSensor["agents/traffic/sensor.py<br>TrafficSensor"]
-        RawTel --> L4Sensor["agents/l4_l7/sensor.py<br>L4L7Sensor"]
-        
-        InfraSensor -.-> FuzzyEng["core/fuzzy.py<br>FuzzyLogicEngine (TRIMF)"]
-        TrafficSensor -.-> FuzzyEng
-        L4Sensor -.-> FuzzyEng
-    end
+The system has two kinds of participants. **Symbolic components** are deterministic Python: they decide what each agent sees and how much its vote weighs. **LLM agents** reason over what they are given. They never set their own authority and never issue the final verdict.
 
-    subgraph BRAIN ["2. Brain Orchestrator & Reasoning Engine"]
-        ActiveAlerts["Active Domain Alerts<br>(Anomaly Scores & Evidence)"]
-        InfraSensor -->|Alert / Filtered| ActiveAlerts
-        TrafficSensor -->|Alert / Filtered| ActiveAlerts
-        L4Sensor -->|Alert / Filtered| ActiveAlerts
-        
-        ActiveAlerts --> Iterator["agents/brain/iterator.py<br>AsyncConsensusIterator (Orchestrator)"]
-        
-        Iterator <-->|Generate Hypothesis| Reasoner["agents/brain/reasoner.py<br>ReasoningEngine (Qwen3 14B / Symbolic)"]
-    end
+### Symbolic components
 
-    subgraph VOTERS ["3. Adversarial Domain Voter Agents"]
-        Iterator -->|Broadcast Hypothesis| InfraVoter["agents/voters/llm_voter.py<br>Infrastructure Voter Agent"]
-        Iterator -->|Broadcast Hypothesis| TrafficVoter["agents/voters/llm_voter.py<br>Traffic Voter Agent"]
-        Iterator -->|Broadcast Hypothesis| L4Voter["agents/voters/llm_voter.py<br>L4/L7 Voter Agent"]
-        
-        GlobalState -.->|Local Metrics| InfraVoter
-        GlobalState -.->|Local Metrics| TrafficVoter
-        GlobalState -.->|Local Metrics| L4Voter
-    end
+| Component | Responsibility | Output |
+|---|---|---|
+| `InfrastructureSensor` | Fuzzy-scores device health: status, CPU, memory, interface errors | `anomaly_score`, severity tier |
+| `TrafficSensor` | Fuzzy-scores performance: latency, jitter, loss, utilization, queue drops | `anomaly_score`, severity tier |
+| `L4L7Sensor` | Fuzzy-scores services: DNS, DHCP, application health | `anomaly_score`, severity tier |
+| `AsyncConsensusIterator` | The orchestrator. Masks telemetry per domain, injects scores into prompts, runs the voters concurrently, computes consensus and runs the epoch loop | Consensus ratio, final verdict |
+| Report formatter | Maps the agreed result into the `DiagnosticReport` schema | Benchmark JSON report |
 
-    subgraph MIDDLEWARE ["4. Coordination Middleware & Consensus"]
-        InfraVoter --> MidIn["core/middleware.py<br>Pydantic Schema Validator"]
-        TrafficVoter --> MidTr["core/middleware.py<br>Pydantic Schema Validator"]
-        L4Voter --> MidL4["core/middleware.py<br>Pydantic Schema Validator"]
-        
-        MidIn --> Math["Dynamic Severity Multiplier<br>Consensus Math (Iterator)"]
-        MidTr --> Math
-        MidL4 --> Math
-    end
+Severity tiers run `HEALTHY → MINOR → MAJOR → CRITICAL → FATAL` (score 0.0 to 3.0+). If all three scores are 0.0, no LLM is called.
 
-    subgraph PERSISTENCE ["5. State, Memory & Output Persistence"]
-        Math -->|Record Rounds & Feedback| Memory[("core/memory.py<br>IncidentMemory (data/incident_memory.json)")]
-        Memory -.->|Inject Past Round Context| Reasoner
-        Memory -.->|Inject Past Votes| InfraVoter
-        Memory -.->|Inject Past Votes| TrafficVoter
-        Memory -.->|Inject Past Votes| L4Voter
-        
-        Math -->|Write Final Report| OutStore["core/output_store.py<br>save_output_json"]
-        OutStore --> OutFile[("output.json / outputs/{id}.json")]
-    end
+### LLM agents
+
+| Agent | Sees | Does | Never |
+|---|---|---|---|
+| **The Brain** (`ReasoningEngine`) | Fuzzy alerts from all sensors | Proposes one root-cause hypothesis with recommended actions, and revises it when votes come back against it | Votes on its own hypothesis |
+| `traffic_agent` | Traffic telemetry only (interface errors masked) | Votes `APPROVE` / `REJECT` / `ABSTAIN` on the hypothesis, backed by evidence | Sees data outside its domain |
+| `infrastructure_agent` | Infrastructure telemetry only | Same as above | Sees data outside its domain |
+| `l4_l7_agent` | Service telemetry only (CPU masked) | Same as above | Sees data outside its domain |
+
+### Cognitive split: asymmetric chain-of-thought
+
+The Brain and the voters run on the same model in deliberately different modes. This optimises token generation and VRAM use.
+
+| | The Brain | The Voters |
+|---|---|---|
+| **Mode** | Native chain-of-thought (thinking **enabled**) | Strict zero-shot (thinking **disabled**) |
+| **Token budget** | High, giving it a reasoning scratchpad | Minimal: a single vote and short evidence |
+| **Job** | Analyses alerts and debate memory in depth, then proposes the root cause | Pattern-matches the hypothesis against its own metrics |
+| **Speed** | Slower, deliberate | Milliseconds, fully asynchronous |
+
+Deep reasoning happens **once**, in the Brain. The three voters stay fast and cheap, so the debate scales without exhausting the T4's VRAM.
+
+### How the vote works
+
+1. The **Brain** proposes one hypothesis, e.g. *"congestion on the MHR uplink"*, along with recommended actions (`hypothesis_broadcast`).
+2. All three voters (`traffic_agent`, `infrastructure_agent`, `l4_l7_agent`) review it **asynchronously**. Each one sees only its own masked telemetry.
+3. Each voter casts exactly one of three votes and backs it with facts from its own domain:
+
+
+| Vote | Meaning |
+|---|---|
+| `APPROVE` | My domain's telemetry supports this hypothesis |
+| `REJECT` | My domain's telemetry argues against it (a `suggested_alternative` can be given) |
+| `ABSTAIN` | My domain has nothing relevant, or the vote was forced by the middleware |
+
+```json
+{
+  "agent_id": "traffic_agent",
+  "vote": "APPROVE",
+  "reason": "Uplink saturated with egress drops",
+  "supporting_evidence": ["utilization_out_pct = 97%", "out_discards = 1840"]
+}
+```
+
+4. The orchestrator **weights** each vote by its domain's `anomaly_score`, so an agent whose domain is abnormal carries more authority.
+5. The weighted result is the **confidence**:
+   - **≥ 0.70:** the hypothesis is accepted and the debate ends early.
+   - **Only one `APPROVE`, all others `ABSTAIN`:** confidence is **capped at 0.60**, so a single agent can never push a hypothesis through on its own.
+   - **< 0.70:** the rejections and reasons go back to the Brain for a new hypothesis, for up to 3 rounds. If there is still no consensus, the best hypothesis is reported with status **`investigating`**.
+
+### Voter rules
+
+Each voter's prompt includes its domain's `anomaly_score`, and that score sets its behaviour:
+
+- **Score > 0 (bleeding):** cite abnormal metrics as `supporting_evidence`. Do not use normal metrics (e.g. normal CPU) to `REJECT` a valid fault in another domain.
+- **Score = 0 (healthy):** may only falsify, never support. `supporting_evidence` must stay empty, and the voter should `ABSTAIN` if the hypothesis is vague ("Unknown network anomaly") or blames another domain.
+- **Cascading failures:** downstream agents (e.g. `L4_L7`) must vote `APPROVE` when the Brain proposes a catastrophic physical failure, such as a dead core switch, that explains their downstream service timeouts. This stops domain silos from rejecting a valid root cause just because the fault is outside their layer. The rule fixes the `EVAL-10` total-meltdown case.
+- **Always:** the LLM chooses the vote; Python sets its weight.
+
+### Analogy: a hospital diagnosis board
+
+| Hospital | Zephyr |
+|---|---|
+| **Triage monitors** check every patient's vitals. If all vitals are normal, the patient goes home without seeing a doctor. | Fuzzy sensors and the fast-path exit |
+| **The chief physician** reads the triage alerts and proposes one diagnosis. | The Brain |
+| **Specialists** (cardiologist, neurologist, pathologist) each see only their own test results and vote for it, against it, or abstain. | `traffic_agent`, `infrastructure_agent`, `l4_l7_agent` |
+| The specialist whose tests look most abnormal **carries the most weight**. A diagnosis backed by only one specialist is recorded as **tentative**, never certain. | Score-based weights and the 0.60 single-agent cap |
+| **The board secretary** keeps the minutes, tallies the votes and sends the chief back to rethink, for up to 3 rounds. | `AsyncConsensusIterator` |
+| **The records clerk** writes the final report in the hospital's standard format. | Report formatter |
+
+The chief physician never grades their own diagnosis, and no specialist can comment on tests they haven't seen. That is why the system avoids echo chambers.
+
+---
+
+## 2. Communication Interfaces
+
+Agents exchange **structured Python dictionaries / JSON**, never free text. There are two lines of defence for data quality:
+
+- **On the way in**, Pydantic validates the input shape and the fuzzy logic engine absorbs noise in the values.
+- **On the way out**, the `CoordinationMiddleware` checks every LLM response before it reaches the consensus math.
+
+```
+POST ─► TelemetryInput (Pydantic) ─► Sensors (FuzzyLogicEngine) ─► Orchestrator ─► Brain ─► Voters
+                                                                        ▲                    │
+                                                                        └─ CoordinationMiddleware ◄─┘
+```
+
+### 2.1 External interfaces
+
+| Endpoint | Direction | Payload |
+|---|---|---|
+| `POST /api/v1/diagnose` | Client → engine | `TelemetryInput` in, `DiagnosticReport` out |
+| `WS /api/v1/debate-stream` | Engine → dashboard | Live pipeline events and consensus math traces |
+
+### 2.2 Inbound: Pydantic and fuzzy logic
+
+- **`TelemetryInput` (Pydantic)** rejects structurally invalid requests at the API Gateway, before any agent runs.
+- **`FuzzyLogicEngine`** (inside each sensor) is the main defence against noisy telemetry. It scores the *degree* of drift instead of applying hard binary thresholds, so a single noisy sample only nudges the `anomaly_score` and does not trigger a false alarm.
+
+### 2.3 Outbound: `CoordinationMiddleware` (semantic firewall)
+
+The middleware sits **between the domain voters and the orchestrator**. It intercepts the raw JSON produced by Qwen and validates it against the Pydantic `AgentVoteSchema`. This stops hallucinated keys or invalid vote types from ever reaching the consensus math.
+
+**Circuit breaker.** The system does not retry. A vote is replaced with a safe fallback in two cases:
+- the LLM call exceeds the **45-second `aiohttp` timeout**
+- the response breaks `AgentVoteSchema`
+
+The fallback is:
+
+```json
+{ "vote": "ABSTAIN", "reason": "Middleware intercept" }
+```
+
+This means a single bad or slow LLM response can never hang or crash the pipeline.
+
+### 2.4 Message contracts
+
+| Message | From → To | Fields |
+|---|---|---|
+| Sensor output | Sensor → Orchestrator | `device_id`, `domain`, `alert_category`, `evidence[]` |
+| `hypothesis_broadcast` | Brain → Voters | `incident_id`, `proposed_root_cause`, `confidence_estimate`, `recommended_actions[]`, `target_devices[]` |
+| `hypothesis_vote` | Voter → Orchestrator (via middleware) | `incident_id`, `agent_id`, `vote` (`APPROVE` / `REJECT` / `ABSTAIN`), `reason`, `suggested_alternative`, `supporting_evidence[]` |
+
+Example `hypothesis_vote`:
+
+```json
+{
+  "incident_id": "INC-8832",
+  "agent_id": "traffic_agent",
+  "vote": "APPROVE",
+  "reason": "Uplink utilization and egress drops match congestion",
+  "suggested_alternative": null,
+  "supporting_evidence": ["utilization_out_pct = 97%", "out_discards = 1840"]
+}
 ```
 
 ---
 
-## 3. Core Component Analysis & Agent Typologies
+## 3. Orchestration & Data Flow
 
-### 3.1. Telemetry Ingestion & Neuro-Symbolic Fuzzy Edge Sensors
+The orchestrator controls the whole diagnostic debate. It decides which incident runs, which agents are consulted, how their votes are combined and when the debate ends. It is built for three things: **stability under load**, **non-blocking execution** and **zero state bleed between incidents**.
 
-* **Components**:
-  * `InfrastructureSensor` (`zephyr2.0/agents/infrastructure/sensor.py`)
-  * `TrafficSensor` (`zephyr2.0/agents/traffic/sensor.py`)
-  * `L4L7Sensor` (`zephyr2.0/agents/l4_l7/sensor.py`)
-  * `FuzzyLogicEngine` (`zephyr2.0/core/fuzzy.py`)
-  * `StateStore` (`zephyr2.0/core/shared_state.py`)
+### 3.1 Sequential Event Router: `route_and_resolve_batch`
 
-* **Responsibilities**:
-  1. **Telemetry Parsing & Type Sanitization**: Ingests incoming JSON telemetry containing interface statistics, CPU metrics, queue drops, latency, jitter, DNS timings, and DHCP pool states.
-  2. **Thread-Safe State Synchronization**: Updates the global singleton `global_state` so voter agents have access to verified device metrics without passing raw payloads through prompts.
-  3. **Fuzzification (TRIMF)**: Replaces rigid binary thresholds with Triangular Membership Functions:
-     $$\mu(x; a, b, c) = \max\left(0, \min\left(\frac{x-a}{b-a}, \frac{c-x}{c-b}\right)\right)$$
-     Metrics are classified into `Normal`, `Warning`, and `Critical` states with continuous membership degrees.
-  4. **Noise Dropping**: Alerts with severity `healthy` are discarded immediately, saving downstream LLM tokens and execution latency.
-  5. **Anomaly Score Emission**: Calculates a float `anomaly_score` (ranging from `0.0` to `3.0+`) that directly determines the voting power of that domain during the debate.
+A campus-wide outage produces a flood of alerts at once. The router does not fire them all at the LLM in parallel. Instead it:
 
----
+1. **Takes in** the full, unordered batch of campus telemetry.
+2. **Clusters** alerts by `device_id` (temporal topology clustering), so related symptoms on the same device become one incident instead of many duplicates.
+3. **Queues** the incidents and resolves them **one at a time**.
 
-### 3.2. Central Brain: Reasoning Engine
+This sequencing works as a **circuit breaker for the inference layer**. It protects local GPU VRAM from out-of-memory (OOM) crashes and keeps token generation fast, even during a live demo or a real outage storm.
 
-* **Component**: `ReasoningEngine` (`zephyr2.0/agents/brain/reasoner.py`)
-* **Model**: Local/Remote Ollama `qwen3:14b` with deterministic neuro-symbolic fallback.
-* **Responsibilities**:
-  1. **Hypothesis Formulation**: Aggregates filtered active alerts, device IDs, and previous round context to propose a root cause hypothesis, confidence estimate, and actionable remediation steps.
-  2. **Critical Pivot Adherence**: In multi-epoch debates, if an adversarial voter agent emits a `CRITICAL PIVOT HINT` (e.g., *"Ignore traffic; this is Layer 1 cable degradation"*), the prompt forces the Reasoner to discard its previous hypothesis and pivot to the suggested domain.
-  3. **Dual-Mode Fallback Resilience**: If the Ollama daemon is offline or returns unparseable markdown, the engine automatically switches to `_correlate_symbolic_hypothesis()`, which correlates alerts deterministically via domain severity sorting without crashing.
+### 3.2 The Debate Loop: `execute_voting_loop`
 
----
+Each incident goes through the same lifecycle:
 
-### 3.3. Adversarial Domain Voter Agents
+1. **Hypothesis.** The `ReasoningEngine` (Qwen 2.5 14B AWQ, chain-of-thought enabled) produces a JSON hypothesis with the proposed root cause and recommended actions.
+2. **Broadcast.** The orchestrator sends it as a `hypothesis_broadcast` to the three domain voters: `Infrastructure`, `Traffic` and `L4_L7`.
+3. **Asynchronous collection.** Votes are gathered with non-blocking async calls, so the Python event loop stays free while the LLM is generating. Each response passes through the `CoordinationMiddleware` (section 2.3) before it is counted.
+4. **Consensus check.** The votes are scored (section 3.3). If consensus is reached, the debate ends. If not, the result is written to memory and the Brain starts the next round.
 
-* **Component**: `LLMDomainVoter` (`zephyr2.0/agents/voters/llm_voter.py`)
-* **Agents Instantiated**:
-  * `infrastructure_agent`: Monitors Layer 1/2 hardware (`cpu_utilization_pct`, `interface_errors`, `queue_drops`).
-  * `traffic_agent`: Monitors Layer 3 traffic dynamics (`link_utilization_pct`, `latency_ms`, `packet_loss_pct`, `jitter_ms`).
-  * `l4_l7_agent`: Monitors Layer 4/7 services (`dns_latency_ms`, `dhcp_pool_utilization_pct`).
-* **Responsibilities & Skeptic Logic**:
-  1. **Strict Domain Isolation**: An agent only evaluates hypotheses against its own monitored metrics. It explicitly rejects root-cause claims that falsely implicate its domain.
-  2. **Adversarial Voting Tree**:
-     * `APPROVE`: The hypothesis describes root-cause symptoms that match local anomalous metrics.
-     * `REJECT`: The agent's local metrics prove the hypothesis mathematically impossible, or the hypothesis mistakes a secondary symptom for a root cause.
-     * `ABSTAIN`: The metrics are normal and the hypothesis falls outside the agent's domain.
-  3. **Pivot Hint Generation**: When rejecting a hypothesis, the voter generates a concrete `pivot_hint` guiding the Brain toward the true fault domain.
+### 3.3 Consensus Math & Single-Agent Protection
+
+| Condition | Outcome |
+|---|---|
+| Domain voters agree, **confidence ≥ 0.70** | Debate **ends early** and the hypothesis is accepted |
+| Only **one** voter returns `APPROVE` and the rest `ABSTAIN` | Confidence is **capped at 0.60** |
+| Disagreement | Next round, up to **3 rounds** |
+| **Healthy bypass:** all fuzzy sensors return `0.0` | The consensus loop is **skipped entirely** (fast path) |
+| **Zero-weight guard:** a baseline reaches the loop and every agent votes `APPROVE` with `0.0` weight | The middleware forces confidence to **`1.0`** and exits cleanly, avoiding a divide-by-zero |
+
+**Why the 0.60 cap matters.** Without it, one confident but hallucinating agent could approve a hypothesis while the others abstain, and immediately override the system. The cap means a single-agent finding is reported with **moderate confidence**, never high. Isolated faults such as **DHCP pool exhaustion** still get diagnosed, but the uncertainty is stated honestly.
+
+### 3.4 Thread-Safe Memory Management: `IncidentMemory`
+
+- **Debate history.** `IncidentMemory` records every hypothesis, vote and confidence score for the incident, across a maximum of **3 rounds**. Each new round of the Brain builds on this history.
+- **Concurrency safety.** All reads and writes are protected by `threading.Lock()` mutexes, so asynchronous vote collection cannot cause race conditions.
+- **Guaranteed cleanup.** Each incident runs inside a strict `try...finally` block. Memory is wiped after every incident, **even if the LLM crashes or times out**, so no state from one incident can leak into the next.
 
 ---
 
-### 3.4. Coordination Middleware & Semantic Firewall
+## 4. Evidence Correlation & Error Handling
 
-* **Component**: `CoordinationMiddleware` (`zephyr2.0/core/middleware.py`)
-* **Responsibilities**:
-  1. **Schema Validation**: Validates all agent votes against the Pydantic schema `AgentVoteSchema`.
-  2. **Crash & Drift Prevention**: If an LLM hallucinates non-standard keys or conversational text instead of strict JSON, the middleware intercepts the error and returns a sanitized fallback payload:
-     ```python
-     {
-         "vote": "ABSTAIN",
-         "reason": "Middleware intercept: Agent generated malformed JSON schema.",
-         "suggested_alternative": None,
-         "supporting_evidence": []
-     }
-     ```
-     This prevents corrupt payloads from reaching the consensus engine.
+Zephyr correlates evidence **mathematically before the LLM is involved**, and is built to survive both corrupted telemetry and LLM failures at runtime.
 
----
+### 4.1 Deterministic Evidence Correlation (Symbolic Layer)
 
-### 3.5. Consensus Orchestrator: AsyncConsensusIterator
+All raw metrics pass through the **Fuzzy Logic Engine** before any LLM sees them.
 
-* **Component**: `AsyncConsensusIterator` (`zephyr2.0/agents/brain/iterator.py`)
-* **Responsibilities**:
-  1. **Multi-Device Sequential Routing**: In `route_and_resolve_batch()`, groups alerts by `device_id` and processes incidents sequentially to protect local GPU VRAM.
-  2. **Debate Epoch Orchestration**: Coordinates up to 3 iterative debate rounds between Reasoner and Voter agents.
-  3. **Dynamic Severity Multiplier Math**:
-     Rather than simple unweighted majority voting (which allows healthy domains to out-vote a single failing domain), Zephyr 2.0 maps sensor `anomaly_score`s directly to voter voting weights:
-     $$W_{\text{agent}} = \max_{\text{alert} \in \text{Domain}} (\text{alert.anomaly\_score})$$
-     $$\text{Confidence} = \frac{\sum_{\text{APPROVE}} W_i}{\sum_{\text{APPROVE}} W_i + \sum_{\text{REJECT}} W_i}$$
-     * `FATAL` anomaly ($W \ge 3.0$)
-     * `CRITICAL` anomaly ($2.0 \le W < 3.0$)
-     * `MAJOR` anomaly ($1.0 \le W < 2.0$)
-     * `MINOR` anomaly ($0.0 < W < 1.0$)
-     * `HEALTHY` domain ($W = 0.0 \rightarrow \text{ABSTAIN}$)
-  4. **Break Condition**: If confidence reaches $\ge 0.70$, debate concludes immediately. Otherwise, voter feedback is committed to memory and Round 2 commences.
+**Triangular Membership Functions (TRIMF).** Each metric is mapped from a raw number to a linguistic degree of membership:
 
----
-
-### 3.6. Persistence & Audit Layer
-
-* **Components**:
-  * `IncidentMemory` (`zephyr2.0/core/memory.py`)
-  * `output_store` (`zephyr2.0/core/output_store.py`)
-* **Responsibilities**:
-  1. **Disk-Backed Memory Store**: Saves multi-round debate states to `data/incident_memory.json` using mutex locks and atomic `.tmp` file replacement.
-  2. **Clean Working State vs. Audit Archive**: When an incident finishes, `clear_incident()` purges active working rounds to prevent context bleed, while preserving a permanent archived record on disk.
-  3. **Native JSON Output Export**: Exports the final report to `output.json` and `outputs/{incident_id}.json` in the exact format produced by the system.
-
----
-
-## 4. Multi-Agent Debate & Resolution Sequence Diagram
-
-The following sequence diagram illustrates an adversarial debate where an initial incorrect hypothesis is rejected, pivoted, and successfully resolved in Round 2:
-
-```mermaid
-sequenceDiagram
-    autonumber
-    participant Telemetry as Telemetry Stream
-    participant State as StateStore
-    participant Sensors as Fuzzy Sensors (Infra/Traffic/L4)
-    participant Orchestrator as AsyncConsensusIterator
-    participant Brain as ReasoningEngine
-    participant Memory as IncidentMemory
-    participant Voters as LLM Domain Voters
-    participant Middleware as CoordinationMiddleware
-    participant Output as output.json
-
-    %% Ingestion
-    Telemetry->>State: update_state(device_id, metrics)
-    Telemetry->>Sensors: process_telemetry(raw_telemetry)
-    Sensors-->>Orchestrator: Emit active_alerts with Anomaly Scores
-
-    %% Round 1
-    Note over Orchestrator,Brain: Epoch 1: Initial Diagnosis
-    Orchestrator->>Memory: get_reasoner_context(incident_id)
-    Memory-->>Orchestrator: "No previous rounds. Round 1."
-    Orchestrator->>Brain: generate_hypothesis(alerts, context)
-    Brain-->>Orchestrator: Hypothesis 1: "Link Congestion"
-    Orchestrator->>Memory: record_hypothesis(Round 1, "Link Congestion")
-
-    %% Voting Round 1
-    Orchestrator->>Voters: Broadcast Hypothesis 1
-    Voters->>State: Fetch local domain metrics
-    Voters-->>Middleware: Raw Votes (Infra rejects, Traffic approves)
-    Middleware-->>Orchestrator: Sanitized Votes + Pivot Hint: "Physical cable errors 18500"
-    Orchestrator->>Memory: record_vote(Round 1, votes, reasons, pivot_hint)
-    
-    %% Consensus Evaluation Round 1
-    Note over Orchestrator: Consensus Calculation: Confidence = 0.12 (< 0.70)
-    Note over Orchestrator: Consensus Failed -> Trigger Round 2
-
-    %% Round 2
-    Note over Orchestrator,Brain: Epoch 2: Pivot & Re-evaluation
-    Orchestrator->>Memory: get_reasoner_context(incident_id)
-    Memory-->>Orchestrator: Injects History + CRITICAL PIVOT HINT ("Physical cable errors")
-    Orchestrator->>Brain: generate_hypothesis(alerts, updated_context)
-    Brain-->>Orchestrator: Hypothesis 2: "L1 Physical Cable Degradation"
-    Orchestrator->>Memory: record_hypothesis(Round 2, Hypothesis 2)
-
-    %% Voting Round 2
-    Orchestrator->>Voters: Broadcast Hypothesis 2
-    Voters-->>Middleware: Infra APPROVES (Weight 3.0), Traffic ABSTAINS
-    Middleware-->>Orchestrator: Sanitized Votes
-    Orchestrator->>Memory: record_vote(Round 2, votes)
-
-    %% Consensus Evaluation Round 2
-    Note over Orchestrator: Consensus Calculation: Confidence = 1.0 (>= 0.70)
-    Note over Orchestrator: Strong Consensus Reached!
-
-    %% Finalization
-    Orchestrator->>Memory: record_final_report(incident_id, best_report)
-    Orchestrator->>Output: save_output_json(best_report)
-    Orchestrator->>Memory: clear_incident(archive=True)
+```
+μ(x) = max( min( (x − a)/(b − a), (c − x)/(c − b) ), 0 )
 ```
 
+```
+cpu: 78%  ──► TRIMF ──►  "Warning CPU load detected (Fuzzy Confidence: 0.80)"
+```
+
+**Three-way classification.** Every signal ends up in exactly one class:
+
+| Class | Meaning | Treatment |
+|---|---|---|
+| **Benign noise** | Normal variation or a one-off spike | Dropped and never reaches the LLM |
+| **Warning** | Borderline degradation | Passed on with its fuzzy confidence |
+| **Critical** | Severe fault | Passed on with its fuzzy confidence |
+
+**Why it matters.** The engine is a mathematically grounded filter, and it directly addresses the hackathon's requirement for **robustness to noisy, inconsistent telemetry**. The LLM correlates *pre-scored evidence* rather than raw numbers, so it never has to guess whether a value like `78%` is dangerous.
+
+### 4.2 Error Handling & System Resilience
+
+**Pydantic semantic firewall (`CoordinationMiddleware`)**
+
+Every LLM response is intercepted and validated against `AgentVoteSchema`:
+
+| LLM failure | Middleware response |
+|---|---|
+| Hallucinated or invalid JSON key | Catches the validation error and forces `ABSTAIN` |
+| Invented vote type (e.g. `vote: MAYBE`) | Catches the validation error and forces `ABSTAIN` |
+| Conversational markdown wrapper (```` ```json … ``` ````) | Strips the markdown, then validates |
+
+A malformed agent response therefore **degrades to a safe abstention** and never crashes the pipeline.
+
+**Non-blocking I/O and timeouts**
+
+- All inference calls use asynchronous `aiohttp` with a hard **45-second timeout**.
+- If the GPU inference node freezes or VRAM locks up, the agent times out, the error is logged and orchestration continues.
+- The master event loop is never blocked.
+
+**Graceful degradation**
+
+If consensus is still not reached after **3 rounds**, the system does not fail. Instead it:
+
+1. Outputs the **highest-confidence hypothesis** found during the debate.
+2. Sets `status` to **`investigating`** instead of `diagnosed`.
+3. Records the gap in `limitations` (e.g. *"Failed to reach strong consensus"*).
+
+The operator always gets a usable, honestly labelled report, even under the worst-case runtime conditions.
+
 ---
 
-## 5. Mathematical Consensus Model
+## 5. Workflow
 
-Standard LLM consensus frameworks fail when majority voting is applied across heterogeneous domain sensors. For example, a physical fiber break causes:
-* `InfrastructureSensor`: Interface Errors = 25,000 ($\rightarrow \text{FATAL Anomaly, Score} = 3.0$)
-* `TrafficSensor`: Elevated Latency = 45 ms ($\rightarrow \text{MINOR Anomaly, Score} = 0.5$)
-* `L4L7Sensor`: Normal DNS/DHCP ($\rightarrow \text{HEALTHY, Score} = 0.0$)
+Every request takes the same path, from raw telemetry to the final JSON report.
 
-If the Brain incorrectly guesses *"Minor Latency Anomaly due to Traffic"*, an unweighted voting system could yield:
-* Traffic: `APPROVE`
-* L4/L7: `ABSTAIN` (or APPROVE)
-* Infrastructure: `REJECT`
-* **Result**: $50\%$ approval, masking a physical link failure.
+```
+POST /api/v1/diagnose
+   │
+   ▼
+① Validate & isolate ─► ② Fuzzy scoring ─► all 0.0? ──YES──► Healthy report (no LLM)
+                                              │ NO
+                                              ▼
+                        ③ Route & queue incidents (by device_id, one at a time)
+                                              │
+                        ┌─────────────────────▼─────────────────────┐
+                        │ ④ Mask telemetry + inject scored prompts  │
+                        │ ⑤ Brain → new hypothesis_broadcast        │◄──┐ rejections + reasons
+                        │ ⑥ Voters → hypothesis_vote (async)        │   │ (max 3 rounds)
+                        │   └─ CoordinationMiddleware               │   │
+                        │ ⑦ Confidence ≥ 0.70 ? ── NO ──────────────┼───┘
+                        └─────────────────────┬─────────────────────┘
+                                              │ YES  (or 3 rounds → "investigating")
+                                              ▼
+                        ⑧ DiagnosticReport JSON ─► ⑨ Wipe IncidentMemory ─► next incident
+```
 
-### Zephyr 2.0 Dynamic Severity Multiplier
-In Zephyr 2.0, voting power is proportional to the sensor's anomaly severity:
+| Step | Stage | What happens |
+|---|---|---|
+| ① | Validate & isolate | `TelemetryInput` (Pydantic) validates the request and `global_state` is cleared. |
+| ② | Fuzzy scoring | The three sensors apply TRIMF: noise is dropped, and warnings and critical faults get a fuzzy confidence and an `anomaly_score`. |
+| — | Fast path | If every score is 0.0, a healthy report is returned immediately and no LLM is called. |
+| ③ | Route | `route_and_resolve_batch` clusters alerts by `device_id` and queues the incidents to run one at a time. |
+| ④ | Mask & prompt | Each voter receives only its own domain's telemetry plus a bleeding or healthy directive. |
+| ⑤ | Hypothesise | The `ReasoningEngine` (Qwen 2.5 14B AWQ, chain-of-thought enabled) proposes a root cause and recommended actions. |
+| ⑥ | Vote | `Infrastructure`, `Traffic` and `L4_L7` vote `APPROVE` / `REJECT` / `ABSTAIN` asynchronously. `CoordinationMiddleware` validates each vote and forces `ABSTAIN` on bad JSON or a 45 s timeout. |
+| ⑦ | Decide | Confidence ≥ 0.70 ends the debate. A single-agent approval is capped at 0.60. Below 0.70, the Brain revises, for up to 3 rounds. |
+| ⑧ | Report | The result is mapped into `DiagnosticReport`. If there is no consensus after 3 rounds, the best hypothesis is reported with status `investigating` and the gap is listed in `limitations`. |
+| ⑨ | Clean up | `IncidentMemory` is wiped in a `try...finally` block, and the next queued incident starts. |
 
-$$\text{Weight}(A_i) = \max_{m \in \text{Domain}(A_i)} (\text{TRIMF\_Score}(m))$$
-
-$$\text{Confidence} = \frac{\sum_{i \in \text{APPROVE}} \text{Weight}(A_i)}{\sum_{i \in \text{APPROVE}} \text{Weight}(A_i) + \sum_{j \in \text{REJECT}} \text{Weight}(A_j)}$$
-
-Under this model:
-* Infrastructure `REJECT` weight = $3.0$
-* Traffic `APPROVE` weight = $0.5$
-* Confidence = $\frac{0.5}{0.5 + 3.0} = \mathbf{0.14}$ ($\rightarrow \text{Strong Rejection}$)
-
-Hypothesis 1 is rejected, forcing the Brain to ingest the Infrastructure agent's pivot hint. When Hypothesis 2 proposes *"L1 Physical Cable Degradation"*:
-* Infrastructure `APPROVE` weight = $3.0$
-* Traffic `ABSTAIN` weight = $0.0$
-* Confidence = $\frac{3.0}{3.0 + 0.0} = \mathbf{1.00}$ ($\rightarrow \text{Consensus Reached in Round 2}$).
-
----
-
-## 6. Operational Failure Modes & Mitigations
-
-| Failure Mode | Root Cause | Zephyr 2.0 Architectural Mitigation |
-| :--- | :--- | :--- |
-| **Hallucination Cascades** | LLM accepts incorrect hypotheses to be helpful. | **Adversarial Personas**: Voters are prompted to be strictly skeptical and reject any claim unsupported by their metrics. |
-| **LLM Daemon Offline / OOM** | Local Ollama instance crashes or runs out of VRAM. | **Dual-Mode Neuro-Symbolic Fallback**: `ReasoningEngine` falls back to deterministic rule sorting via `_correlate_symbolic_hypothesis()`. |
-| **Semantic Drift / Bad JSON** | LLM emits conversational markdown or unexpected keys. | **Coordination Middleware**: Pydantic validation intercepts malformed schemas and enforces safe `ABSTAIN` defaults. |
-| **Consensus Gridlock** | Healthy domain agents dilute severe failure signals. | **Dynamic Severity Multipliers**: Catastrophic alerts ($3.0$) carry 6x the voting power of minor symptoms ($0.5$). |
-| **State Bleed Across Outages** | Previous incident context corrupts subsequent debates. | **Archive-on-Clear**: Working rounds are cleared from active memory while permanently preserved in disk archives. |
-| **Disk Corruption on Shutdown** | Power loss during incident memory disk writes. | **Atomic Writes**: Serializes to `.tmp` files first and executes atomic OS-level file replacements. |
+Throughout the run, `RealTimeNOCLogger` streams each step and its confidence maths over `WS /api/v1/debate-stream` to the live dashboard.
