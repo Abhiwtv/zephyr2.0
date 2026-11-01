@@ -31,7 +31,7 @@ class Settings(BaseModel):
         description="Base URL for Ollama/vLLM inference (Cloudflare tunnel or local)"
     )
     OLLAMA_MODEL: str = Field(
-        default_factory=lambda: os.getenv("OLLAMA_MODEL", "qwen3:14b"),
+        default_factory=lambda: os.getenv("OLLAMA_MODEL", "qwen2.5:14b"),
         description="Target model identifier (e.g. qwen3:14b, qwen2.5:14b)"
     )
     REASONER_TIMEOUT_SECONDS: int = Field(
@@ -129,15 +129,19 @@ class Settings(BaseModel):
 
 # Global state to track the active GPU tunnel URL
 class EngineState:
-    url: Optional[str] = os.environ.get("ENGINE_URL", None) or None
+    url: Optional[str] = None
 
     @classmethod
     def get_url(cls) -> Optional[str]:
-        return cls.url or os.environ.get("ENGINE_URL", None) or None
+        return cls.url
 
     @classmethod
     def get_chat_url(cls) -> str:
-        base = cls.get_url().rstrip("/")
+        current_url = cls.get_url()
+        if not current_url:
+            raise ValueError("Engine is currently offline. Boot the GPU first.")
+            
+        base = current_url.rstrip("/")
         if base.endswith("/v1/chat/completions"):
             return base
         if base.endswith("/api/generate"):
@@ -146,4 +150,4 @@ class EngineState:
 
 # Singleton instance
 settings = Settings()
-EngineState.url = settings.ENGINE_URL
+
