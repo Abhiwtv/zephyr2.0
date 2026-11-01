@@ -56,7 +56,35 @@ def test_runner_telemetry_websocket_broadcast():
         ws_msg = websocket.receive_text()
         assert "[KAGGLE_RUNNER] Model download complete. (100.0%)" in ws_msg
 
+def test_engine_initial_offline_state_and_online_transition():
+    from core.config import EngineState
+    client = TestClient(app)
+    
+    # Ensure offline initially
+    EngineState.url = None
+    status_response = client.get("/api/v1/engine/status")
+    assert status_response.status_code == 200
+    data = status_response.json()
+    assert data["status"] == "offline"
+    assert data["active_engine"] is None
+
+    # Update URL via set-url
+    set_resp = client.post("/api/v1/engine/set-url", json={"url": "https://test-tunnel.trycloudflare.com"})
+    assert set_resp.status_code == 200
+    assert set_resp.json()["active_engine"] == "https://test-tunnel.trycloudflare.com"
+
+    # Status should now be online with active_engine
+    status_response = client.get("/api/v1/engine/status")
+    assert status_response.status_code == 200
+    data = status_response.json()
+    assert data["status"] == "online"
+    assert data["active_engine"] == "https://test-tunnel.trycloudflare.com"
+
+    # Reset back to offline
+    EngineState.url = None
+
 if __name__ == "__main__":
+    test_engine_initial_offline_state_and_online_transition()
     test_runner_telemetry_with_progress()
     test_runner_telemetry_without_progress()
     test_runner_telemetry_websocket_broadcast()

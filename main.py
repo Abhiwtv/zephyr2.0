@@ -667,9 +667,10 @@ async def receive_runner_telemetry(payload: RunnerTelemetry):
 )
 async def get_engine_status():
     """Returns current active LLM engine URL and configuration."""
+    is_online = bool(EngineState.url)
     return {
-        "status": "online" if EngineState.url else "offline",
-        "active_engine": EngineState.url,
+        "status": "online" if is_online else "offline",
+        "active_engine": EngineState.url if is_online else None,
         "model": settings.OLLAMA_MODEL,
         "boot_in_progress": ignition_telemetry.get("start_time") is not None,
         "last_boot_duration": ignition_telemetry.get("last_boot_duration"),

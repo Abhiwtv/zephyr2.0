@@ -24,12 +24,10 @@ class Settings(BaseModel):
     Loads values from environment variables or .env file with sane defaults.
     """
     # Remote LLM & Inference Engine Settings
-    ENGINE_URL: str = Field(
+    ENGINE_URL: Optional[str] = Field(
         default_factory=lambda: (
-            os.getenv("ENGINE_URL")
-            or os.getenv("OLLAMA_BASE_URL")
-            or "http://localhost:11434"
-        ).rstrip("/"),
+            (os.getenv("ENGINE_URL") or os.getenv("OLLAMA_BASE_URL") or "").rstrip("/") or None
+        ),
         description="Base URL for Ollama/vLLM inference (Cloudflare tunnel or local)"
     )
     OLLAMA_MODEL: str = Field(
@@ -131,11 +129,11 @@ class Settings(BaseModel):
 
 # Global state to track the active GPU tunnel URL
 class EngineState:
-    url: str = os.environ.get("ENGINE_URL", "") or "http://localhost:11434"
+    url: Optional[str] = os.environ.get("ENGINE_URL", None) or None
 
     @classmethod
-    def get_url(cls) -> str:
-        return cls.url or os.environ.get("ENGINE_URL", "") or "http://localhost:11434"
+    def get_url(cls) -> Optional[str]:
+        return cls.url or os.environ.get("ENGINE_URL", None) or None
 
     @classmethod
     def get_chat_url(cls) -> str:
