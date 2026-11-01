@@ -17,7 +17,10 @@ from typing import Dict, List, Any, Optional
 import os
 import shutil
 import subprocess
+import threading
+from contextlib import asynccontextmanager
 from pathlib import Path
+import requests
 from fastapi import FastAPI, WebSocket, WebSocketDisconnect, status, Request, Query, BackgroundTasks, HTTPException
 from fastapi.responses import JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
@@ -41,10 +44,44 @@ logging.basicConfig(
 )
 logger = logging.getLogger("NetCoop-Engine")
 
+
+def listen_to_ntfy():
+    """Background thread that listens to the ntfy.sh stream continuously."""
+    url = "https://ntfy.sh/zephyr-gpu-status-k92a/json"
+    print(f"[*] Starting background listener on {url}")
+    logger.info(f"[*] Starting background listener on {url}")
+    while True:
+        try:
+            # stream=True keeps the connection open waiting for new pushes
+            with requests.get(url, stream=True, timeout=None) as resp:
+                for line in resp.iter_lines():
+                    if line:
+                        data = json.loads(line)
+                        if data.get("event") == "message":
+                            new_engine_url = (data.get("message") or "").strip().rstrip("/")
+                            if new_engine_url and (new_engine_url.startswith("https://") or new_engine_url.startswith("http://")):
+                                EngineState.url = new_engine_url
+                                os.environ["ENGINE_URL"] = new_engine_url
+                                settings.ENGINE_URL = new_engine_url
+                                print(f"\n[+] BOOM! Engine URL autonomously updated to: {EngineState.url}\n")
+                                logger.info(f"[+] BOOM! Engine URL autonomously updated to: {EngineState.url}")
+        except Exception as e:
+            print(f"[!] ntfy.sh stream disconnected, reconnecting in 5s... ({e})")
+            logger.warning(f"[!] ntfy.sh stream disconnected, reconnecting in 5s... ({e})")
+            time.sleep(5)
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    # Fire the ntfy listener on a background thread when FastAPI starts
+    listener_thread = threading.Thread(target=listen_to_ntfy, daemon=True)
+    listener_thread.start()
+    yield
+
 app = FastAPI(
     title="NetCoop Live Engine",
     description="Real-time Neuro-Symbolic Multi-Agent Diagnostic Engine & Debate Stream",
-    version="2.0.0"
+    version="2.0.0",
+    lifespan=lifespan
 )
 
 # ---------------------------------------------------------------------------
