@@ -14,7 +14,14 @@ import time
 from datetime import datetime, timezone
 from typing import Dict, List, Any, Optional
 
-from fastapi import FastAPI, WebSocket, WebSocketDisconnect, status, Request, Query
+import os
+import shutil
+import subprocess
+import threading
+from contextlib import asynccontextmanager
+from pathlib import Path
+import requests
+from fastapi import FastAPI, WebSocket, WebSocketDisconnect, status, Request, Query, BackgroundTasks, HTTPException
 from fastapi.responses import JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field, model_validator
@@ -24,7 +31,7 @@ import uvicorn
 from agents.infrastructure.sensor import InfrastructureSensor
 from agents.traffic.sensor import TrafficSensor
 from agents.l4_l7.sensor import L4L7Sensor
-from core.config import settings
+from core.config import EngineState, settings
 from agents.brain.iterator import AsyncConsensusIterator
 from agents.brain.reasoner import ReasoningEngine
 from agents.voters.llm_voter import LLMDomainVoter
@@ -37,10 +44,60 @@ logging.basicConfig(
 )
 logger = logging.getLogger("NetCoop-Engine")
 
+# Global state to track engine boot times
+ignition_telemetry = {"start_time": None, "last_boot_duration": None}
+
+
+def listen_to_ntfy():
+    """Background thread that listens to the ntfy.sh stream continuously."""
+    global ignition_telemetry
+    url = "https://ntfy.sh/zephyr-gpu-status-k92a/json"
+    print(f"[*] Starting background listener on {url}")
+    logger.info(f"[*] Starting background listener on {url}")
+    while True:
+        try:
+            # stream=True keeps the connection open waiting for new pushes
+            with requests.get(url, stream=True, timeout=None) as resp:
+                for line in resp.iter_lines():
+                    if line:
+                        data = json.loads(line)
+                        if data.get("event") == "message":
+                            new_engine_url = (data.get("message") or "").strip().rstrip("/")
+                            if new_engine_url and (new_engine_url.startswith("https://") or new_engine_url.startswith("http://")):
+                                EngineState.url = new_engine_url
+                                os.environ["ENGINE_URL"] = new_engine_url
+                                settings.ENGINE_URL = new_engine_url
+                                print(f"\n[+] BOOM! Engine URL autonomously updated to: {EngineState.url}\n")
+                                logger.info(f"[+] BOOM! Engine URL autonomously updated to: {EngineState.url}")
+
+                                # --- NEW TELEMETRY LOGIC ---
+                                if ignition_telemetry.get("start_time"):
+                                    elapsed = time.time() - ignition_telemetry["start_time"]
+                                    mins = int(elapsed // 60)
+                                    secs = int(elapsed % 60)
+                                    boot_msg = f"[*] TELEMETRY: GPU Engine boot sequence completed in {mins}m {secs}s."
+                                    print(f"\n{boot_msg}\n")
+                                    logger.info(boot_msg)
+                                    ignition_telemetry["last_boot_duration"] = f"{mins}m {secs}s"
+                                    ignition_telemetry["start_time"] = None  # Reset for next run
+                                # ---------------------------
+        except Exception as e:
+            print(f"[!] ntfy.sh stream disconnected, reconnecting in 5s... ({e})")
+            logger.warning(f"[!] ntfy.sh stream disconnected, reconnecting in 5s... ({e})")
+            time.sleep(5)
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    # Fire the ntfy listener on a background thread when FastAPI starts
+    listener_thread = threading.Thread(target=listen_to_ntfy, daemon=True)
+    listener_thread.start()
+    yield
+
 app = FastAPI(
     title="NetCoop Live Engine",
     description="Real-time Neuro-Symbolic Multi-Agent Diagnostic Engine & Debate Stream",
-    version="2.0.0"
+    version="2.0.0",
+    lifespan=lifespan
 )
 
 # ---------------------------------------------------------------------------
@@ -483,6 +540,114 @@ async def get_incident_status(incident_id: str):
         status_code=status.HTTP_200_OK,
         content=active_diagnoses[incident_id]
     )
+
+
+
+# ===========================================================================
+# Task 4: GPU Engine Automation & Live URL Routing
+# ===========================================================================
+
+class EngineURLPayload(BaseModel):
+    url: str
+
+def trigger_kaggle_push():
+    """Background task to fire the Kaggle batch job with a unique UUID."""
+    global ignition_telemetry
+    ignition_telemetry["start_time"] = time.time()
+    try:
+        kaggle_user = os.getenv("KAGGLE_USER", "")
+        if not kaggle_user:
+            print("[!] KAGGLE_USER not found in environment.")
+            return
+
+        # 1. Generate a unique ID to avoid 409 Conflicts
+        run_id = uuid.uuid4().hex[:6]
+        slug = f"zephyr-engine-{run_id}"
+
+        # 2. Overwrite kernel-metadata.json dynamically
+        metadata_path = "/home/ubuntu/zephyr-control/kaggle-runner/kernel-metadata.json"
+        metadata = {
+            "id": f"{kaggle_user}/{slug}",
+            "title": slug,
+            "code_file": "runner.py",
+            "language": "python",
+            "kernel_type": "script",
+            "is_private": True,
+            "enable_gpu": True,
+            "enable_tpu": False,
+            "enable_internet": True,
+            "machine_shape": "NvidiaTeslaT4"
+        }
+        
+        with open(metadata_path, "w") as f:
+            json.dump(metadata, f, indent=2)
+
+        print(f"[*] Generated unique Kaggle payload: {slug}")
+
+        # 3. Execute the push
+        cmd = [
+            "/home/ubuntu/zephyr-control/venv/bin/kaggle", 
+            "kernels", 
+            "push", 
+            "-p", 
+            "/home/ubuntu/zephyr-control/kaggle-runner"
+        ]
+        
+        custom_env = os.environ.copy()
+        custom_env["KAGGLE_USERNAME"] = kaggle_user
+        custom_env["KAGGLE_KEY"] = os.getenv("KAGGLE_KEY", "")
+        custom_env["HOME"] = "/home/ubuntu"
+        
+        result = subprocess.run(cmd, capture_output=True, text=True, check=True, env=custom_env)
+        print(f"[+] Kaggle push successful for {slug}:\n{result.stdout}")
+        
+    except subprocess.CalledProcessError as e:
+        print(f"[!] Kaggle push failed:\nSTDERR: {e.stderr}\nSTDOUT: {e.stdout}")
+    except Exception as ex:
+        print(f"[!] Unexpected error in background task: {ex}")
+
+@app.post(
+    "/api/v1/engine/ignite",
+    summary="Ignite Kaggle GPU Engine",
+    tags=["Engine"]
+)
+async def ignite_gpu_engine(background_tasks: BackgroundTasks):
+    """Fired by your Next.js dashboard button to boot the GPU."""
+    background_tasks.add_task(trigger_kaggle_push)
+    return {"status": "success", "message": "Kaggle GPU provisioning initiated."}
+
+@app.post(
+    "/api/v1/engine/set-url",
+    summary="Set Dynamic Engine URL",
+    tags=["Engine"]
+)
+async def set_engine_url(payload: EngineURLPayload):
+    """Updates the active routing URL in memory without restarting the server."""
+    clean_url = payload.url.strip().rstrip("/")
+    if not (clean_url.startswith("https://") or clean_url.startswith("http://")):
+        raise HTTPException(status_code=400, detail="Invalid Cloudflare URL")
+
+    EngineState.url = clean_url
+    os.environ["ENGINE_URL"] = clean_url
+    settings.ENGINE_URL = clean_url
+    print(f"[+] Engine URL dynamically updated to: {EngineState.url}")
+    logger.info(f"[+] Engine URL dynamically updated to: {EngineState.url}")
+    return {"status": "success", "active_engine": EngineState.url}
+
+@app.get(
+    "/api/v1/engine/status",
+    summary="Get Active Engine Status",
+    tags=["Engine"]
+)
+async def get_engine_status():
+    """Returns current active LLM engine URL and configuration."""
+    return {
+        "status": "online" if EngineState.url else "offline",
+        "active_engine": EngineState.url,
+        "model": settings.OLLAMA_MODEL,
+        "boot_in_progress": ignition_telemetry.get("start_time") is not None,
+        "last_boot_duration": ignition_telemetry.get("last_boot_duration")
+    }
 
 
 # ---------------------------------------------------------------------------

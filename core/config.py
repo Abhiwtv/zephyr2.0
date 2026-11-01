@@ -129,5 +129,23 @@ class Settings(BaseModel):
         """Alias property for ENGINE_URL to maintain backwards compatibility."""
         return self.ENGINE_URL
 
+# Global state to track the active GPU tunnel URL
+class EngineState:
+    url: str = os.environ.get("ENGINE_URL", "") or "http://localhost:11434"
+
+    @classmethod
+    def get_url(cls) -> str:
+        return cls.url or os.environ.get("ENGINE_URL", "") or "http://localhost:11434"
+
+    @classmethod
+    def get_chat_url(cls) -> str:
+        base = cls.get_url().rstrip("/")
+        if base.endswith("/v1/chat/completions"):
+            return base
+        if base.endswith("/api/generate"):
+            base = base.replace("/api/generate", "")
+        return f"{base}/v1/chat/completions"
+
 # Singleton instance
 settings = Settings()
+EngineState.url = settings.ENGINE_URL

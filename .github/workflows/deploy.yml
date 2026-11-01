@@ -1,0 +1,66 @@
+name: Deploy to Oracle VM
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Copy files via SCP
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ secrets.ORACLE_HOST }}
+          username: ubuntu
+          key: ${{ secrets.ORACLE_SSH_KEY }}
+          source: "."
+          target: "/home/ubuntu/zephyr-control"
+
+      - name: Boot the Pipeline
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.ORACLE_HOST }}
+          username: ubuntu
+          key: ${{ secrets.ORACLE_SSH_KEY }}
+          script: |
+            cd /home/ubuntu/zephyr-control
+            
+            # 1. Update and install dependencies
+            sudo apt-get update -yq
+            sudo apt-get install -yq python3-venv python3-pip python3-full
+            
+            # 2. Build environment
+            if [ ! -d "venv" ]; then
+              python3 -m venv venv
+            fi
+            
+            # 3. Install dependencies using absolute path
+            /home/ubuntu/zephyr-control/venv/bin/pip install -r requirements.txt
+            
+            # 4. Create a native systemd service 
+            sudo tee /etc/systemd/system/zephyr-api.service > /dev/null <<EOF
+            [Unit]
+            Description=Zephyr FastAPI Control Plane
+            After=network.target
+
+            [Service]
+            User=ubuntu
+            WorkingDirectory=/home/ubuntu/zephyr-control
+            ExecStart=/home/ubuntu/zephyr-control/venv/bin/uvicorn main:app --host 127.0.0.1 --port 5000
+            Restart=always
+            StandardOutput=append:/home/ubuntu/zephyr-control/backend.log
+            StandardError=inherit
+
+            [Install]
+            WantedBy=multi-user.target
+            EOF
+            
+            # 5. Reload daemon and start the engine
+            sudo systemctl daemon-reload
+            sudo systemctl enable zephyr-api
+            sudo systemctl restart zephyr-api
