@@ -5,7 +5,7 @@ class StateStore:
     def __init__(self):
         self.device_states = {}
         self.latest_device = None
-        self._lock = threading.Lock() # <-- ADDED MUTEX LOCK
+        self._lock = threading.RLock() # <-- ADDED MUTEX LOCK
 
     def update_state(self, device_id, metrics):
         with self._lock:              # <-- ACQUIRE LOCK BEFORE WRITING

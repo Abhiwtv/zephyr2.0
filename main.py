@@ -20,7 +20,10 @@ from pydantic import BaseModel, Field
 import uvicorn
 
 # --- IMPORT LIVE PIPELINE COMPONENTS ---
-from core.sensors import InfrastructureSensor, TrafficSensor, L4L7Sensor
+from agents.infrastructure.sensor import InfrastructureSensor
+from agents.traffic.sensor import TrafficSensor
+from agents.l4_l7.sensor import L4L7Sensor
+from core.config import settings
 from agents.brain.iterator import AsyncConsensusIterator
 from agents.brain.reasoner import ReasoningEngine
 from agents.voters.llm_voter import LLMDomainVoter
@@ -262,4 +265,4 @@ async def run_live_diagnosis(payload: TelemetryInput) -> DiagnosticReport:
 
 if __name__ == "__main__":
     logger.info("Starting NetCoop Live Engine on http://0.0.0.0:8000 ...")
-    uvicorn.run("main:app", host="0.0.0.0", port=8000, reload=True)
+    uvicorn.run("main:app", host=settings.HOST, port=settings.PORT, reload=settings.DEBUG)

@@ -238,6 +238,20 @@ class AsyncConsensusIterator:
         finally:
             shared_memory.clear_incident(incident_id, archive=True)
 
+    def execute_voting_loop_sync(self, incident_id, active_alerts, output_file: Optional[str] = None):
+        """Synchronous convenience wrapper around execute_voting_loop."""
+        try:
+            loop = asyncio.get_running_loop()
+        except RuntimeError:
+            loop = None
+
+        if loop and loop.is_running():
+            import concurrent.futures
+            with concurrent.futures.ThreadPoolExecutor(max_workers=1) as executor:
+                return executor.submit(lambda: asyncio.run(self.execute_voting_loop(incident_id, active_alerts, output_file))).result()
+        else:
+            return asyncio.run(self.execute_voting_loop(incident_id, active_alerts, output_file))
+
     async def route_and_resolve_batch(self, all_active_alerts, output_file: Optional[str] = None):
         target_output_file = output_file or self.output_file
         if not all_active_alerts:

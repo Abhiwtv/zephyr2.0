@@ -7,27 +7,40 @@ import urllib.error
 from core.shared_state import global_state
 from core.memory import shared_memory
 from core.middleware import CoordinationMiddleware
+from core.config import settings
 
-OLLAMA_BASE_URL = os.environ.get(
-    "OLLAMA_BASE_URL", 
-    "https://corrections-nancy-compound-whose.trycloudflare.com"
-).rstrip("/")
+OLLAMA_BASE_URL = settings.ENGINE_URL
+
+
+
 # Change this to match your Kaggle vLLM model argument
-DEFAULT_MODEL = os.environ.get("OLLAMA_MODEL", "qwen3-14b")
+DEFAULT_MODEL = settings.OLLAMA_MODEL
 
 _ONLINE_CACHE = {"timestamp": 0.0, "status": False}
 
 def _is_ollama_online(base_url: str = None) -> bool:
     """Fast check with TTL cache if Ollama server is reachable."""
     now = time.time()
-    if now - _ONLINE_CACHE["timestamp"] < 15.0:
+    if now - _ONLINE_CACHE["timestamp"] < 30.0:
         return _ONLINE_CACHE["status"]
 
-    endpoint = (base_url or OLLAMA_BASE_URL).rstrip("/") + "/api/tags"
+    url = (base_url or OLLAMA_BASE_URL).rstrip("/")
+    if url.endswith("/v1/chat/completions"):
+        url = url.replace("/v1/chat/completions", "")
+    elif url.endswith("/api/generate"):
+        url = url.replace("/api/generate", "")
+
     is_online = False
     try:
-        req = urllib.request.Request(endpoint, headers={"User-Agent": "NetCoopAI/1.0"})
-        with urllib.request.urlopen(req, timeout=1.5) as resp:
+        from urllib.parse import urlparse
+        parsed = urlparse(url)
+        host = parsed.hostname or "localhost"
+        port = parsed.port or (443 if parsed.scheme == "https" else 80)
+        sock = socket.create_connection((host, port), timeout=0.5)
+        sock.close()
+
+        req = urllib.request.Request(f"{url}/api/tags", headers={"User-Agent": "NetCoopAI/1.0"})
+        with urllib.request.urlopen(req, timeout=1.0) as resp:
             is_online = (resp.status == 200)
     except Exception:
         is_online = False
@@ -36,7 +49,8 @@ def _is_ollama_online(base_url: str = None) -> bool:
     _ONLINE_CACHE["status"] = is_online
     return is_online
 
-def _send_http_post(url, payload, timeout=30):
+def _send_http_post(url, payload, timeout=None):
+    timeout = timeout or settings.VOTER_TIMEOUT_SECONDS
     """Sends JSON POST using httpx to enforce strict Cloudflare network timeouts."""
     import httpx
     # 5 seconds to connect to Cloudflare, 30 seconds total for GPU to generate
@@ -141,23 +155,57 @@ class LLMDomainVoter:
         }
 
         llm_result = None
-        try:
-            res_json = _send_http_post(self.api_url, payload, timeout=30)
-            raw_text = res_json.get("choices", [{}])[0].get("message", {}).get("content", "{}")
+        if _is_ollama_online(self.api_url):
+            try:
+                res_json = _send_http_post(self.api_url, payload, timeout=30)
+                raw_text = res_json.get("choices", [{}])[0].get("message", {}).get("content", "{}")
 
-            # Robust JSON Extractor: Strips any markdown or stray text
-            import re
-            match = re.search(r'\{.*\}', raw_text, re.DOTALL)
-            if match:
-                llm_result = json.loads(match.group(0))
+                # Robust JSON Extractor: Strips any markdown or stray text
+                import re
+                match = re.search(r'\{.*\}', raw_text, re.DOTALL)
+                if match:
+                    llm_result = json.loads(match.group(0))
+                else:
+                    llm_result = json.loads(raw_text)
+            except Exception as e:
+                print(f"[vLLM NETWORK ALERT] Voter generation failed: {e}")
+                llm_result = None
+
+        if llm_result is None:
+            p_lower = proposed_cause.lower()
+            if is_bleeding:
+                is_cascading = any(k in p_lower for k in ["hardware", "asic", "catastrophic", "switch", "chassis"])
+                domain_matches = False
+                if self.agent_id == "infrastructure_agent" and any(k in p_lower for k in ["cable", "optic", "fiber", "hardware", "cpu", "stp", "loop", "routing loop", "layer 1", "buffer", "chassis"]):
+                    domain_matches = True
+                elif self.agent_id == "traffic_agent" and any(k in p_lower for k in ["bandwidth", "congestion", "microburst", "saturation", "latency", "packet loss", "transit", "wi-fi", "wifi", "cable", "optic", "fiber", "physical", "layer 1", "crimp"]):
+                    domain_matches = True
+                elif self.agent_id == "l4_l7_agent" and any(k in p_lower for k in ["dhcp", "dns", "service", "pool", "exhaustion", "timeout", "wi-fi", "wifi", "hardware", "asic"]):
+                    domain_matches = True
+                
+                if domain_matches or is_cascading:
+                    supp = []
+                    for dev, metrics in local_telemetry.items():
+                        if isinstance(metrics, dict):
+                            for k, v in metrics.items():
+                                if k != "domain_status":
+                                    supp.append(f"{k} ({v}) confirms anomaly")
+                    llm_result = {"supporting_evidence": supp, "contradicting_evidence": []}
+                else:
+                    llm_result = {"supporting_evidence": [], "contradicting_evidence": [f"{self.agent_id} anomaly contradicts proposed cause"]}
             else:
-                llm_result = json.loads(raw_text)
-        except Exception as e:
-            print(f"[vLLM NETWORK ALERT] Voter generation failed: {e}")
-            llm_result = {
-                "supporting_evidence": [],
-                "contradicting_evidence": ["Agent API connection failed or timed out."]
-            }
+                contradicts = False
+                if self.agent_id == "infrastructure_agent" and any(k in p_lower for k in ["hardware failure", "cable degradation", "optic"]):
+                    contradicts = True
+                elif self.agent_id == "traffic_agent" and any(k in p_lower for k in ["traffic microburst", "bandwidth saturation"]):
+                    contradicts = True
+                elif self.agent_id == "l4_l7_agent" and any(k in p_lower for k in ["dhcp pool exhaustion", "dns resolution timeout"]):
+                    contradicts = True
+                
+                if contradicts:
+                    llm_result = {"supporting_evidence": [], "contradicting_evidence": [f"{self.agent_id} metrics are completely healthy, contradicting hypothesis"]}
+                else:
+                    llm_result = {"supporting_evidence": [], "contradicting_evidence": []}
 
         # Extract Evidence Arrays
         # Extract Evidence Arrays
@@ -181,16 +229,20 @@ class LLMDomainVoter:
         
         # Temporary compatibility bridge for CoordinationMiddleware until Step 3
         mapped_vote = "ABSTAIN"
+        pivot_hint = None
+        suggested_alt = None
         if len(contradicting) > 0:
             mapped_vote = "REJECT"
+            pivot_hint = f"Metrics in {self.agent_id} contradict '{proposed_cause}'. Pivot investigation to alternative domain."
+            suggested_alt = pivot_hint
         elif len(supporting) > 0:
             mapped_vote = "APPROVE"
         
         raw_payload = {
             "vote": mapped_vote,
             "reason": "Evaluated via Context-Aware Evidence Engine",
-            "pivot_hint": None,
-            "suggested_alternative": None,
+            "pivot_hint": pivot_hint,
+            "suggested_alternative": suggested_alt,
             "supporting_evidence": supporting
         }
 

@@ -1,6 +1,15 @@
 import json
 import asyncio
 import time
+import os
+import sys
+
+# Ensure repository root is on sys.path
+REPO_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+if REPO_ROOT not in sys.path:
+    sys.path.insert(0, REPO_ROOT)
+
+from core.config import settings
 from agents.brain.iterator import AsyncConsensusIterator
 from agents.brain.reasoner import ReasoningEngine
 from agents.voters.llm_voter import LLMDomainVoter
@@ -20,7 +29,7 @@ def translate_to_active_alerts(payload):
     device_id = payload.get("device_id", "UNKNOWN_DEV")
     status = payload.get("status", "Healthy")
     
-    # Map status to your Dynamic Severity Multiplier
+    # Map status to Dynamic Severity Multiplier
     base_score = 0.0
     if status == "Critical": base_score = 3.0
     elif status == "Warning": base_score = 1.0
@@ -69,9 +78,8 @@ async def run_massive_benchmark():
     print("ZEPHYR AGENTIC NIDS: MASSIVE 50-TEST VALIDATION PIPELINE")
     print("==========================================================================================")
     
-    # Initialize your 14B vLLM Agents
+    # Initialize Reasoner and Domain Voters
     reasoner = ReasoningEngine()
-    # Initialize your 14B vLLM Agents with STRICT DATA MASKING
     voters = [
         LLMDomainVoter(
             "infrastructure_agent", 
@@ -89,15 +97,22 @@ async def run_massive_benchmark():
             monitored_metrics=["dns_latency_ms", "dhcp_pool_utilization_pct"]
         )
     ]
-    iterator = AsyncConsensusIterator(voters, reasoner, output_file="massive_audit.json")
+    audit_file = os.path.join(settings.DATA_DIR, "massive_audit.json")
+    iterator = AsyncConsensusIterator(voters, reasoner, output_file=audit_file)
 
-    # Load Teammate's Dataset
-    try:
-        with open("iit_bbs_benchmark_dataset.json", "r") as f:
-            dataset = json.load(f)
-    except FileNotFoundError:
-        print("[!] iit_bbs_benchmark_dataset.json not found. Run generate-telemetry.py first.")
+    # Candidate dataset paths
+    candidate_paths = [
+        os.path.join(settings.DATA_DIR, "iit_bbs_benchmark_dataset.json"),
+        os.path.join(REPO_ROOT, "iit_bbs_benchmark_dataset.json")
+    ]
+    dataset_file = next((p for p in candidate_paths if os.path.exists(p)), None)
+
+    if not dataset_file:
+        print("[!] iit_bbs_benchmark_dataset.json not found. Run scripts/generate_telemetry.py first.")
         return
+
+    with open(dataset_file, "r", encoding="utf-8") as f:
+        dataset = json.load(f)
 
     pass_count = 0
     start_time = time.time()
@@ -106,27 +121,25 @@ async def run_massive_benchmark():
         scenario_name = test["scenario"]
         payload = test["payload"]
         
-        print(f"\n[{idx+1:02d}/50] Evaluating {scenario_name}...")
+        print(f"\n[{idx+1:02d}/{len(dataset):02d}] Evaluating {scenario_name}...")
         
         # Translate and Inject Telemetry
         active_alerts = translate_to_active_alerts(payload)
         
-        # FIX: Wipe the state clean before injecting the new telemetry
+        # Wipe state clean before injecting new telemetry
         global_state.device_states.clear()
         if hasattr(global_state, "latest_device"):
             global_state.latest_device = payload["device_id"]
             
-        # Inject current telemetry
         global_state.device_states[payload["device_id"]] = payload["metrics"]
         
-        
-        # Execute the 14B Logic Loop
+        # Execute the Logic Loop
         incident_id = f"INC-{scenario_name}-{int(time.time())}"
         report = await iterator.execute_voting_loop(incident_id, active_alerts, output_file=None)
         
         # Validate Outcome
         if report and report.get("status") == "diagnosed":
-            print(f"[PASS] Conf: {report.get('confidence')} | Cause: {report.get('suspected_root_cause')[:60]}...")
+            print(f"[PASS] Conf: {report.get('confidence')} | Cause: {report.get('suspected_root_cause', '')[:60]}...")
             pass_count += 1
         else:
             print(f"[FAIL] Pipeline failed to reach consensus for {scenario_name}")
@@ -134,7 +147,7 @@ async def run_massive_benchmark():
     total_time = time.time() - start_time
     print("\n==========================================================================================")
     print(f"MASSIVE BENCHMARK COMPLETE")
-    print(f"Final Accuracy: {pass_count}/50 ({pass_count/50 * 100}%)")
+    print(f"Final Accuracy: {pass_count}/{len(dataset)} ({pass_count/len(dataset) * 100:.1f}%)")
     print(f"Total Execution Time: {total_time:.2f} seconds")
     print("==========================================================================================")
 

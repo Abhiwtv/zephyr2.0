@@ -1,0 +1,56 @@
+# ==============================================================================
+# Zephyr 2.0 / NetCoop AI - Caddy Reverse Proxy & TLS Configuration
+# Place this in /etc/caddy/Caddyfile on your Oracle VM or staging host
+# ==============================================================================
+
+{
+    # Global options
+    admin off
+    # email admin@example.com # Uncomment and set for production ACME certificate renewal
+}
+
+# Configurable domain or fallback to localhost / VM Public IP
+{$DOMAIN:localhost} {
+    # Logging
+    log {
+        output file /var/log/caddy/zephyr_access.log {
+            roll_size 10MB
+            roll_keep 5
+        }
+        format console
+    }
+
+    # Compression
+    encode gzip zstd
+
+    # Security Headers
+    header {
+        Strict-Transport-Security "max-age=31536000; includeSubDomains; preload"
+        X-Content-Type-Options "nosniff"
+        X-Frame-Options "DENY"
+        Referrer-Policy "strict-origin-when-cross-origin"
+        -Server
+    }
+
+    # Health check passthrough
+    handle /health {
+        reverse_proxy 127.0.0.1:8000
+    }
+
+    # WebSocket debate stream & REST API proxying
+    handle {
+        reverse_proxy 127.0.0.1:8000 {
+            # WebSockets: Caddy automatically proxies Connection & Upgrade headers
+            header_up Host {host}
+            header_up X-Real-IP {remote_host}
+            header_up X-Forwarded-For {remote_host}
+            header_up X-Forwarded-Proto {scheme}
+
+            # Extended timeouts for long-running consensus debate streams
+            transport http {
+                read_timeout 180s
+                write_timeout 180s
+            }
+        }
+    }
+}

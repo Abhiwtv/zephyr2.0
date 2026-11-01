@@ -1,7 +1,16 @@
 import json
 import random
 import math
+import os
+import sys
 from datetime import datetime, timezone, timedelta
+
+# Ensure repository root is on sys.path
+REPO_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+if REPO_ROOT not in sys.path:
+    sys.path.insert(0, REPO_ROOT)
+
+from core.config import settings
 
 def generate_telemetry(fault_type="healthy_baseline"):
     # 1. Base Setup (Healthy Network)
@@ -278,10 +287,12 @@ if __name__ == "__main__":
             "payload": payload
         })
 
-    # Output to file or terminal
-    with open("iit_bbs_benchmark_dataset.json", "w") as f:
+    # Output to data directory
+    output_path = os.path.join(settings.DATA_DIR, "iit_bbs_benchmark_dataset.json")
+    os.makedirs(os.path.dirname(output_path), exist_ok=True)
+    with open(output_path, "w", encoding="utf-8") as f:
         json.dump(dataset, f, indent=2)
 
-    print(f"Successfully generated {len(dataset)} campus network scenarios.")
+    print(f"Successfully generated {len(dataset)} campus network scenarios at {output_path}")
     print("Example Output (Compound L1 + L7 Fault):")
     print(json.dumps(generate_telemetry("compound_sfp_dhcp"), indent=2))

@@ -1,5 +1,8 @@
 import pytest
-from evaluator import NetCoopEvaluator
+try:
+    from scripts.evaluator import NetCoopEvaluator
+except ImportError:
+    from evaluator import NetCoopEvaluator
 
 def test_evaluator_benchmark_suite():
     """
