@@ -4,25 +4,28 @@ import socket
 import time
 import urllib.request
 import urllib.error
-from core.config import settings
+from core.config import EngineState, settings
 
-OLLAMA_BASE_URL = settings.ENGINE_URL
 DEFAULT_MODEL = settings.OLLAMA_MODEL
 
-_ONLINE_CACHE = {"timestamp": 0.0, "status": False}
+_ONLINE_CACHE = {"url": "", "timestamp": 0.0, "status": False}
+
+def get_active_engine_url() -> str:
+    """Returns dynamic URL from EngineState, environment, or settings."""
+    return (EngineState.url or os.environ.get("ENGINE_URL") or settings.ENGINE_URL or "http://localhost:11434").rstrip("/")
 
 def _is_ollama_online(base_url: str = None) -> bool:
     """Fast check with TTL cache if Ollama server is reachable."""
     now = time.time()
-    if now - _ONLINE_CACHE["timestamp"] < 30.0:
-        return _ONLINE_CACHE["status"]
-    
-    url = (base_url or OLLAMA_BASE_URL).rstrip("/")
+    url = (base_url or get_active_engine_url()).rstrip("/")
     if url.endswith("/v1/chat/completions"):
         url = url.replace("/v1/chat/completions", "")
     elif url.endswith("/api/generate"):
         url = url.replace("/api/generate", "")
 
+    if _ONLINE_CACHE.get("url") == url and (now - _ONLINE_CACHE.get("timestamp", 0.0) < 30.0):
+        return _ONLINE_CACHE.get("status", False)
+    
     is_online = False
     try:
         from urllib.parse import urlparse
@@ -38,6 +41,7 @@ def _is_ollama_online(base_url: str = None) -> bool:
     except Exception:
         is_online = False
 
+    _ONLINE_CACHE["url"] = url
     _ONLINE_CACHE["timestamp"] = now
     _ONLINE_CACHE["status"] = is_online
     return is_online
@@ -55,9 +59,22 @@ def _send_http_post(url, payload, timeout=None):
 class ReasoningEngine:
     """Ollama-driven logic engine running Qwen3 14B with symbolic correlation fallback."""
     def __init__(self, api_url=None, model_name=None):
-        self.api_url = api_url or f"{OLLAMA_BASE_URL}/v1/chat/completions"
+        self._custom_api_url = api_url
         self.model_name = model_name or DEFAULT_MODEL
         self.memory = []
+
+    @property
+    def api_url(self) -> str:
+        if self._custom_api_url:
+            return self._custom_api_url
+        base = get_active_engine_url()
+        if base.endswith("/v1/chat/completions"):
+            return base
+        return f"{base}/v1/chat/completions"
+
+    @api_url.setter
+    def api_url(self, val: str):
+        self._custom_api_url = val
 
         self.system_prompt = """
         You are the NetCoop Reasoning Engine. Your job is to diagnose network faults.

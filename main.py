@@ -14,7 +14,11 @@ import time
 from datetime import datetime, timezone
 from typing import Dict, List, Any, Optional
 
-from fastapi import FastAPI, WebSocket, WebSocketDisconnect, status, Request, Query
+import os
+import shutil
+import subprocess
+from pathlib import Path
+from fastapi import FastAPI, WebSocket, WebSocketDisconnect, status, Request, Query, BackgroundTasks, HTTPException
 from fastapi.responses import JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field, model_validator
@@ -24,7 +28,7 @@ import uvicorn
 from agents.infrastructure.sensor import InfrastructureSensor
 from agents.traffic.sensor import TrafficSensor
 from agents.l4_l7.sensor import L4L7Sensor
-from core.config import settings
+from core.config import EngineState, settings
 from agents.brain.iterator import AsyncConsensusIterator
 from agents.brain.reasoner import ReasoningEngine
 from agents.voters.llm_voter import LLMDomainVoter
@@ -483,6 +487,86 @@ async def get_incident_status(incident_id: str):
         status_code=status.HTTP_200_OK,
         content=active_diagnoses[incident_id]
     )
+
+
+
+# ===========================================================================
+# Task 4: GPU Engine Automation & Live URL Routing
+# ===========================================================================
+
+class EngineURLPayload(BaseModel):
+    url: str
+
+def trigger_kaggle_push():
+    """Background task to fire the Kaggle batch job."""
+    try:
+        # Use absolute path to the venv kaggle binary if present, fallback to system/which
+        kaggle_bin = "/home/ubuntu/zephyr-control/venv/bin/kaggle"
+        if not os.path.exists(kaggle_bin):
+            kaggle_bin = shutil.which("kaggle") or "kaggle"
+
+        runner_dir = "/home/ubuntu/zephyr-control/kaggle-runner"
+        if not os.path.exists(runner_dir):
+            runner_dir = str(Path(__file__).resolve().parent / "kaggle-runner")
+
+        cmd = [
+            kaggle_bin,
+            "kernels",
+            "push",
+            "-p",
+            runner_dir
+        ]
+        # Run detached from the request thread
+        res = subprocess.run(cmd, capture_output=True, text=True, check=True)
+        logger.info(f"[+] Kaggle push output: {res.stdout}")
+        print(f"[+] Kaggle push output: {res.stdout}")
+    except subprocess.CalledProcessError as e:
+        logger.error(f"[!] Kaggle push failed: {e.stderr}")
+        print(f"[!] Kaggle push failed: {e.stderr}")
+    except Exception as e:
+        logger.error(f"[!] Kaggle push error: {e}")
+        print(f"[!] Kaggle push error: {e}")
+
+@app.post(
+    "/api/v1/engine/ignite",
+    summary="Ignite Kaggle GPU Engine",
+    tags=["Engine"]
+)
+async def ignite_gpu_engine(background_tasks: BackgroundTasks):
+    """Fired by your Next.js dashboard button to boot the GPU."""
+    background_tasks.add_task(trigger_kaggle_push)
+    return {"status": "success", "message": "Kaggle GPU provisioning initiated."}
+
+@app.post(
+    "/api/v1/engine/set-url",
+    summary="Set Dynamic Engine URL",
+    tags=["Engine"]
+)
+async def set_engine_url(payload: EngineURLPayload):
+    """Updates the active routing URL in memory without restarting the server."""
+    clean_url = payload.url.strip().rstrip("/")
+    if not (clean_url.startswith("https://") or clean_url.startswith("http://")):
+        raise HTTPException(status_code=400, detail="Invalid Cloudflare URL")
+
+    EngineState.url = clean_url
+    os.environ["ENGINE_URL"] = clean_url
+    settings.ENGINE_URL = clean_url
+    print(f"[+] Engine URL dynamically updated to: {EngineState.url}")
+    logger.info(f"[+] Engine URL dynamically updated to: {EngineState.url}")
+    return {"status": "success", "active_engine": EngineState.url}
+
+@app.get(
+    "/api/v1/engine/status",
+    summary="Get Active Engine Status",
+    tags=["Engine"]
+)
+async def get_engine_status():
+    """Returns current active LLM engine URL and configuration."""
+    return {
+        "status": "online" if EngineState.url else "offline",
+        "active_engine": EngineState.url,
+        "model": settings.OLLAMA_MODEL
+    }
 
 
 # ---------------------------------------------------------------------------
