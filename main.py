@@ -45,7 +45,7 @@ logging.basicConfig(
 logger = logging.getLogger("NetCoop-Engine")
 
 # Global state to track engine boot times
-ignition_telemetry = {"start_time": None, "last_boot_duration": None}
+ignition_telemetry = {"start_time": None, "last_boot_duration": None, "latest_telemetry": None}
 
 
 def listen_to_ntfy():
@@ -57,7 +57,7 @@ def listen_to_ntfy():
     while True:
         try:
             # stream=True keeps the connection open waiting for new pushes
-            with requests.get(url, stream=True, timeout=None) as resp:
+            with requests.get(url, stream=True, timeout=(5, None)) as resp:
                 for line in resp.iter_lines():
                     if line:
                         data = json.loads(line)
@@ -550,6 +550,10 @@ async def get_incident_status(incident_id: str):
 class EngineURLPayload(BaseModel):
     url: str
 
+class RunnerTelemetry(BaseModel):
+    message: str
+    progress: Optional[float] = None
+
 def trigger_kaggle_push():
     """Background task to fire the Kaggle batch job with a unique UUID."""
     global ignition_telemetry
@@ -634,6 +638,25 @@ async def set_engine_url(payload: EngineURLPayload):
     logger.info(f"[+] Engine URL dynamically updated to: {EngineState.url}")
     return {"status": "success", "active_engine": EngineState.url}
 
+@app.post(
+    "/api/v1/engine/telemetry",
+    summary="Ingest Kaggle Runner Telemetry",
+    tags=["Engine"]
+)
+async def receive_runner_telemetry(payload: RunnerTelemetry):
+    """Catches live download/boot logs from Kaggle and streams them to the UI."""
+    global ignition_telemetry
+    ignition_telemetry["latest_telemetry"] = {
+        "message": payload.message,
+        "progress": payload.progress,
+        "timestamp": datetime.now(timezone.utc).isoformat()
+    }
+    log_msg = f"[KAGGLE_RUNNER] {payload.message}"
+    if payload.progress is not None:
+        log_msg += f" ({payload.progress}%)"
+    await noc_logger.emit(log_msg)
+    return {"status": "received"}
+
 @app.get(
     "/api/v1/engine/status",
     summary="Get Active Engine Status",
@@ -646,7 +669,8 @@ async def get_engine_status():
         "active_engine": EngineState.url,
         "model": settings.OLLAMA_MODEL,
         "boot_in_progress": ignition_telemetry.get("start_time") is not None,
-        "last_boot_duration": ignition_telemetry.get("last_boot_duration")
+        "last_boot_duration": ignition_telemetry.get("last_boot_duration"),
+        "latest_telemetry": ignition_telemetry.get("latest_telemetry")
     }
 
 
