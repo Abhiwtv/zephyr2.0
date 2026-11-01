@@ -29,9 +29,18 @@ jobs:
           key: ${{ secrets.ORACLE_SSH_KEY }}
           script: |
             cd /home/ubuntu/zephyr-control
+            
+            # 1. Create the virtual environment if it doesn't exist yet
+            if [ ! -d "venv" ]; then
+              python3 -m venv venv
+            fi
+            
+            # 2. Activate and install dependencies
             source venv/bin/activate
             pip install -r requirements.txt
-            # Kill existing uvicorn process
+            
+            # 3. Kill existing uvicorn process safely
             pkill -f "uvicorn main:app" || true
-            # Restart in background
+            
+            # 4. Restart in background
             nohup uvicorn main:app --host 127.0.0.1 --port 5000 > backend.log 2>&1 &
