@@ -1,0 +1,37 @@
+name: Deploy to Oracle VM
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Copy files via SCP
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ secrets.ORACLE_HOST }}
+          username: ubuntu
+          key: ${{ secrets.ORACLE_SSH_KEY }}
+          source: "."
+          target: "/home/ubuntu/zephyr-control"
+
+      - name: Restart FastAPI Server
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.ORACLE_HOST }}
+          username: ubuntu
+          key: ${{ secrets.ORACLE_SSH_KEY }}
+          script: |
+            cd /home/ubuntu/zephyr-control
+            source venv/bin/activate
+            pip install -r requirements.txt
+            # Kill existing uvicorn process
+            pkill -f "uvicorn main:app" || true
+            # Restart in background
+            nohup uvicorn main:app --host 127.0.0.1 --port 5000 > backend.log 2>&1 &
