@@ -39,15 +39,28 @@ jobs:
               python3 -m venv venv
             fi
             
-            # 3. Install packages using the absolute path (bypassing 'source activate')
+            # 3. Install dependencies using absolute path
             /home/ubuntu/zephyr-control/venv/bin/pip install -r requirements.txt
             
-            # 4. Kill the old instance securely
-            pkill -f "uvicorn main:app" || true
-            sleep 1
+            # 4. Create a native systemd service 
+            sudo tee /etc/systemd/system/zephyr-api.service > /dev/null <<EOF
+            [Unit]
+            Description=Zephyr FastAPI Control Plane
+            After=network.target
+
+            [Service]
+            User=ubuntu
+            WorkingDirectory=/home/ubuntu/zephyr-control
+            ExecStart=/home/ubuntu/zephyr-control/venv/bin/uvicorn main:app --host 127.0.0.1 --port 5000
+            Restart=always
+            StandardOutput=append:/home/ubuntu/zephyr-control/backend.log
+            StandardError=inherit
+
+            [Install]
+            WantedBy=multi-user.target
+            EOF
             
-            # 5. Run completely detached in a new session group
-            setsid /home/ubuntu/zephyr-control/venv/bin/uvicorn main:app --host 127.0.0.1 --port 5000 > backend.log 2>&1 < /dev/null &
-            
-            # 6. Force the SSH session to close instantly
-            exit 0
+            # 5. Reload daemon and start the engine
+            sudo systemctl daemon-reload
+            sudo systemctl enable zephyr-api
+            sudo systemctl restart zephyr-api
