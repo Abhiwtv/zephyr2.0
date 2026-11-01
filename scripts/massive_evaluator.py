@@ -114,6 +114,22 @@ async def run_massive_benchmark():
     with open(dataset_file, "r", encoding="utf-8") as f:
         dataset = json.load(f)
 
+    # By default, run on the first 10 data items (can override via CLI arg or EVAL_LIMIT env var)
+    limit = 10
+    if len(sys.argv) > 1:
+        arg = sys.argv[1]
+        if arg.isdigit():
+            limit = int(arg)
+        elif arg.lower() in ("--full", "-a", "--all", "all"):
+            limit = len(dataset)
+    elif os.getenv("EVAL_LIMIT"):
+        try:
+            limit = int(os.getenv("EVAL_LIMIT"))
+        except ValueError:
+            limit = 10
+
+    dataset = dataset[:limit]
+
     pass_count = 0
     start_time = time.time()
 

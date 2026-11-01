@@ -1,4 +1,11 @@
 import json
+import sys
+import os
+
+REPO_ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+if REPO_ROOT not in sys.path:
+    sys.path.insert(0, REPO_ROOT)
+
 from core.fuzzy import FuzzyLogicEngine
 from agents.infrastructure.sensor import InfrastructureSensor
 from agents.traffic.sensor import TrafficSensor

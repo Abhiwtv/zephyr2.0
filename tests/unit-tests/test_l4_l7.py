@@ -1,4 +1,11 @@
 import json
+import sys
+import os
+
+REPO_ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+if REPO_ROOT not in sys.path:
+    sys.path.insert(0, REPO_ROOT)
+
 from core.shared_state import global_state
 from agents.l4_l7.sensor import L4L7Sensor
 from agents.l4_l7.voter import L4L7Voter

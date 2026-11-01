@@ -1,7 +1,13 @@
 import os
+import sys
 import json
 import shutil
 import tempfile
+
+REPO_ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+if REPO_ROOT not in sys.path:
+    sys.path.insert(0, REPO_ROOT)
+
 from core.memory import IncidentMemory
 from core.output_store import save_output_json, load_output_json
 
