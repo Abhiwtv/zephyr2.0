@@ -5,9 +5,10 @@ from datetime import datetime, timezone
 from typing import Dict, Any, Optional
 
 from core.output_store import save_output_json
+from core.config import settings
 
-REPO_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-DEFAULT_MEMORY_FILE = os.path.join(REPO_ROOT, "data", "incident_memory.json")
+REPO_ROOT = settings.REPO_ROOT
+DEFAULT_MEMORY_FILE = settings.INCIDENT_MEMORY_PATH
 
 class IncidentMemory:
     """
@@ -18,7 +19,7 @@ class IncidentMemory:
     def __init__(self, persistence_file: str = DEFAULT_MEMORY_FILE, auto_save: bool = True):
         self.persistence_file = persistence_file
         self.auto_save = auto_save
-        self._lock = threading.Lock()
+        self._lock = threading.RLock()
 
         # Active in-memory incidents currently in debate: incident_id -> dict
         self.incidents: Dict[str, Any] = {}

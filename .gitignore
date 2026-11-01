@@ -1,10 +1,15 @@
+# Python bytecode & cache
 __pycache__/
 *.py[cod]
 *$py.class
 *.tmp
-__pycache__/
-*.py[cod]
-*$py.class
 .pytest_cache/
-test_remote_llm.py
 
+# Environment settings
+.env
+
+# Runtime outputs & scratch
+output.json
+massive_audit.json
+test_remote_llm.py
+scratch/

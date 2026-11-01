@@ -2,7 +2,13 @@ import asyncio
 import json
 import random
 import os
+import sys
 from datetime import datetime, timezone
+
+# Ensure repository root is on sys.path
+REPO_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+if REPO_ROOT not in sys.path:
+    sys.path.insert(0, REPO_ROOT)
 
 # Import our NetCoop architecture
 from core.shared_state import global_state

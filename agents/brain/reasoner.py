@@ -4,27 +4,36 @@ import socket
 import time
 import urllib.request
 import urllib.error
+from core.config import settings
 
-OLLAMA_BASE_URL = os.environ.get(
-    "OLLAMA_BASE_URL", 
-    "https://corrections-nancy-compound-whose.trycloudflare.com"
-).rstrip("/")
-# Change this to match your Kaggle vLLM model argument
-DEFAULT_MODEL = os.environ.get("OLLAMA_MODEL", "qwen3-14b")
+OLLAMA_BASE_URL = settings.ENGINE_URL
+DEFAULT_MODEL = settings.OLLAMA_MODEL
 
 _ONLINE_CACHE = {"timestamp": 0.0, "status": False}
 
 def _is_ollama_online(base_url: str = None) -> bool:
     """Fast check with TTL cache if Ollama server is reachable."""
     now = time.time()
-    if now - _ONLINE_CACHE["timestamp"] < 15.0:
+    if now - _ONLINE_CACHE["timestamp"] < 30.0:
         return _ONLINE_CACHE["status"]
     
-    endpoint = (base_url or OLLAMA_BASE_URL).rstrip("/") + "/api/tags"
+    url = (base_url or OLLAMA_BASE_URL).rstrip("/")
+    if url.endswith("/v1/chat/completions"):
+        url = url.replace("/v1/chat/completions", "")
+    elif url.endswith("/api/generate"):
+        url = url.replace("/api/generate", "")
+
     is_online = False
     try:
-        req = urllib.request.Request(endpoint, headers={"User-Agent": "NetCoopAI/1.0"})
-        with urllib.request.urlopen(req, timeout=1.5) as resp:
+        from urllib.parse import urlparse
+        parsed = urlparse(url)
+        host = parsed.hostname or "localhost"
+        port = parsed.port or (443 if parsed.scheme == "https" else 80)
+        sock = socket.create_connection((host, port), timeout=0.5)
+        sock.close()
+
+        req = urllib.request.Request(f"{url}/api/tags", headers={"User-Agent": "NetCoopAI/1.0"})
+        with urllib.request.urlopen(req, timeout=1.0) as resp:
             is_online = (resp.status == 200)
     except Exception:
         is_online = False
@@ -33,10 +42,11 @@ def _is_ollama_online(base_url: str = None) -> bool:
     _ONLINE_CACHE["status"] = is_online
     return is_online
 
-def _send_http_post(url, payload, timeout=90):  # Increased from 30
+def _send_http_post(url, payload, timeout=None):
     """Sends JSON POST using httpx to enforce strict Cloudflare network timeouts."""
     import httpx
-    limits = httpx.Timeout(timeout, connect=5.0)
+    actual_timeout = timeout or settings.REASONER_TIMEOUT_SECONDS
+    limits = httpx.Timeout(actual_timeout, connect=5.0)
     with httpx.Client(timeout=limits) as client:
         r = client.post(url, json=payload)
         r.raise_for_status()
@@ -214,7 +224,7 @@ class ReasoningEngine:
         )
 
     def generate_hypothesis_sync(self, incident_id, aggregated_alerts, memory_context=""):
-        devices = list(set(alert["device_id"] for alert in aggregated_alerts))
+        devices = list(set(alert.get("device_id", "UNKNOWN_DEV") for alert in aggregated_alerts if isinstance(alert, dict)))
         
         prompt = f"""
         You are the NetCoop Reasoning Engine. Your job is to diagnose network faults.
@@ -251,26 +261,27 @@ class ReasoningEngine:
         }
 
         llm_result = None
-        try:
-            res_json = _send_http_post(self.api_url, payload, timeout=90)
-            
-            # Ensure raw_text is ALWAYS a string, never None
-            raw_text = res_json.get("choices", [{}])[0].get("message", {}).get("content")
-            if not raw_text:
-                raw_text = "{}"
-            
-            # Explicitly wipe <think> tags before parsing
-            import re
-            raw_text = re.sub(r'<think>.*?</think>', '', raw_text, flags=re.DOTALL).strip()
-            
-            match = re.search(r'\{.*\}', raw_text, re.DOTALL)
-            if match:
-                llm_result = json.loads(match.group(0))
-            else:
-                llm_result = json.loads(raw_text)
-        except Exception as e:
-            print(f"[vLLM NETWORK ALERT] Brain generation failed: {e}")
-            llm_result = None
+        if _is_ollama_online(self.api_url):
+            try:
+                res_json = _send_http_post(self.api_url, payload, timeout=settings.REASONER_TIMEOUT_SECONDS)
+                
+                # Ensure raw_text is ALWAYS a string, never None
+                raw_text = res_json.get("choices", [{}])[0].get("message", {}).get("content")
+                if not raw_text:
+                    raw_text = "{}"
+                
+                # Explicitly wipe <think> tags before parsing
+                import re
+                raw_text = re.sub(r'<think>.*?</think>', '', raw_text, flags=re.DOTALL).strip()
+                
+                match = re.search(r'\{.*\}', raw_text, re.DOTALL)
+                if match:
+                    llm_result = json.loads(match.group(0))
+                else:
+                    llm_result = json.loads(raw_text)
+            except Exception as e:
+                print(f"[vLLM NETWORK ALERT] Brain generation failed: {e}")
+                llm_result = None
 
         if llm_result is not None:
             root_cause = llm_result.get("proposed_root_cause", "Unknown network anomaly")

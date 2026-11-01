@@ -6,6 +6,12 @@ import tempfile
 from datetime import datetime, timezone
 from typing import Dict, List, Any
 
+# Ensure repository root is on sys.path when executed directly
+REPO_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+if REPO_ROOT not in sys.path:
+    sys.path.insert(0, REPO_ROOT)
+
+from core.config import settings
 from core.shared_state import global_state
 from core.memory import shared_memory
 from agents.infrastructure.sensor import InfrastructureSensor
@@ -228,9 +234,9 @@ class NetCoopEvaluator:
     Evaluates multi-agent consensus, noise suppression, and diagnosis accuracy
     against ground truth benchmark datasets.
     """
-    def __init__(self, dataset_path: str = "benchmark_dataset.jsonl", results_path: str = "evaluation_results.jsonl"):
-        self.dataset_path = dataset_path
-        self.results_path = results_path
+    def __init__(self, dataset_path: str = None, results_path: str = None):
+        self.dataset_path = dataset_path or settings.BENCHMARK_DATASET_PATH
+        self.results_path = results_path or settings.EVALUATION_RESULTS_PATH
         
         # Initialize Sensors
         self.infra_sensor = InfrastructureSensor()
@@ -259,9 +265,17 @@ class NetCoopEvaluator:
     def load_dataset(self) -> List[Dict[str, Any]]:
         """Loads benchmark dataset from JSONL file or fallback structure."""
         cases = []
-        if os.path.exists(self.dataset_path):
+        # Check both configured path and local fallbacks
+        candidate_paths = [
+            self.dataset_path,
+            os.path.join(REPO_ROOT, "data", "benchmark_dataset.jsonl"),
+            os.path.join(REPO_ROOT, "benchmark_dataset.jsonl")
+        ]
+        target_path = next((p for p in candidate_paths if p and os.path.exists(p)), None)
+
+        if target_path:
             try:
-                with open(self.dataset_path, "r", encoding="utf-8") as f:
+                with open(target_path, "r", encoding="utf-8") as f:
                     for line in f:
                         line = line.strip()
                         if line:
@@ -340,7 +354,7 @@ class NetCoopEvaluator:
                         rounds = int(word)
 
         domain_match = self._verify_domain_alignment(gt_category, suspected_cause, active_alerts)
-        passed = (len(active_alerts) > 0) and (confidence >= 0.70) and domain_match
+        passed = (len(active_alerts) > 0) and (confidence >= settings.CONSENSUS_THRESHOLD) and domain_match
 
         eval_record = {
             "test_id": test_id,
@@ -404,10 +418,13 @@ class NetCoopEvaluator:
         # Write run results to JSONL log
         target_log = self.results_path
         try:
+            dir_name = os.path.dirname(os.path.abspath(target_log))
+            if dir_name and not os.path.exists(dir_name):
+                os.makedirs(dir_name, exist_ok=True)
             with open(target_log, "a", encoding="utf-8") as f:
                 for r in results:
                     f.write(json.dumps(r) + "\n")
-        except PermissionError:
+        except (PermissionError, OSError):
             target_log = os.path.join(tempfile.gettempdir(), os.path.basename(self.results_path))
             try:
                 with open(target_log, "a", encoding="utf-8") as f:
