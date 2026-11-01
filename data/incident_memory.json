@@ -1,5 +1,5 @@
 {
-  "last_updated": "2026-11-01T01:23:29.674955+00:00",
+  "last_updated": "2026-11-01T01:49:04.100719+00:00",
   "active_incidents": {
     "INC-l1_fiber_bend_core-1793486343": {
       "incident_id": "INC-l1_fiber_bend_core-1793486343",
@@ -108,8 +108,8 @@
   "history": {
     "INC-TEST-99": {
       "incident_id": "INC-TEST-99",
-      "created_at": "2026-11-01T01:22:11.255689+00:00",
-      "updated_at": "2026-11-01T01:22:11.338112+00:00",
+      "created_at": "2026-10-31T12:48:53.151554+00:00",
+      "updated_at": "2026-10-31T12:48:53.157063+00:00",
       "status": "in_progress",
       "rounds": {
         "1": {
@@ -119,15 +119,13 @@
               "vote": "APPROVE",
               "reason": "High interface errors detected.",
               "alternative": null,
-              "question": null,
-              "pivot_hint": null
+              "question": null
             },
             "traffic_agent": {
               "vote": "REJECT",
               "reason": "No packet loss detected.",
               "alternative": "Look into L4-L7 services",
-              "question": null,
-              "pivot_hint": "Pivot to Layer 1 hardware or L4-L7 services."
+              "question": null
             }
           }
         },
@@ -138,15 +136,13 @@
               "vote": "ABSTAIN",
               "reason": "Out of my domain.",
               "alternative": null,
-              "question": null,
-              "pivot_hint": null
+              "question": null
             }
           }
         }
       },
-      "feedback": [],
       "final_report": null,
-      "archived_at": "2026-11-01T01:22:11.358415+00:00"
+      "archived_at": "2026-10-31T12:48:53.158075+00:00"
     },
     "EVAL-INC-EVAL-02-1793466612": {
       "incident_id": "EVAL-INC-EVAL-02-1793466612",
@@ -19495,6 +19491,1128 @@
         ]
       },
       "archived_at": "2026-11-01T01:23:29.674892+00:00"
+    },
+    "INC-CS_DEPT_CORE_SW-a6cd84": {
+      "incident_id": "INC-CS_DEPT_CORE_SW-a6cd84",
+      "created_at": "2026-11-01T00:09:10.028540+00:00",
+      "updated_at": "2026-11-01T00:09:10.133407+00:00",
+      "status": "diagnosed",
+      "rounds": {
+        "1": {
+          "hypothesis": "The CS_DEPT_CORE_SW is experiencing a critical CPU overload (100% utilization) combined with excessive queue drops (45,000) and severe traffic degradation (18% packet loss, 950ms latency). This indicates a processing bottleneck likely caused by either a hardware failure, a misconfigured Quality of Service (QoS) policy, or an unexpected surge in traffic volume overwhelming the switch's capacity.",
+          "votes": {
+            "infrastructure_agent": {
+              "vote": "APPROVE",
+              "reason": "Evaluated via Context-Aware Evidence Engine",
+              "alternative": null,
+              "question": null,
+              "pivot_hint": null
+            },
+            "traffic_agent": {
+              "vote": "APPROVE",
+              "reason": "Evaluated via Context-Aware Evidence Engine",
+              "alternative": null,
+              "question": null,
+              "pivot_hint": null
+            },
+            "l4_l7_agent": {
+              "vote": "ABSTAIN",
+              "reason": "Evaluated via Context-Aware Evidence Engine",
+              "alternative": null,
+              "question": null,
+              "pivot_hint": null
+            }
+          }
+        }
+      },
+      "feedback": [],
+      "final_report": {
+        "incident_id": "INC-CS_DEPT_CORE_SW-a6cd84",
+        "status": "diagnosed",
+        "suspected_root_cause": "The CS_DEPT_CORE_SW is experiencing a critical CPU overload (100% utilization) combined with excessive queue drops (45,000) and severe traffic degradation (18% packet loss, 950ms latency). This indicates a processing bottleneck likely caused by either a hardware failure, a misconfigured Quality of Service (QoS) policy, or an unexpected surge in traffic volume overwhelming the switch's capacity.",
+        "confidence": 1.0,
+        "affected_devices": [
+          "CS_DEPT_CORE_SW"
+        ],
+        "supporting_evidence": [
+          {
+            "evidence_extracted": "CS_DEPT_CORE_SW cpu_utilization_pct confirms 100% CPU utilization"
+          },
+          {
+            "evidence_extracted": "CS_DEPT_CORE_SW queue_drops confirms 45,000 queue drops"
+          },
+          {
+            "evidence_extracted": "packet_loss_pct confirms 18% packet loss"
+          },
+          {
+            "evidence_extracted": "latency_ms confirms 950ms latency"
+          }
+        ],
+        "alternative_causes": [],
+        "recommended_actions": [
+          "Check switch hardware health (fan status, temperature, power supply) to rule out physical failures",
+          "Review QoS policies for misconfigurations that might be causing abnormal traffic prioritization",
+          "Inspect CPU usage trends over time to identify if this is a sudden spike or gradual degradation",
+          "Verify link status and cable integrity for physical layer issues",
+          "Check for signs of DDoS attacks or abnormal traffic patterns using flow analysis tools"
+        ],
+        "evidence_sources": [
+          "infrastructure_agent",
+          "traffic_agent"
+        ],
+        "limitations": [
+          "Consensus reached in round 1"
+        ]
+      },
+      "archived_at": "2026-11-01T00:09:10.165014+00:00"
+    },
+    "INC-CS_DEPT_CORE_SW-61b936": {
+      "incident_id": "INC-CS_DEPT_CORE_SW-61b936",
+      "created_at": "2026-11-01T00:13:35.943177+00:00",
+      "updated_at": "2026-11-01T00:13:36.052402+00:00",
+      "status": "diagnosed",
+      "rounds": {
+        "1": {
+          "hypothesis": "Physical layer degradation causing interface errors and network congestion on the CS_DEPT_CORE_SW switch",
+          "votes": {
+            "infrastructure_agent": {
+              "vote": "APPROVE",
+              "reason": "Evaluated via Context-Aware Evidence Engine",
+              "alternative": null,
+              "question": null,
+              "pivot_hint": null
+            },
+            "traffic_agent": {
+              "vote": "APPROVE",
+              "reason": "Evaluated via Context-Aware Evidence Engine",
+              "alternative": null,
+              "question": null,
+              "pivot_hint": null
+            },
+            "l4_l7_agent": {
+              "vote": "ABSTAIN",
+              "reason": "Evaluated via Context-Aware Evidence Engine",
+              "alternative": null,
+              "question": null,
+              "pivot_hint": null
+            }
+          }
+        }
+      },
+      "feedback": [],
+      "final_report": {
+        "incident_id": "INC-CS_DEPT_CORE_SW-61b936",
+        "status": "diagnosed",
+        "suspected_root_cause": "Physical layer degradation causing interface errors and network congestion on the CS_DEPT_CORE_SW switch",
+        "confidence": 1.0,
+        "affected_devices": [
+          "CS_DEPT_CORE_SW"
+        ],
+        "supporting_evidence": [
+          {
+            "evidence_extracted": "interface_errors confirms Physical layer degradation"
+          },
+          {
+            "evidence_extracted": "queue_drops confirms network congestion"
+          },
+          {
+            "evidence_extracted": "link_utilization_pct confirms high utilization (91.4%)"
+          },
+          {
+            "evidence_extracted": "packet_loss_pct confirms packet loss (6.3%)"
+          }
+        ],
+        "alternative_causes": [],
+        "recommended_actions": [
+          "Inspect and replace faulty cables/ports connected to the switch",
+          "Check for hardware failures in the switch's interface modules",
+          "Monitor traffic patterns to confirm congestion",
+          "Verify proper cooling and environmental conditions",
+          "Check for firmware updates for the switch"
+        ],
+        "evidence_sources": [
+          "infrastructure_agent",
+          "traffic_agent"
+        ],
+        "limitations": [
+          "Consensus reached in round 1"
+        ]
+      },
+      "archived_at": "2026-11-01T00:13:36.083646+00:00"
+    },
+    "INC-CS_DEPT_CORE_SW-2f3523": {
+      "incident_id": "INC-CS_DEPT_CORE_SW-2f3523",
+      "created_at": "2026-11-01T00:17:39.323242+00:00",
+      "updated_at": "2026-11-01T00:17:39.488850+00:00",
+      "status": "diagnosed",
+      "rounds": {
+        "1": {
+          "hypothesis": "High interface error count (18342) on CS_DEPT_CORE_SW indicates potential physical layer issues (e.g., faulty cabling, hardware degradation) or configuration errors causing data transmission failures.",
+          "votes": {
+            "infrastructure_agent": {
+              "vote": "APPROVE",
+              "reason": "Evaluated via Context-Aware Evidence Engine",
+              "alternative": null,
+              "question": null,
+              "pivot_hint": null
+            },
+            "traffic_agent": {
+              "vote": "APPROVE",
+              "reason": "Evaluated via Context-Aware Evidence Engine",
+              "alternative": null,
+              "question": null,
+              "pivot_hint": null
+            },
+            "l4_l7_agent": {
+              "vote": "ABSTAIN",
+              "reason": "Evaluated via Context-Aware Evidence Engine",
+              "alternative": null,
+              "question": null,
+              "pivot_hint": null
+            }
+          }
+        }
+      },
+      "feedback": [],
+      "final_report": {
+        "incident_id": "INC-CS_DEPT_CORE_SW-2f3523",
+        "status": "diagnosed",
+        "suspected_root_cause": "High interface error count (18342) on CS_DEPT_CORE_SW indicates potential physical layer issues (e.g., faulty cabling, hardware degradation) or configuration errors causing data transmission failures.",
+        "confidence": 1.0,
+        "affected_devices": [
+          "CS_DEPT_CORE_SW"
+        ],
+        "supporting_evidence": [
+          {
+            "evidence_extracted": "interface_errors confirms High interface error count (18342) on CS_DEPT_CORE_SW"
+          },
+          {
+            "evidence_extracted": "queue_drops confirms potential data transmission failures"
+          },
+          {
+            "evidence_extracted": "packet_loss_pct confirms 6.3% packet loss"
+          }
+        ],
+        "alternative_causes": [],
+        "recommended_actions": [
+          "Inspect and replace suspected faulty cables/connections connected to the switch",
+          "Check switch port hardware health and firmware status",
+          "Monitor interface error rates over time to confirm persistence",
+          "Verify STP configuration to rule out broadcast storms"
+        ],
+        "evidence_sources": [
+          "infrastructure_agent",
+          "traffic_agent"
+        ],
+        "limitations": [
+          "Consensus reached in round 1"
+        ]
+      },
+      "archived_at": "2026-11-01T00:17:39.532318+00:00"
+    },
+    "INC-CS_DEPT_CORE_SW-19436e": {
+      "incident_id": "INC-CS_DEPT_CORE_SW-19436e",
+      "created_at": "2026-11-01T00:31:46.401889+00:00",
+      "updated_at": "2026-11-01T00:31:46.507254+00:00",
+      "status": "diagnosed",
+      "rounds": {
+        "1": {
+          "hypothesis": "High interface error count on the CS_DEPT_CORE_SW switch, likely due to physical layer issues (e.g., faulty cabling, hardware degradation, or electrical interference), compounded by near-maximum link utilization causing packet loss and increased latency.",
+          "votes": {
+            "infrastructure_agent": {
+              "vote": "APPROVE",
+              "reason": "Evaluated via Context-Aware Evidence Engine",
+              "alternative": null,
+              "question": null,
+              "pivot_hint": null
+            },
+            "traffic_agent": {
+              "vote": "APPROVE",
+              "reason": "Evaluated via Context-Aware Evidence Engine",
+              "alternative": null,
+              "question": null,
+              "pivot_hint": null
+            },
+            "l4_l7_agent": {
+              "vote": "ABSTAIN",
+              "reason": "Evaluated via Context-Aware Evidence Engine",
+              "alternative": null,
+              "question": null,
+              "pivot_hint": null
+            }
+          }
+        }
+      },
+      "feedback": [],
+      "final_report": {
+        "incident_id": "INC-CS_DEPT_CORE_SW-19436e",
+        "status": "diagnosed",
+        "suspected_root_cause": "High interface error count on the CS_DEPT_CORE_SW switch, likely due to physical layer issues (e.g., faulty cabling, hardware degradation, or electrical interference), compounded by near-maximum link utilization causing packet loss and increased latency.",
+        "confidence": 1.0,
+        "affected_devices": [
+          "CS_DEPT_CORE_SW"
+        ],
+        "supporting_evidence": [
+          {
+            "evidence_extracted": "interface_errors confirms High interface error count"
+          },
+          {
+            "evidence_extracted": "queue_drops confirms increased packet loss and latency"
+          },
+          {
+            "evidence_extracted": "CS_DEPT_CORE_SW link_utilization_pct confirms near-maximum link utilization"
+          },
+          {
+            "evidence_extracted": "CS_DEPT_CORE_SW packet_loss_pct confirms packet loss"
+          },
+          {
+            "evidence_extracted": "CS_DEPT_CORE_SW latency_ms confirms increased latency"
+          }
+        ],
+        "alternative_causes": [],
+        "recommended_actions": [
+          "Inspect and replace faulty cables or connectors on the CS_DEPT_CORE_SW switch interfaces with high error counts.",
+          "Check the switch's hardware health (e.g., power supply, fan status, temperature) for signs of degradation.",
+          "Verify link utilization thresholds and consider implementing QoS policies to prioritize critical traffic.",
+          "Monitor interface error rates and link utilization over time to confirm if the issue persists or escalates."
+        ],
+        "evidence_sources": [
+          "infrastructure_agent",
+          "traffic_agent"
+        ],
+        "limitations": [
+          "Consensus reached in round 1"
+        ]
+      },
+      "archived_at": "2026-11-01T00:31:46.544573+00:00"
+    },
+    "INC-CS_DEPT_CORE_SW-7be908": {
+      "incident_id": "INC-CS_DEPT_CORE_SW-7be908",
+      "created_at": "2026-11-01T00:36:01.520501+00:00",
+      "updated_at": "2026-11-01T00:36:01.694561+00:00",
+      "status": "diagnosed",
+      "rounds": {
+        "1": {
+          "hypothesis": "Failing network interface card (NIC) or physical cable degradation on the CS_DEPT_CORE_SW switch causing excessive interface errors and downstream traffic degradation.",
+          "votes": {
+            "infrastructure_agent": {
+              "vote": "APPROVE",
+              "reason": "Evaluated via Context-Aware Evidence Engine",
+              "alternative": null,
+              "question": null,
+              "pivot_hint": null
+            },
+            "traffic_agent": {
+              "vote": "APPROVE",
+              "reason": "Evaluated via Context-Aware Evidence Engine",
+              "alternative": null,
+              "question": null,
+              "pivot_hint": null
+            },
+            "l4_l7_agent": {
+              "vote": "ABSTAIN",
+              "reason": "Evaluated via Context-Aware Evidence Engine",
+              "alternative": null,
+              "question": null,
+              "pivot_hint": null
+            }
+          }
+        }
+      },
+      "feedback": [],
+      "final_report": {
+        "incident_id": "INC-CS_DEPT_CORE_SW-7be908",
+        "status": "diagnosed",
+        "suspected_root_cause": "Failing network interface card (NIC) or physical cable degradation on the CS_DEPT_CORE_SW switch causing excessive interface errors and downstream traffic degradation.",
+        "confidence": 1.0,
+        "affected_devices": [
+          "CS_DEPT_CORE_SW"
+        ],
+        "supporting_evidence": [
+          {
+            "evidence_extracted": "interface_errors confirms Failing network interface card (NIC) or physical cable degradation"
+          },
+          {
+            "evidence_extracted": "queue_drops confirms Failing network interface card (NIC) or physical cable degradation"
+          },
+          {
+            "evidence_extracted": "packet_loss_pct confirms 6.3% packet loss"
+          },
+          {
+            "evidence_extracted": "latency_ms confirms 212.0 ms latency"
+          }
+        ],
+        "alternative_causes": [],
+        "recommended_actions": [
+          "Inspect and replace suspected faulty physical cables connected to the switch",
+          "Test the switch's NIC with a known good cable and port",
+          "Check for firmware updates for the switch hardware",
+          "Monitor interface error rates and traffic metrics after implementing fixes",
+          "Isolate and test connected devices to rule out end-host induced errors"
+        ],
+        "evidence_sources": [
+          "infrastructure_agent",
+          "traffic_agent"
+        ],
+        "limitations": [
+          "Consensus reached in round 1"
+        ]
+      },
+      "archived_at": "2026-11-01T00:36:01.746936+00:00"
+    },
+    "INC-CS_DEPT_CORE_SW-6f7d3a": {
+      "incident_id": "INC-CS_DEPT_CORE_SW-6f7d3a",
+      "created_at": "2026-11-01T00:39:26.831116+00:00",
+      "updated_at": "2026-11-01T00:39:26.990649+00:00",
+      "status": "diagnosed",
+      "rounds": {
+        "1": {
+          "hypothesis": "High interface error count (18,342) on CS_DEPT_CORE_SW indicates potential physical layer degradation, hardware failure, or severe congestion causing transmission errors. Coupled with 91.4% link utilization, this suggests sustained overloading of the switch's core interface.",
+          "votes": {
+            "infrastructure_agent": {
+              "vote": "APPROVE",
+              "reason": "Evaluated via Context-Aware Evidence Engine",
+              "alternative": null,
+              "question": null,
+              "pivot_hint": null
+            },
+            "traffic_agent": {
+              "vote": "APPROVE",
+              "reason": "Evaluated via Context-Aware Evidence Engine",
+              "alternative": null,
+              "question": null,
+              "pivot_hint": null
+            },
+            "l4_l7_agent": {
+              "vote": "ABSTAIN",
+              "reason": "Evaluated via Context-Aware Evidence Engine",
+              "alternative": null,
+              "question": null,
+              "pivot_hint": null
+            }
+          }
+        }
+      },
+      "feedback": [],
+      "final_report": {
+        "incident_id": "INC-CS_DEPT_CORE_SW-6f7d3a",
+        "status": "diagnosed",
+        "suspected_root_cause": "High interface error count (18,342) on CS_DEPT_CORE_SW indicates potential physical layer degradation, hardware failure, or severe congestion causing transmission errors. Coupled with 91.4% link utilization, this suggests sustained overloading of the switch's core interface.",
+        "confidence": 1.0,
+        "affected_devices": [
+          "CS_DEPT_CORE_SW"
+        ],
+        "supporting_evidence": [
+          {
+            "evidence_extracted": "interface_errors confirms potential physical layer degradation, hardware failure, or severe congestion"
+          },
+          {
+            "evidence_extracted": "queue_drops confirms sustained overloading of the switch's core interface"
+          },
+          {
+            "evidence_extracted": "link_utilization_pct confirms 91.4% utilization"
+          },
+          {
+            "evidence_extracted": "packet_loss_pct confirms 6.3% loss"
+          }
+        ],
+        "alternative_causes": [],
+        "recommended_actions": [
+          "Inspect and replace faulty cables/transceivers connected to the affected interface",
+          "Check switch hardware health indicators (temperature, power supply, fan status)",
+          "Verify interface configuration (speed/duplex settings) matches connected devices",
+          "Implement temporary traffic shaping rules to reduce link utilization",
+          "Check for broadcast storms or Layer 2 loops using STP logs"
+        ],
+        "evidence_sources": [
+          "infrastructure_agent",
+          "traffic_agent"
+        ],
+        "limitations": [
+          "Consensus reached in round 1"
+        ]
+      },
+      "archived_at": "2026-11-01T00:39:27.051945+00:00"
+    },
+    "INC-CS_DEPT_CORE_SW-155fee": {
+      "incident_id": "INC-CS_DEPT_CORE_SW-155fee",
+      "created_at": "2026-11-01T00:41:47.911454+00:00",
+      "updated_at": "2026-11-01T00:41:48.070577+00:00",
+      "status": "diagnosed",
+      "rounds": {
+        "1": {
+          "hypothesis": "Physical layer interface failure on CS_DEPT_CORE_SW causing excessive errors and downstream traffic degradation",
+          "votes": {
+            "infrastructure_agent": {
+              "vote": "APPROVE",
+              "reason": "Evaluated via Context-Aware Evidence Engine",
+              "alternative": null,
+              "question": null,
+              "pivot_hint": null
+            },
+            "traffic_agent": {
+              "vote": "APPROVE",
+              "reason": "Evaluated via Context-Aware Evidence Engine",
+              "alternative": null,
+              "question": null,
+              "pivot_hint": null
+            },
+            "l4_l7_agent": {
+              "vote": "ABSTAIN",
+              "reason": "Evaluated via Context-Aware Evidence Engine",
+              "alternative": null,
+              "question": null,
+              "pivot_hint": null
+            }
+          }
+        }
+      },
+      "feedback": [],
+      "final_report": {
+        "incident_id": "INC-CS_DEPT_CORE_SW-155fee",
+        "status": "diagnosed",
+        "suspected_root_cause": "Physical layer interface failure on CS_DEPT_CORE_SW causing excessive errors and downstream traffic degradation",
+        "confidence": 1.0,
+        "affected_devices": [
+          "CS_DEPT_CORE_SW"
+        ],
+        "supporting_evidence": [
+          {
+            "evidence_extracted": "interface_errors confirms Physical layer interface failure"
+          },
+          {
+            "evidence_extracted": "queue_drops confirms downstream traffic degradation"
+          },
+          {
+            "evidence_extracted": "packet_loss_pct confirms excessive errors"
+          },
+          {
+            "evidence_extracted": "latency_ms confirms downstream traffic degradation"
+          }
+        ],
+        "alternative_causes": [],
+        "recommended_actions": [
+          "Inspect and replace faulty physical cables connected to CS_DEPT_CORE_SW",
+          "Test switch port hardware for failure using diagnostic tools",
+          "Check for duplex/misconfiguration issues on affected interfaces",
+          "Monitor traffic patterns to determine if congestion exacerbates error conditions",
+          "Verify proper grounding and environmental conditions for network equipment"
+        ],
+        "evidence_sources": [
+          "infrastructure_agent",
+          "traffic_agent"
+        ],
+        "limitations": [
+          "Consensus reached in round 1"
+        ]
+      },
+      "archived_at": "2026-11-01T00:41:48.132111+00:00"
+    },
+    "INC-CS_DEPT_CORE_SW-5c90bf": {
+      "incident_id": "INC-CS_DEPT_CORE_SW-5c90bf",
+      "created_at": "2026-11-01T00:41:48.166889+00:00",
+      "updated_at": "2026-11-01T00:41:48.318259+00:00",
+      "status": "diagnosed",
+      "rounds": {
+        "1": {
+          "hypothesis": "High interface error count (18,342) on CS_DEPT_CORE_SW indicates potential hardware failure, misconfigured VLANs, or physical layer issues (e.g., faulty cables). Concurrently high link utilization (91.4%) suggests congestion exacerbating packet loss (6.3%) and latency (212ms).",
+          "votes": {
+            "infrastructure_agent": {
+              "vote": "APPROVE",
+              "reason": "Evaluated via Context-Aware Evidence Engine",
+              "alternative": null,
+              "question": null,
+              "pivot_hint": null
+            },
+            "traffic_agent": {
+              "vote": "APPROVE",
+              "reason": "Evaluated via Context-Aware Evidence Engine",
+              "alternative": null,
+              "question": null,
+              "pivot_hint": null
+            },
+            "l4_l7_agent": {
+              "vote": "ABSTAIN",
+              "reason": "Evaluated via Context-Aware Evidence Engine",
+              "alternative": null,
+              "question": null,
+              "pivot_hint": null
+            }
+          }
+        }
+      },
+      "feedback": [],
+      "final_report": {
+        "incident_id": "INC-CS_DEPT_CORE_SW-5c90bf",
+        "status": "diagnosed",
+        "suspected_root_cause": "High interface error count (18,342) on CS_DEPT_CORE_SW indicates potential hardware failure, misconfigured VLANs, or physical layer issues (e.g., faulty cables). Concurrently high link utilization (91.4%) suggests congestion exacerbating packet loss (6.3%) and latency (212ms).",
+        "confidence": 1.0,
+        "affected_devices": [
+          "CS_DEPT_CORE_SW"
+        ],
+        "supporting_evidence": [
+          {
+            "evidence_extracted": "interface_errors confirms High interface error count (18,342)"
+          },
+          {
+            "evidence_extracted": "queue_drops confirms packet loss and potential congestion"
+          },
+          {
+            "evidence_extracted": "link_utilization_pct confirms high utilization"
+          },
+          {
+            "evidence_extracted": "latency_ms confirms high latency"
+          },
+          {
+            "evidence_extracted": "packet_loss_pct confirms packet loss"
+          }
+        ],
+        "alternative_causes": [],
+        "recommended_actions": [
+          "Inspect physical connections (cables, transceivers) on affected interfaces",
+          "Check switch hardware health (fan status, temperature, power supply)",
+          "Review VLAN configurations and STP settings for misconfigurations",
+          "Isolate traffic by temporarily disabling non-critical ports to test congestion impact",
+          "Capture packet traces to analyze error patterns"
+        ],
+        "evidence_sources": [
+          "infrastructure_agent",
+          "traffic_agent"
+        ],
+        "limitations": [
+          "Consensus reached in round 1"
+        ]
+      },
+      "archived_at": "2026-11-01T00:41:48.362813+00:00"
+    },
+    "INC-CS_DEPT_CORE_SW-6e8556": {
+      "incident_id": "INC-CS_DEPT_CORE_SW-6e8556",
+      "created_at": "2026-11-01T00:50:41.317428+00:00",
+      "updated_at": "2026-11-01T00:50:41.496259+00:00",
+      "status": "diagnosed",
+      "rounds": {
+        "1": {
+          "hypothesis": "High interface error count on CS_DEPT_CORE_SW indicates potential physical layer issues (e.g., faulty cabling, incorrect VLAN tagging, or hardware degradation) compounded by near-maximum link utilization causing packet loss and increased latency.",
+          "votes": {
+            "infrastructure_agent": {
+              "vote": "APPROVE",
+              "reason": "Evaluated via Context-Aware Evidence Engine",
+              "alternative": null,
+              "question": null,
+              "pivot_hint": null
+            },
+            "traffic_agent": {
+              "vote": "APPROVE",
+              "reason": "Evaluated via Context-Aware Evidence Engine",
+              "alternative": null,
+              "question": null,
+              "pivot_hint": null
+            },
+            "l4_l7_agent": {
+              "vote": "ABSTAIN",
+              "reason": "Evaluated via Context-Aware Evidence Engine",
+              "alternative": null,
+              "question": null,
+              "pivot_hint": null
+            }
+          }
+        }
+      },
+      "feedback": [],
+      "final_report": {
+        "incident_id": "INC-CS_DEPT_CORE_SW-6e8556",
+        "status": "diagnosed",
+        "suspected_root_cause": "High interface error count on CS_DEPT_CORE_SW indicates potential physical layer issues (e.g., faulty cabling, incorrect VLAN tagging, or hardware degradation) compounded by near-maximum link utilization causing packet loss and increased latency.",
+        "confidence": 1.0,
+        "affected_devices": [
+          "CS_DEPT_CORE_SW"
+        ],
+        "supporting_evidence": [
+          {
+            "evidence_extracted": "interface_errors confirms potential physical layer issues"
+          },
+          {
+            "evidence_extracted": "queue_drops confirms packet loss and increased latency"
+          },
+          {
+            "evidence_extracted": "link_utilization_pct confirms near-maximum link utilization"
+          },
+          {
+            "evidence_extracted": "packet_loss_pct confirms increased packet loss"
+          },
+          {
+            "evidence_extracted": "latency_ms confirms increased latency"
+          }
+        ],
+        "alternative_causes": [],
+        "recommended_actions": [
+          "Inspect physical connections and transceivers on all ports with error counts",
+          "Verify VLAN configuration consistency across connected devices",
+          "Check for hardware degradation or overheating on the core switch",
+          "Implement traffic shaping policies to reduce link utilization",
+          "Monitor for broadcast storms or misconfigured spanning tree protocols"
+        ],
+        "evidence_sources": [
+          "infrastructure_agent",
+          "traffic_agent"
+        ],
+        "limitations": [
+          "Consensus reached in round 1"
+        ]
+      },
+      "archived_at": "2026-11-01T00:50:41.539275+00:00"
+    },
+    "INC-CS_DEPT_CORE_SW-8ca6c9": {
+      "incident_id": "INC-CS_DEPT_CORE_SW-8ca6c9",
+      "created_at": "2026-11-01T00:52:02.964901+00:00",
+      "updated_at": "2026-11-01T00:52:03.083676+00:00",
+      "status": "diagnosed",
+      "rounds": {
+        "1": {
+          "hypothesis": "Hardware failure or physical layer degradation on the CS_DEPT_CORE_SW interface causing excessive errors and network congestion.",
+          "votes": {
+            "infrastructure_agent": {
+              "vote": "APPROVE",
+              "reason": "Evaluated via Context-Aware Evidence Engine",
+              "alternative": null,
+              "question": null,
+              "pivot_hint": null
+            },
+            "traffic_agent": {
+              "vote": "APPROVE",
+              "reason": "Evaluated via Context-Aware Evidence Engine",
+              "alternative": null,
+              "question": null,
+              "pivot_hint": null
+            },
+            "l4_l7_agent": {
+              "vote": "ABSTAIN",
+              "reason": "Evaluated via Context-Aware Evidence Engine",
+              "alternative": null,
+              "question": null,
+              "pivot_hint": null
+            }
+          }
+        }
+      },
+      "feedback": [],
+      "final_report": {
+        "incident_id": "INC-CS_DEPT_CORE_SW-8ca6c9",
+        "status": "diagnosed",
+        "suspected_root_cause": "Hardware failure or physical layer degradation on the CS_DEPT_CORE_SW interface causing excessive errors and network congestion.",
+        "confidence": 1.0,
+        "affected_devices": [
+          "CS_DEPT_CORE_SW"
+        ],
+        "supporting_evidence": [
+          {
+            "evidence_extracted": "interface_errors confirms Hardware failure or physical layer degradation"
+          },
+          {
+            "evidence_extracted": "queue_drops confirms Hardware failure or physical layer degradation"
+          },
+          {
+            "evidence_extracted": "CS_DEPT_CORE_SW link_utilization_pct confirms high utilization (91.4%)"
+          },
+          {
+            "evidence_extracted": "CS_DEPT_CORE_SW packet_loss_pct confirms excessive packet loss (6.3%)"
+          }
+        ],
+        "alternative_causes": [],
+        "recommended_actions": [
+          "Inspect physical connections (cables, ports) on the affected interface",
+          "Check switch hardware health indicators and logs for interface faults",
+          "Test with replacement hardware if possible",
+          "Monitor traffic patterns to confirm if congestion is secondary to the hardware issue"
+        ],
+        "evidence_sources": [
+          "infrastructure_agent",
+          "traffic_agent"
+        ],
+        "limitations": [
+          "Consensus reached in round 1"
+        ]
+      },
+      "archived_at": "2026-11-01T00:52:03.116891+00:00"
+    },
+    "INC-CS_DEPT_CORE_SW-b0e349": {
+      "incident_id": "INC-CS_DEPT_CORE_SW-b0e349",
+      "created_at": "2026-11-01T01:13:58.865757+00:00",
+      "updated_at": "2026-11-01T01:13:59.010584+00:00",
+      "status": "diagnosed",
+      "rounds": {
+        "1": {
+          "hypothesis": "High interface error count and link utilization on CS_DEPT_CORE_SW indicate a combination of physical layer degradation and network congestion, likely caused by faulty cabling, hardware failure, or sustained high traffic load exceeding switch capacity.",
+          "votes": {
+            "infrastructure_agent": {
+              "vote": "APPROVE",
+              "reason": "Evaluated via Context-Aware Evidence Engine",
+              "alternative": null,
+              "question": null,
+              "pivot_hint": null
+            },
+            "traffic_agent": {
+              "vote": "APPROVE",
+              "reason": "Evaluated via Context-Aware Evidence Engine",
+              "alternative": null,
+              "question": null,
+              "pivot_hint": null
+            },
+            "l4_l7_agent": {
+              "vote": "ABSTAIN",
+              "reason": "Evaluated via Context-Aware Evidence Engine",
+              "alternative": null,
+              "question": null,
+              "pivot_hint": null
+            }
+          }
+        }
+      },
+      "feedback": [],
+      "final_report": {
+        "incident_id": "INC-CS_DEPT_CORE_SW-b0e349",
+        "status": "diagnosed",
+        "suspected_root_cause": "High interface error count and link utilization on CS_DEPT_CORE_SW indicate a combination of physical layer degradation and network congestion, likely caused by faulty cabling, hardware failure, or sustained high traffic load exceeding switch capacity.",
+        "confidence": 1.0,
+        "affected_devices": [
+          "CS_DEPT_CORE_SW"
+        ],
+        "supporting_evidence": [
+          {
+            "evidence_extracted": "interface_errors confirms physical layer degradation"
+          },
+          {
+            "evidence_extracted": "queue_drops confirms network congestion"
+          },
+          {
+            "evidence_extracted": "link_utilization_pct confirms high network congestion"
+          },
+          {
+            "evidence_extracted": "packet_loss_pct confirms physical layer degradation"
+          }
+        ],
+        "alternative_causes": [],
+        "recommended_actions": [
+          "Inspect and replace suspected faulty cables/transceivers connected to the switch",
+          "Check switch hardware health indicators (temperature, fan status, power supply)",
+          "Monitor real-time traffic patterns for sustained high utilization",
+          "Verify switch CPU/memory utilization to rule out resource exhaustion",
+          "Test alternative physical paths by temporarily rerouting critical traffic"
+        ],
+        "evidence_sources": [
+          "infrastructure_agent",
+          "traffic_agent"
+        ],
+        "limitations": [
+          "Consensus reached in round 1"
+        ]
+      },
+      "archived_at": "2026-11-01T01:13:59.045952+00:00"
+    },
+    "INC-CS_DEPT_CORE_SW-dfe883": {
+      "incident_id": "INC-CS_DEPT_CORE_SW-dfe883",
+      "created_at": "2026-11-01T01:15:03.286301+00:00",
+      "updated_at": "2026-11-01T01:15:03.419286+00:00",
+      "status": "diagnosed",
+      "rounds": {
+        "1": {
+          "hypothesis": "Physical layer degradation or hardware failure in the core switch causing interface errors and congestion",
+          "votes": {
+            "infrastructure_agent": {
+              "vote": "APPROVE",
+              "reason": "Evaluated via Context-Aware Evidence Engine",
+              "alternative": null,
+              "question": null,
+              "pivot_hint": null
+            },
+            "traffic_agent": {
+              "vote": "APPROVE",
+              "reason": "Evaluated via Context-Aware Evidence Engine",
+              "alternative": null,
+              "question": null,
+              "pivot_hint": null
+            },
+            "l4_l7_agent": {
+              "vote": "ABSTAIN",
+              "reason": "Evaluated via Context-Aware Evidence Engine",
+              "alternative": null,
+              "question": null,
+              "pivot_hint": null
+            }
+          }
+        }
+      },
+      "feedback": [],
+      "final_report": {
+        "incident_id": "INC-CS_DEPT_CORE_SW-dfe883",
+        "status": "diagnosed",
+        "suspected_root_cause": "Physical layer degradation or hardware failure in the core switch causing interface errors and congestion",
+        "confidence": 1.0,
+        "affected_devices": [
+          "CS_DEPT_CORE_SW"
+        ],
+        "supporting_evidence": [
+          {
+            "evidence_extracted": "interface_errors confirms Physical layer degradation or hardware failure"
+          },
+          {
+            "evidence_extracted": "queue_drops confirms Physical layer degradation or hardware failure"
+          },
+          {
+            "evidence_extracted": "link_utilization_pct confirms high utilization (91.4%)"
+          },
+          {
+            "evidence_extracted": "packet_loss_pct confirms packet loss (6.3%)"
+          }
+        ],
+        "alternative_causes": [],
+        "recommended_actions": [
+          "Inspect all physical connections and cabling for damage or looseness",
+          "Check switch port statistics for error counters",
+          "Verify hardware health indicators (temperature, fan status)",
+          "Perform a packet capture to analyze error patterns",
+          "Check for broadcast storms or network loops"
+        ],
+        "evidence_sources": [
+          "infrastructure_agent",
+          "traffic_agent"
+        ],
+        "limitations": [
+          "Consensus reached in round 1"
+        ]
+      },
+      "archived_at": "2026-11-01T01:15:03.453617+00:00"
+    },
+    "INC-CS_DEPT_CORE_SW-bde1e3": {
+      "incident_id": "INC-CS_DEPT_CORE_SW-bde1e3",
+      "created_at": "2026-11-01T01:18:50.326845+00:00",
+      "updated_at": "2026-11-01T01:18:50.462105+00:00",
+      "status": "diagnosed",
+      "rounds": {
+        "1": {
+          "hypothesis": "The CS_DEPT_CORE_SW is experiencing severe interface errors (18,342 errors) likely due to physical layer degradation, hardware failure, or misconfigured interfaces, compounded by near-maximum link utilization (91.4%) causing packet loss and latency.",
+          "votes": {
+            "infrastructure_agent": {
+              "vote": "APPROVE",
+              "reason": "Evaluated via Context-Aware Evidence Engine",
+              "alternative": null,
+              "question": null,
+              "pivot_hint": null
+            },
+            "traffic_agent": {
+              "vote": "APPROVE",
+              "reason": "Evaluated via Context-Aware Evidence Engine",
+              "alternative": null,
+              "question": null,
+              "pivot_hint": null
+            },
+            "l4_l7_agent": {
+              "vote": "ABSTAIN",
+              "reason": "Evaluated via Context-Aware Evidence Engine",
+              "alternative": null,
+              "question": null,
+              "pivot_hint": null
+            }
+          }
+        }
+      },
+      "feedback": [],
+      "final_report": {
+        "incident_id": "INC-CS_DEPT_CORE_SW-bde1e3",
+        "status": "diagnosed",
+        "suspected_root_cause": "The CS_DEPT_CORE_SW is experiencing severe interface errors (18,342 errors) likely due to physical layer degradation, hardware failure, or misconfigured interfaces, compounded by near-maximum link utilization (91.4%) causing packet loss and latency.",
+        "confidence": 1.0,
+        "affected_devices": [
+          "CS_DEPT_CORE_SW"
+        ],
+        "supporting_evidence": [
+          {
+            "evidence_extracted": "interface_errors confirms severe interface errors (18,342 errors)"
+          },
+          {
+            "evidence_extracted": "queue_drops confirms packet loss due to near-maximum link utilization"
+          },
+          {
+            "evidence_extracted": "link_utilization_pct confirms near-maximum link utilization (91.4%)"
+          },
+          {
+            "evidence_extracted": "packet_loss_pct confirms packet loss (6.3%)"
+          },
+          {
+            "evidence_extracted": "latency_ms confirms increased latency (212.0 ms)"
+          }
+        ],
+        "alternative_causes": [],
+        "recommended_actions": [
+          "Inspect physical connections (cables, ports) on the CS_DEPT_CORE_SW for damage or looseness.",
+          "Check switch hardware health (fan status, temperature, power supply) for failures.",
+          "Verify interface configuration (speed/duplex settings) for mismatches.",
+          "Implement traffic shaping or QoS policies to reduce link utilization.",
+          "Replace suspected faulty hardware components (e.g., line cards, ports)."
+        ],
+        "evidence_sources": [
+          "infrastructure_agent",
+          "traffic_agent"
+        ],
+        "limitations": [
+          "Consensus reached in round 1"
+        ]
+      },
+      "archived_at": "2026-11-01T01:18:50.516143+00:00"
+    },
+    "INC-CS_DEPT_CORE_SW-9092b1": {
+      "incident_id": "INC-CS_DEPT_CORE_SW-9092b1",
+      "created_at": "2026-11-01T01:19:53.281775+00:00",
+      "updated_at": "2026-11-01T01:19:53.356573+00:00",
+      "status": "diagnosed",
+      "rounds": {
+        "1": {
+          "hypothesis": "High interface error count (18,342) on CS_DEPT_CORE_SW indicates a critical physical layer or hardware failure, likely causing congestion and downstream traffic anomalies.",
+          "votes": {
+            "infrastructure_agent": {
+              "vote": "APPROVE",
+              "reason": "Evaluated via Context-Aware Evidence Engine",
+              "alternative": null,
+              "question": null,
+              "pivot_hint": null
+            },
+            "traffic_agent": {
+              "vote": "APPROVE",
+              "reason": "Evaluated via Context-Aware Evidence Engine",
+              "alternative": null,
+              "question": null,
+              "pivot_hint": null
+            },
+            "l4_l7_agent": {
+              "vote": "ABSTAIN",
+              "reason": "Evaluated via Context-Aware Evidence Engine",
+              "alternative": null,
+              "question": null,
+              "pivot_hint": null
+            }
+          }
+        }
+      },
+      "feedback": [],
+      "final_report": {
+        "incident_id": "INC-CS_DEPT_CORE_SW-9092b1",
+        "status": "diagnosed",
+        "suspected_root_cause": "High interface error count (18,342) on CS_DEPT_CORE_SW indicates a critical physical layer or hardware failure, likely causing congestion and downstream traffic anomalies.",
+        "confidence": 1.0,
+        "affected_devices": [
+          "CS_DEPT_CORE_SW"
+        ],
+        "supporting_evidence": [
+          {
+            "evidence_extracted": "interface_errors confirms High interface error count (18,342) on CS_DEPT_CORE_SW"
+          },
+          {
+            "evidence_extracted": "queue_drops confirms congestion"
+          },
+          {
+            "evidence_extracted": "packet_loss_pct confirms 6.3% packet loss"
+          },
+          {
+            "evidence_extracted": "link_utilization_pct confirms 91.4% utilization"
+          }
+        ],
+        "alternative_causes": [],
+        "recommended_actions": [
+          "Inspect and replace faulty physical cables/ports connected to CS_DEPT_CORE_SW",
+          "Check switch hardware health (power supply, ASICs) for failures",
+          "Verify spanning tree protocol status to rule out network loops",
+          "Monitor interface error rates over time to confirm persistent hardware issues"
+        ],
+        "evidence_sources": [
+          "infrastructure_agent",
+          "traffic_agent"
+        ],
+        "limitations": [
+          "Consensus reached in round 1"
+        ]
+      },
+      "archived_at": "2026-11-01T01:19:53.374287+00:00"
+    },
+    "INC-CS_DEPT_CORE_SW-586a15": {
+      "incident_id": "INC-CS_DEPT_CORE_SW-586a15",
+      "created_at": "2026-11-01T01:49:03.917211+00:00",
+      "updated_at": "2026-11-01T01:49:04.063581+00:00",
+      "status": "diagnosed",
+      "rounds": {
+        "1": {
+          "hypothesis": "Physical Layer 1 Ethernet Cable Degradation or Crimping Fault",
+          "votes": {
+            "infrastructure_agent": {
+              "vote": "APPROVE",
+              "reason": "Evaluated via Context-Aware Evidence Engine",
+              "alternative": null,
+              "question": null,
+              "pivot_hint": null
+            },
+            "traffic_agent": {
+              "vote": "APPROVE",
+              "reason": "Evaluated via Context-Aware Evidence Engine",
+              "alternative": null,
+              "question": null,
+              "pivot_hint": null
+            },
+            "l4_l7_agent": {
+              "vote": "ABSTAIN",
+              "reason": "Evaluated via Context-Aware Evidence Engine",
+              "alternative": null,
+              "question": null,
+              "pivot_hint": null
+            }
+          }
+        }
+      },
+      "feedback": [],
+      "final_report": {
+        "incident_id": "INC-CS_DEPT_CORE_SW-586a15",
+        "status": "diagnosed",
+        "suspected_root_cause": "Physical Layer 1 Ethernet Cable Degradation or Crimping Fault",
+        "confidence": 1.0,
+        "affected_devices": [
+          "CS_DEPT_CORE_SW"
+        ],
+        "supporting_evidence": [
+          {
+            "evidence_extracted": "interface_errors (18342) confirms anomaly"
+          },
+          {
+            "evidence_extracted": "queue_drops (2210) confirms anomaly"
+          },
+          {
+            "evidence_extracted": "cpu_utilization_pct (34.0) confirms anomaly"
+          },
+          {
+            "evidence_extracted": "link_utilization_pct (91.4) confirms anomaly"
+          },
+          {
+            "evidence_extracted": "latency_ms (212.0) confirms anomaly"
+          },
+          {
+            "evidence_extracted": "jitter_ms (48.0) confirms anomaly"
+          },
+          {
+            "evidence_extracted": "packet_loss_pct (6.3) confirms anomaly"
+          }
+        ],
+        "alternative_causes": [],
+        "recommended_actions": [
+          "Perform time-domain reflectometry (TDR) cable test",
+          "Replace degraded Cat6 patch lead at podium/patch panel",
+          "Verify port pinouts and inspect RJ45 connector contacts"
+        ],
+        "evidence_sources": [
+          "infrastructure_agent",
+          "traffic_agent"
+        ],
+        "limitations": [
+          "Consensus reached in round 1"
+        ]
+      },
+      "archived_at": "2026-11-01T01:49:04.100719+00:00"
     }
   }
 }
