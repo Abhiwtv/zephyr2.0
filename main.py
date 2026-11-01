@@ -498,34 +498,58 @@ class EngineURLPayload(BaseModel):
     url: str
 
 def trigger_kaggle_push():
-    """Background task to fire the Kaggle batch job."""
+    """Background task to fire the Kaggle batch job with a unique UUID."""
     try:
-        # Use absolute path to the venv kaggle binary if present, fallback to system/which
-        kaggle_bin = "/home/ubuntu/zephyr-control/venv/bin/kaggle"
-        if not os.path.exists(kaggle_bin):
-            kaggle_bin = shutil.which("kaggle") or "kaggle"
+        kaggle_user = os.getenv("KAGGLE_USER", "")
+        if not kaggle_user:
+            print("[!] KAGGLE_USER not found in environment.")
+            return
 
-        runner_dir = "/home/ubuntu/zephyr-control/kaggle-runner"
-        if not os.path.exists(runner_dir):
-            runner_dir = str(Path(__file__).resolve().parent / "kaggle-runner")
+        # 1. Generate a unique ID to avoid 409 Conflicts
+        run_id = uuid.uuid4().hex[:6]
+        slug = f"zephyr-engine-{run_id}"
 
+        # 2. Overwrite kernel-metadata.json dynamically
+        metadata_path = "/home/ubuntu/zephyr-control/kaggle-runner/kernel-metadata.json"
+        metadata = {
+            "id": f"{kaggle_user}/{slug}",
+            "title": slug,
+            "code_file": "runner.py",
+            "language": "python",
+            "kernel_type": "script",
+            "is_private": True,
+            "enable_gpu": True,
+            "enable_tpu": False,
+            "enable_internet": True,
+            "machine_shape": "NvidiaTeslaT4"
+        }
+        
+        with open(metadata_path, "w") as f:
+            json.dump(metadata, f, indent=2)
+
+        print(f"[*] Generated unique Kaggle payload: {slug}")
+
+        # 3. Execute the push
         cmd = [
-            kaggle_bin,
-            "kernels",
-            "push",
-            "-p",
-            runner_dir
+            "/home/ubuntu/zephyr-control/venv/bin/kaggle", 
+            "kernels", 
+            "push", 
+            "-p", 
+            "/home/ubuntu/zephyr-control/kaggle-runner"
         ]
-        # Run detached from the request thread
-        res = subprocess.run(cmd, capture_output=True, text=True, check=True)
-        logger.info(f"[+] Kaggle push output: {res.stdout}")
-        print(f"[+] Kaggle push output: {res.stdout}")
+        
+        custom_env = os.environ.copy()
+        custom_env["KAGGLE_USERNAME"] = kaggle_user
+        custom_env["KAGGLE_KEY"] = os.getenv("KAGGLE_KEY", "")
+        custom_env["HOME"] = "/home/ubuntu"
+        
+        result = subprocess.run(cmd, capture_output=True, text=True, check=True, env=custom_env)
+        print(f"[+] Kaggle push successful for {slug}:\n{result.stdout}")
+        
     except subprocess.CalledProcessError as e:
-        logger.error(f"[!] Kaggle push failed: {e.stderr}")
-        print(f"[!] Kaggle push failed: {e.stderr}")
-    except Exception as e:
-        logger.error(f"[!] Kaggle push error: {e}")
-        print(f"[!] Kaggle push error: {e}")
+        print(f"[!] Kaggle push failed:\nSTDERR: {e.stderr}\nSTDOUT: {e.stdout}")
+    except Exception as ex:
+        print(f"[!] Unexpected error in background task: {ex}")
 
 @app.post(
     "/api/v1/engine/ignite",
